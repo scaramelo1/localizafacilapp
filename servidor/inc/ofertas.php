@@ -110,7 +110,7 @@ function mp_pagar_oferta(array $o): string {
     $u = $o['usuario_id'] ?: (contas_do_comercio((int)$o['profissional_id'])[0] ?? null);
     $email = (string)(($u ? valor('SELECT email FROM usuarios WHERE id = ?', [$u]) : null)
         ?: valor("SELECT email FROM pedidos WHERE profissional_id = ? AND email IS NOT NULL ORDER BY id DESC LIMIT 1", [$o['profissional_id']])
-        ?: 'achafacilcontato@gmail.com');
+        ?: 'localizafacilapp@gmail.com');
     $volta = url_publica('painel/oferta.php');
     $pref = mp_api('POST', '/checkout/preferences', [
         'items' => [['id' => 'oferta', 'title' => mb_substr('Localiza Fácil - Oferta da semana - ' . $comercio, 0, 250),
