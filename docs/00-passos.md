@@ -2,7 +2,7 @@
 
 Projeto em /var/www/guia-novo (pasta e banco com o nome provisório "guia-novo"; marca escolhida: Localiza Fácil). Por enquanto em
 https://fsadesigners.com.br/guia-novo/ (pedido do usuário, 20/11), TUDO com noindex (config 'sem_google' + X-Robots-Tag).
-Banco guia_novo, config /etc/guia-novo/config.php, dados /var/lib/guia-novo. Histórico do Acha Fácil: docs/historico-acha-facil.md.
+Banco guia_novo, config /etc/guia-novo/config.php, dados /var/lib/guia-novo. GitHub: github.com/scaramelo1/localizafacilapp (20/11). Histórico do Acha Fácil: docs/historico-acha-facil.md.
 Plano criado em 20/11/2026.
 
 Motivo: em 20/11 às 11:52 o Google rebaixou o achafacilapp.com.br inteiro (ver passo 119 do 00-passos.md).
