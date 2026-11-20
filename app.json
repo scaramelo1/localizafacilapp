@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "Acha Fácil",
+    "name": "Localiza Fácil",
     "slug": "acha-facil",
     "platforms": [
       "ios",
       "android"
     ],
-    "version": "1.13.0",
+    "version": "1.14.0",
     "scheme": "achafacil",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,7 +25,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "O Acha Fácil usa sua localização só para mostrar os comércios perto de você. Ela não é guardada."
+          "locationWhenInUsePermission": "O Localiza Fácil usa sua localização só para mostrar os comércios perto de você. Ela não é guardada."
         }
       ],
       [

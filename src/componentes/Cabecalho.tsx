@@ -16,13 +16,13 @@ export function Traco({ largura = 96 }: { largura?: number }) {
   return <Image source={TRACO} style={{ width: largura, height: largura / 10 }} contentFit="contain" accessible={false} />;
 }
 
-/** "Acha Fácil!" em branco, inclinado, com o traço amarelo embaixo. */
-export function Marca({ tamanho = 24 }: { tamanho?: number }) {
+/** "Localiza Fácil" em branco, inclinado, com o traço amarelo embaixo. */
+export function Marca({ tamanho = 21 }: { tamanho?: number }) {   // 20/11: 21 (era 24), "Localiza Fácil" é mais comprido
   return (
-    <View accessibilityRole="header" accessibilityLabel="Acha Fácil">
-      <Text style={[estilos.marca, { fontSize: tamanho }]}>Acha Fácil!</Text>
+    <View accessibilityRole="header" accessibilityLabel="Localiza Fácil">
+      <Text style={[estilos.marca, { fontSize: tamanho }]}>Localiza Fácil</Text>
       <View style={{ marginTop: -3 }}>
-        <Traco largura={tamanho * 3.9} />
+        <Traco largura={tamanho * 5} />
       </View>
     </View>
   );

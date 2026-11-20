@@ -41,7 +41,7 @@ const PLANOS: { chave: string; nome: string; sub: string; icone: NomeIcone; iten
     itens: [
       'Tudo o que tem no Básico',
       'Até 10 fotos na sua página',
-      'Selo "Verificado pelo Acha Fácil"',
+      'Selo "Verificado pelo Localiza Fácil"',
       'Responder as avaliações dos clientes',
       'Ver quantas pessoas abriram sua página e chamaram no WhatsApp',
       'Aparece no topo da tela inicial',
@@ -55,7 +55,7 @@ const PLANOS: { chave: string; nome: string; sub: string; icone: NomeIcone; iten
     icone: 'web',
     itens: [
       'Tudo o que tem no Destaque',
-      'Site próprio do seu negócio feito pela equipe do Acha Fácil',
+      'Site próprio do seu negócio feito pela equipe do Localiza Fácil',
       'Domínio incluso (ex.: seunegocio.com.br)',
       'Botões de WhatsApp, mapa e horário no site',
       'Mudanças de texto e fotos do site quando precisar',
@@ -73,7 +73,7 @@ export default function TelaParaComercios() {
       <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
         <Cabecalho voltar titulo="Este comércio é seu?" />
         <View style={{ padding: 16, gap: 14 }}>
-          <Text style={estilos.intro}>Assuma o perfil do seu comércio no Acha Fácil para manter as informações certas e ser encontrado por mais clientes.</Text>
+          <Text style={estilos.intro}>Assuma o perfil do seu comércio no Localiza Fácil para manter as informações certas e ser encontrado por mais clientes.</Text>
           {PLANOS.map((p) => (
             <View key={p.chave} style={[estilos.plano, p.chave === 'destaque' && { borderColor: cores.amarelo, borderWidth: 2 }]}>
               <View style={{ flexDirection: 'row', gap: 14, alignItems: 'center' }}>

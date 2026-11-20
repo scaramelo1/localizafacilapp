@@ -1,4 +1,4 @@
-// Visual do Acha Fácil (modelo do usuário, 07/11): cabeçalho verde-escuro com a paisagem da cidade (morros e igreja),
+// Visual do Localiza Fácil (modelo do usuário, 07/11): cabeçalho verde-escuro com a paisagem da cidade (morros e igreja),
 // título branco com traço amarelo e busca amarela; corpo claro com cartões brancos de borda fina; botões amarelos
 // com texto verde. Letras grandes e botões altos (fácil para a terceira idade).
 export const cores = {

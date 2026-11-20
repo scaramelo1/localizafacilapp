@@ -142,7 +142,7 @@ export function PertoDeVoce({ semLocalizacao }: { semLocalizacao?: React.ReactNo
           <Text style={estilos.conviteTitulo}>Veja o que tem perto de você</Text>
           <Text style={estilos.conviteTexto}>
             {estado === 'negado' && !podePerguntar
-              ? 'A localização está desligada para o Acha Fácil. Ligue nas configurações do celular.'
+              ? 'A localização está desligada para o Localiza Fácil. Ligue nas configurações do celular.'
               : 'Restaurantes, farmácias, floriculturas e muito mais, do mais perto ao mais longe.'}
           </Text>
           {estado === 'negado' && !podePerguntar ? (

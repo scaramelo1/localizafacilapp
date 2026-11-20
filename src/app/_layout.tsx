@@ -23,7 +23,7 @@ function AbrirAvisos() {
       ultimo = r.notification.request.identifier;
       const dados = r.notification.request.content.data ?? {};
       // 19/11: relatorio mensal do dono (e outros avisos com pagina do site): abre o link no navegador
-      if (typeof dados.url === 'string' && dados.url.startsWith('https://achafacilapp.com.br/')) {
+      if (typeof dados.url === 'string' && dados.url.startsWith('https://localizafacilapp.com.br/')) {
         Linking.openURL(dados.url).catch(() => {});
         return;
       }

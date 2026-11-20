@@ -12,8 +12,8 @@ const LOGO = 200;
 const DURACAO_PARADA = 1400; // tempo com o nome na tela antes de sumir
 
 /**
- * Splash Screen do Acha Fácil (fundo verde, como a arte da marca): a logo sobe um pouco,
- * aparecem "Acha Fácil!" e "O comércio da sua cidade, pertinho de você."; depois tudo some e mostra o app.
+ * Splash Screen do Localiza Fácil (fundo verde, como a arte da marca): a logo sobe um pouco,
+ * aparecem "Localiza Fácil" e "O comércio da sua cidade, pertinho de você."; depois tudo some e mostra o app.
  * Tocar na tela pula a abertura.
  */
 export function Abertura({ children }: { children: React.ReactNode }) {
@@ -53,7 +53,7 @@ export function Abertura({ children }: { children: React.ReactNode }) {
           style={[StyleSheet.absoluteFill, estilos.fundo, { opacity: saida }]}
           onLayout={iniciar}
           onTouchEnd={sair}
-          accessibilityLabel="Acha Fácil! O comércio da sua cidade, pertinho de você."
+          accessibilityLabel="Localiza Fácil O comércio da sua cidade, pertinho de você."
         >
           <Animated.Image
             source={require('../../assets/splash-icon.png')}
@@ -77,7 +77,7 @@ export function Abertura({ children }: { children: React.ReactNode }) {
             ]}
           >
             <Text style={estilos.titulo}>
-              Acha <Text style={{ color: cores.amarelo }}>Fácil!</Text>
+              Localiza <Text style={{ color: cores.amarelo }}>Fácil</Text>
             </Text>
             <Text style={estilos.lema}>O comércio da sua cidade,{'\n'}pertinho de você.</Text>
           </Animated.View>

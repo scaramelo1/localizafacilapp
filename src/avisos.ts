@@ -25,7 +25,7 @@ export async function criarCanais() {
   /* eslint-disable import/namespace */
   await Notifications.setNotificationChannelAsync('novidades', {
     name: 'Novidades',
-    description: 'Novidades do Acha Fácil na sua cidade',
+    description: 'Novidades do Localiza Fácil na sua cidade',
     importance: Notifications.AndroidImportance.HIGH,
     lightColor: '#F7C600',
   });

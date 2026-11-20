@@ -39,7 +39,7 @@ interface RespostaVersao {
 
 const PACOTE = 'br.com.fsadesigner.achafacil';
 
-/** Abre o app da Play Store direto na página do Acha Fácil; sem o app da loja, abre a página no navegador. */
+/** Abre o app da Play Store direto na página do Localiza Fácil; sem o app da loja, abre a página no navegador. */
 async function abrirPlayStore(pacote: string, pagina: string) {
   try {
     await Linking.openURL(`market://details?id=${pacote}`);
@@ -63,7 +63,7 @@ async function avisoPelaPlay(): Promise<'avisou' | 'sem'> {
     if (avisouPlay) return 'avisou';
     if (!info.updateAvailable) return 'sem';
     avisouPlay = true;
-    Alert.alert('Nova versão do Acha Fácil', 'Tem uma versão nova na Play Store. Atualize agora: seus favoritos e sua conta continuam.', [
+    Alert.alert('Nova versão do Localiza Fácil', 'Tem uma versão nova na Play Store. Atualize agora: seus favoritos e sua conta continuam.', [
       { text: 'Depois', style: 'cancel' },
       {
         text: 'Atualizar',
@@ -101,7 +101,7 @@ export function useAvisoDeVersao() {
           const pagina = r.play?.link || `https://play.google.com/store/apps/details?id=${PACOTE}`;
           jaAvisou.current = versao;
           Alert.alert(
-            'Nova versão do Acha Fácil',
+            'Nova versão do Localiza Fácil',
             `Saiu a versão ${versao} (a sua é a ${VERSAO_INSTALADA}). Atualize pela Play Store: seus favoritos e sua conta continuam.`,
             [
               { text: 'Depois', style: 'cancel' },
@@ -114,7 +114,7 @@ export function useAvisoDeVersao() {
         if (!link) return;
         jaAvisou.current = versao;
         Alert.alert(
-          'Nova versão do Acha Fácil',
+          'Nova versão do Localiza Fácil',
           `Saiu a versão ${versao} (a sua é a ${VERSAO_INSTALADA}). Baixe e instale por cima: seus favoritos e sua conta continuam.`,
           [
             { text: 'Depois', style: 'cancel' },

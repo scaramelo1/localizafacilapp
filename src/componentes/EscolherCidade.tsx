@@ -122,7 +122,7 @@ export function EscolherCidade({
     }
   };
 
-  // "Quero minha Cidade!": pede o Acha Fácil na cidade da pessoa (fica na lista da administração).
+  // "Quero minha Cidade!": pede o Localiza Fácil na cidade da pessoa (fica na lista da administração).
   // Primeiro o estado (lista fixa); depois a cidade, escolhida na lista do IBGE daquele estado (api/municipios.php).
   const [quero, setQuero] = useState<'fechado' | 'aberto' | 'enviando' | 'enviado'>('fechado');
   const [queroUf, setQueroUf] = useState('');
@@ -231,11 +231,11 @@ export function EscolherCidade({
               ) : local.situacao === 'negado' ? (
                 <Aviso
                   icone="map-marker-off-outline"
-                  texto="A localização está desligada para o Acha Fácil. Ligue nas configurações ou escolha a cidade abaixo."
+                  texto="A localização está desligada para o Localiza Fácil. Ligue nas configurações ou escolha a cidade abaixo."
                   botao={{ titulo: 'Abrir configurações', onPress: () => Linking.openSettings() }}
                 />
               ) : local.situacao === 'longe' ? (
-                <Aviso icone="map-marker-question-outline" texto="Você não está em nenhuma cidade atendida pelo Acha Fácil. Escolha abaixo onde quer buscar." />
+                <Aviso icone="map-marker-question-outline" texto="Você não está em nenhuma cidade atendida pelo Localiza Fácil. Escolha abaixo onde quer buscar." />
               ) : (
                 <Aviso icone="map-marker-alert-outline" texto="Não foi possível achar sua localização agora." botao={{ titulo: 'Tentar de novo', onPress: pedir }} />
               )}
@@ -266,7 +266,7 @@ export function EscolherCidade({
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                 <MaterialCommunityIcons name="check-circle" size={30} color={cores.verde} />
                 <Text style={[estilos.avisoTexto, { flex: 1 }]}>
-                  Pedido anotado! Quanto mais gente pedir {queroEscolhida}, mais rápido o Acha Fácil chega aí.
+                  Pedido anotado! Quanto mais gente pedir {queroEscolhida}, mais rápido o Localiza Fácil chega aí.
                 </Text>
               </View>
             ) : quero === 'fechado' ? (

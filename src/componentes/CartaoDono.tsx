@@ -16,7 +16,7 @@ export function CartaoDono() {
         <MaterialCommunityIcons name="storefront-outline" size={52} color={cores.verde} />
         <View style={{ flex: 1 }}>
           <Text style={estilos.titulo}>Tem um comércio em {cidade.curto}?</Text>
-          <Text style={estilos.texto}>Divulgue seu negócio no Acha Fácil! e seja encontrado por mais clientes da cidade.</Text>
+          <Text style={estilos.texto}>Divulgue seu negócio no Localiza Fácil e seja encontrado por mais clientes da cidade.</Text>
         </View>
       </View>
       <Botao titulo="Procurar meu negócio" seta onPress={() => router.push('/meu-negocio')} estilo={{ marginTop: 14 }} />

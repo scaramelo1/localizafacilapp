@@ -62,7 +62,7 @@ export default function TelaProfissional() {
   const temHorario = !!(p.horarios?.length || p.horario);
   // 19/11: "Olha esse lugar" com o link da ficha no site (abre para quem nao tem o app); conta como 'compartilhar'
   const compartilhar = async () => {
-    const link = p.linkSite ?? 'https://achafacilapp.com.br/';
+    const link = p.linkSite ?? 'https://localizafacilapp.com.br/';
     try {
       const r = await Share.share({ message: `Olha esse lugar: ${p.nome}${p.tipo ? ` (${p.tipo})` : ''}, em ${p.cidade}\n${link}` });
       if (r.action === Share.sharedAction) registrarContato(p.id, 'compartilhar');

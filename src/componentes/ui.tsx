@@ -207,9 +207,9 @@ export function Avatar({ foto, icone, cor = cores.verde, tamanho = 64 }: { foto:
 
 export function SeloVerificado({ compacto, claro }: { compacto?: boolean; claro?: boolean }) {
   return (
-    <View style={[estilos.selo, claro && { backgroundColor: cores.amarelo }]} accessibilityLabel="Verificado pelo Acha Fácil">
+    <View style={[estilos.selo, claro && { backgroundColor: cores.amarelo }]} accessibilityLabel="Verificado pelo Localiza Fácil">
       <MaterialCommunityIcons name="check-decagram" size={16} color={cores.verde} />
-      <Text style={estilos.seloTexto}>{compacto ? 'Verificado' : 'Verificado pelo Acha Fácil'}</Text>
+      <Text style={estilos.seloTexto}>{compacto ? 'Verificado' : 'Verificado pelo Localiza Fácil'}</Text>
     </View>
   );
 }

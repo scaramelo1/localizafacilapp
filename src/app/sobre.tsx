@@ -9,25 +9,25 @@ import { Cabecalho } from '../componentes/Cabecalho';
 import { LinhaMenu } from '../componentes/ui';
 import { cores, fonte, RAIO } from '../tema';
 
-// "Sobre o Acha Fácil!": o que é, as cidades atendidas, termos, privacidade e como falar com o Acha Fácil
+// "Sobre o Localiza Fácil": o que é, as cidades atendidas, termos, privacidade e como falar com o Localiza Fácil
 export default function TelaSobre() {
   const cidades = useCidade().cidades.map((c) => c.nome);
   const lista = cidades.length > 1 ? `${cidades.slice(0, -1).join(', ')} e ${cidades[cidades.length - 1]}` : cidades[0];
   const faleConosco = () =>
-    Linking.openURL(`mailto:${EMAIL_CONTATO}?subject=${encodeURIComponent('Acha Fácil: contato')}`).catch(() =>
+    Linking.openURL(`mailto:${EMAIL_CONTATO}?subject=${encodeURIComponent('Localiza Fácil: contato')}`).catch(() =>
       Alert.alert('Não foi possível abrir o e-mail', `Escreva para ${EMAIL_CONTATO}.`),
     );
 
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
-      <Cabecalho voltar titulo="Sobre o Acha Fácil!" />
+      <Cabecalho voltar titulo="Sobre o Localiza Fácil" />
       <View style={{ padding: 16 }}>
         <View style={estilos.figura}>
           <Image source={require('../../assets/ilustracoes/cidade.png')} style={{ width: '100%', height: 150 }} contentFit="contain" accessible={false} />
         </View>
         <Text style={estilos.titulo}>Conectando você ao comércio da sua cidade</Text>
         <Text style={estilos.texto}>
-          O Acha Fácil! é o guia do comércio local de {lista}: você acha produtos, serviços e empresas da sua cidade e fala direto com
+          O Localiza Fácil é o guia do comércio local de {lista}: você acha produtos, serviços e empresas da sua cidade e fala direto com
           eles, sem precisar de conta.
         </Text>
         <View style={{ marginBottom: 18 }} />

@@ -82,8 +82,14 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    20/11: o teste grátis da API do Google Maps acabou; a importação de Santa Rita (avaliações) ficou para depois (usuário).
 10. ⬜ Botão de confirmação rápida: link por WhatsApp para o dono conferir os dados, informar horário e foto, de graça.
 11. ⬜ Tela no admin "Confirmar por telefone" (a equipe liga, confere e marca como confirmada).
-12. ⬜ App com nome (Localiza Fácil), ícone e servidor novos, MANTENDO o pacote br.com.fsadesigner.achafacil (20/11: app em
-    teste na Play Console, 10º dia; trocar o pacote vira outro app e recomeça o teste).
+12. 🟡 App passado para o Localiza Fácil no código (20/11, pedido do usuário): app.json name "Localiza Fácil", versão
+    1.14.0, texto da localização; 14 arquivos de src/ ("Acha Fácil(!)" -> "Localiza Fácil", Abertura e Cabecalho com o
+    nome novo; Marca 21 px e traço tamanho*5), todos os endereços -> https://localizafacilapp.com.br; ícones novos
+    (icon.png fundo verde + símbolo com contorno, android-icon-foreground com margem do ícone adaptável, splash-icon,
+    favicon, logo) a partir de assets/localiza/simbolo-contorno.svg; antigos em /var/lib/guia-novo/backups/app-icones-acha.
+    MANTIDOS: pacote br.com.fsadesigner.achafacil, slug acha-facil e projectId do EAS (mesmo app na Play, sem perder o
+    teste) e o scheme achafacil:// (o servidor aceita). Falta: gerar o build no PC DEPOIS do domínio no ar (o app chama
+    https://localizafacilapp.com.br/api) e trocar nome/ícone/descrição na Play Console.
 13. 🟡 Cadastros trazidos do Acha Fácil (20/11, pedido do usuário: "admin igual ao do Acha Fácil", opção Cadastros):
     contas (16, mesmos números), sessões do app, aparelhos/avisos, cupons, pedidos/pagamentos das 5 cidades (13 de 16),
     eventos_mp, acessos de dono (7), alterações, oferta da Agnes, avaliações, favoritos, suporte e pedidos de informação
