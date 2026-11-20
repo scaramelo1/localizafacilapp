@@ -38,7 +38,13 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     20/11 ~20h50: no domínio novo deu redirect_uri_mismatch (o retorno https://localizafacilapp.com.br/google/retorno.php
     não estava cadastrado no cliente). PROVISÓRIO: google_retorno voltou para https://fsadesigners.com.br/guia-novo/google/retorno.php
     (cadastrado e funcionando), que redireciona com os parâmetros para o domínio. Quando o usuário cadastrar o do domínio,
-    trocar google_retorno no /etc/guia-novo/config.php. (Obs.: o Google responde 302 até com o erro, então o teste por curl não basta.)
+    trocar google_retorno no /etc/guia-novo/config.php.
+    20/11 ~20h50: teste direto no Google mostrou que o cliente só aceitava https://localizafacilapp.com.br/google/retorno.php/
+    (COM barra; o da FSA tinha saído). google_retorno = esse (o Apache roda retorno.php com a barra). Pedido ao usuário:
+    deixar no cliente os 3 (FSA, domínio sem barra e com barra) para nenhuma troca quebrar o login.
+    COMO TESTAR um retorno sem logar: curl -A Mozilla -o /dev/null -w '%{redirect_url}' 'https://accounts.google.com/o/oauth2/v2/auth?
+    client_id=<id>&redirect_uri=<uri codificado>&response_type=code&scope=openid+email+profile&state=t' -> se contiver
+    oauth/error = recusado; signin/identifier = aceito. (Só ver o 302 da 1ª resposta não basta.)
 ## Fase 1 — Preparar o sistema (Claude)
 4. ✅ Cópia do projeto em pasta nova e banco novo (20/11): /var/www/guia-novo (git novo), banco guia_novo, instalar.sh
    adaptado (sem cron), base.php lendo /etc/guia-novo/config.php (antes apontava para o do Acha Fácil: corrigido),
