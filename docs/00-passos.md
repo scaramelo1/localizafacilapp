@@ -35,7 +35,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 3c. ✅ Login com Google em projeto próprio (20/11): projeto "Localiza Facil" no Google Cloud (nº 1080734033552), tela de
     login "Localiza Fácil", cliente Web com os retornos https://fsadesigners.com.br/guia-novo/google/retorno.php e
     https://localizafacilapp.com.br/google/retorno.php. ID e chave em /etc/guia-novo/config.php (no lugar das do Acha Fácil).
-    O Google aceita o redirect (302 para a tela de login). Falta o usuário testar entrando.
+    20/11 ~20h50: no domínio novo deu redirect_uri_mismatch (o retorno https://localizafacilapp.com.br/google/retorno.php
+    não estava cadastrado no cliente). PROVISÓRIO: google_retorno voltou para https://fsadesigners.com.br/guia-novo/google/retorno.php
+    (cadastrado e funcionando), que redireciona com os parâmetros para o domínio. Quando o usuário cadastrar o do domínio,
+    trocar google_retorno no /etc/guia-novo/config.php. (Obs.: o Google responde 302 até com o erro, então o teste por curl não basta.)
 ## Fase 1 — Preparar o sistema (Claude)
 4. ✅ Cópia do projeto em pasta nova e banco novo (20/11): /var/www/guia-novo (git novo), banco guia_novo, instalar.sh
    adaptado (sem cron), base.php lendo /etc/guia-novo/config.php (antes apontava para o do Acha Fácil: corrigido),
