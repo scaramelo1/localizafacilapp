@@ -31,6 +31,8 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    dados: marcar como confirmada" (e "Voltar para a confirmar"), registro confirmou_ficha/desconfirmou_ficha.
    As 16.400 fichas copiadas entram a confirmar; hoje: São João 2, Poços 1, Vargem 0, Aguaí 0 confirmadas.
    Admins (4) copiados do Acha Fácil, mesmos logins.
+   Fotos (20/11): copiadas de /var/lib/acha-facil/fotos as dos 3 comércios das 4 cidades que tinham (Agnes Veterinária,
+   Studio Movimento Fit, Psicólogo Mário Souza; 10 arquivos).
 7. ✅ Quem vai para o Google EM ONDAS (20/11, regra do usuário + ondas sugeridas pelo Claude e aprovadas), inc/guia.php:
    - nada enquanto 'sem_google' estiver no config (domínio da FSA);
    - ficha: telefone/WhatsApp E (confirmada OU 5+ avaliações no Google), sem precisar confirmar ninguém;
@@ -47,8 +49,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 9. ⬜ Robô do Google Maps não publica mais nada sozinho: só alimenta a lista interna de quem procurar.
 10. ⬜ Botão de confirmação rápida: link por WhatsApp para o dono conferir os dados, informar horário e foto, de graça.
 11. ⬜ Tela no admin "Confirmar por telefone" (a equipe liga, confere e marca como confirmada).
-12. ⬜ App com nome, ícone, pacote e domínio novos (ainda não publicado: dá para mudar tudo).
-13. ⬜ Levar o cliente pagante e as cortesias para o site novo, avisando cada um.
+12. ⬜ App com nome, ícone e servidor novos, MANTENDO o pacote br.com.fsadesigner.achafacil (20/11: app em teste na
+    Play Console, 10º dia; trocar o pacote vira outro app e recomeça o teste). Depois do nome escolhido.
+13. ⬜ Levar o cliente pagante, as cortesias, os acessos de dono e as ofertas (ex.: oferta da Agnes) para o site novo, avisando cada um.
 
 ## Fase 2 — Confirmar fichas antes de abrir (usuário + equipe; 4 a 8 semanas)
 14. ⬜ Meta: 50 a 100 fichas confirmadas por cidade, começando pelos mais procurados ("Quem chamar").
