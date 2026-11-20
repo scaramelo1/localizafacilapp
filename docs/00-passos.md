@@ -27,9 +27,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     amarelo, loja verde com toldo) e simbolo-contorno.svg (contorno branco, usada no site porque topo/rodapé são verdes);
     PNGs em publico/assets (logo, favicon, apple-touch-icon com fundo creme, logo-google-120); og-imagem.py com o nome novo.
     Backups: /var/lib/guia-novo/backups/servidor-antes-marca.tgz e assets-acha.tgz.
-3c. ⬜ Login com Google: o usuário cadastra https://fsadesigners.com.br/guia-novo/google/retorno.php no Google Cloud
-    (20/11 o Google não devolvia: redirect_uri não cadastrado). Depois, o do domínio novo.
-
+3c. ✅ Login com Google em projeto próprio (20/11): projeto "Localiza Facil" no Google Cloud (nº 1080734033552), tela de
+    login "Localiza Fácil", cliente Web com os retornos https://fsadesigners.com.br/guia-novo/google/retorno.php e
+    https://localizafacilapp.com.br/google/retorno.php. ID e chave em /etc/guia-novo/config.php (no lugar das do Acha Fácil).
+    O Google aceita o redirect (302 para a tela de login). Falta o usuário testar entrando.
 ## Fase 1 — Preparar o sistema (Claude)
 4. ✅ Cópia do projeto em pasta nova e banco novo (20/11): /var/www/guia-novo (git novo), banco guia_novo, instalar.sh
    adaptado (sem cron), base.php lendo /etc/guia-novo/config.php (antes apontava para o do Acha Fácil: corrigido),
