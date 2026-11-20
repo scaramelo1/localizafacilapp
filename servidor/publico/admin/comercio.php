@@ -17,6 +17,15 @@ $tipos_area = tipos_por_area();
 $erro = null;
 $valores = [];
 
+// Plano D, passo 6 (20/11): marcar como confirmada pela equipe (ou voltar para "a confirmar")
+if (e_post() && in_array($_POST['acao'] ?? '', ['confirmar', 'desconfirmar'], true)) {
+    exigir_post();
+    $sim = $_POST['acao'] === 'confirmar';
+    marcar_confirmada($id, $sim ? 'equipe' : null);
+    registrar((int)$admin['id'], $sim ? 'confirmou_ficha' : 'desconfirmou_ficha', $id);
+    flash($sim ? 'Ficha marcada como confirmada.' : 'Ficha voltou para "a confirmar".');
+    ir('admin/comercio.php?id=' . $id);
+}
 if (e_post()) {
     exigir_post();
     [$valores, $erro] = limpar_campos_dono($_POST);   // nome, descrição, telefones, Instagram, site, endereço... (mesmas regras do painel)
@@ -128,6 +137,19 @@ admin_inicio('Editar ' . $p['nome'], $admin);
   · <?= $destaque ? 'Destaque em dia' : ($em_dia ? 'plano em dia' : 'sem plano pago') ?>
   · atualizado em <?= h(datahora_br($p['atualizado_em'])) ?></p>
 <?php mostrar_flash(); ?>
+<?php $tem_dono_f = tem_dono($p); ?>
+<form method="post" class="<?= ficha_confirmada($p) ? 'aviso ok' : 'aviso erro' ?>" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+  <?= campo_csrf() ?><input type="hidden" name="id" value="<?= $id ?>">
+  <?php if ($tem_dono_f): ?>
+    <span><strong>✅ Confirmada</strong> — tem dono (cadastrou ou assumiu a ficha).</span>
+  <?php elseif ($p['confirmado_em']): ?>
+    <span><strong>✅ Confirmada pela equipe</strong> em <?= h(datahora_br($p['confirmado_em'])) ?>.</span>
+    <button class="botao secundario" name="acao" value="desconfirmar">Voltar para "a confirmar"</button>
+  <?php else: ?>
+    <span><strong>⏳ A confirmar</strong> — veio da lista do Google Maps e ninguém conferiu ainda.</span>
+    <button class="botao" name="acao" value="confirmar">Conferi os dados: marcar como confirmada</button>
+  <?php endif ?>
+</form>
 <div class="quadro">Aqui o que você salva vai <strong>direto</strong> para o app e o site, sem conferência. Depois de editado
   por um admin, o comércio não é mais mudado pela importação das listas do robô nem pela limpeza automática.</div>
 <?php if ($pend): ?>

@@ -163,6 +163,27 @@ const SQL_NO_GOOGLE = '(' . SQL_TEM_CONTATO . ' AND (' . SQL_TEM_DONO . " OR p.p
     OR COALESCE(p.site, '') <> '' OR COALESCE(p.instagram, '') <> ''
     OR p.id IN (SELECT CAST(SUBSTRING_INDEX(e.caminho, '-', -1) AS UNSIGNED) FROM entradas e
         WHERE e.origem = 'google' AND e.dia >= CURDATE() - INTERVAL 30 DAY AND e.caminho LIKE '%/c/%')))";
+/**
+ * Plano D, passo 6 (20/11): ficha confirmada = conferida pela equipe (confirmado_em) ou com dono (SQL_TEM_DONO,
+ * automático). As outras estão "a confirmar": vieram da lista do Google Maps e ninguém conferiu ainda.
+ */
+const SQL_CONFIRMADA = '(p.confirmado_em IS NOT NULL OR ' . SQL_TEM_DONO . ')';
+function ficha_confirmada(array $p): bool {
+    if (array_key_exists('confirmada', $p)) return (bool)$p['confirmada'];
+    return !empty($p['confirmado_em']) || tem_dono($p);
+}
+/** Marca (ou desmarca, com $por = null) a ficha como conferida pela equipe. */
+function marcar_confirmada(int $id, ?string $por): void {
+    q('UPDATE profissionais SET confirmado_em = ' . ($por === null ? 'NULL' : 'NOW()') . ', confirmado_por = ? WHERE id = ?', [$por, $id]);
+}
+/** Por cidade: [cidade => ['total' =>, 'confirmadas' =>]] (só fichas ativas). */
+function confirmacao_por_cidade(): array {
+    $r = [];
+    foreach (linhas('SELECT p.cidade, COUNT(*) AS total, SUM(' . SQL_CONFIRMADA . ") AS confirmadas FROM profissionais p
+        WHERE p.status = 'ativo' GROUP BY p.cidade") as $l) $r[$l['cidade']] = ['total' => (int)$l['total'], 'confirmadas' => (int)$l['confirmadas']];
+    return $r;
+}
+const META_CONFIRMADAS = 50;   // por cidade, antes de abrir para o Google (docs/00-passos.md, passo 14)
 /** Pagou o Básico ou se cadastrou sozinho (não veio da lista pública). */
 function ficha_paga(array $p): bool {
     if (array_key_exists('ficha_paga', $p)) return (bool)$p['ficha_paga'];

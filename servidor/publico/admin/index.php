@@ -41,6 +41,19 @@ admin_inicio('Pendências', $admin);
 <h1>Pendências</h1>
 <p class="discreto">Olá, <?= h($admin['nome']) ?>. Tudo o que um dono muda fica aqui até alguém aprovar.</p>
 
+<?php // Plano D, passo 6 (20/11): quanto falta confirmar em cada cidade
+$conf = confirmacao_por_cidade(); ?>
+<h2>Fichas confirmadas por cidade</h2>
+<p class="discreto">Confirmada = o dono cadastrou/assumiu ou a equipe conferiu os dados. Meta: <?= META_CONFIRMADAS ?> por cidade antes de abrir para o Google.</p>
+<table class="tabela">
+  <tr><th>Cidade</th><th>Confirmadas</th><th>A confirmar</th><th>Meta</th></tr>
+  <?php foreach (CIDADES as $slug => $c): $l = $conf[$slug] ?? ['total' => 0, 'confirmadas' => 0]; $pct = min(100, (int)round($l['confirmadas'] * 100 / META_CONFIRMADAS)); ?>
+  <tr><td><?= h($c[0]) ?></td><td><strong><?= number_format($l['confirmadas'], 0, ',', '.') ?></strong></td>
+    <td><?= number_format($l['total'] - $l['confirmadas'], 0, ',', '.') ?></td>
+    <td><span style="display:inline-block;width:120px;height:10px;background:#e5e7eb;border-radius:6px;vertical-align:middle"><span style="display:block;height:10px;width:<?= $pct ?>%;background:#005C38;border-radius:6px"></span></span> <?= $pct ?>%</td></tr>
+  <?php endforeach ?>
+</table>
+
 <?php require_once __DIR__ . '/../../inc/eventos.php'; if ($ev_pend = eventos_pendentes_contar()): ?>
 <div class="aviso ok"><strong><?= $ev_pend ?> <?= $ev_pend === 1 ? 'evento enviado' : 'eventos enviados' ?> pelo público esperando autorização.</strong>
   <a class="botao" href="eventos.php" style="margin-left:8px">Ver e autorizar</a></div>
