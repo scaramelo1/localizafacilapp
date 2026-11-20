@@ -24,7 +24,13 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    servidor/dominio/ removido, .htaccess com RewriteBase /guia-novo/ e noindex em tudo.
 5. ✅ Só as 4 cidades ligadas (20/11): cidades, categorias (42) e fichas ativas copiadas do acha_facil:
    São João 4.468, Poços 8.372, Vargem Grande 2.118, Aguaí 1.442 (16.400). Donos, pedidos e pagamentos NÃO copiados (passo 13).
-6. ⬜ Trazer do banco antigo, por dentro, as ~16 mil fichas das 4 cidades como lista de trabalho (estado "a confirmar").
+6. ✅ Fichas "a confirmar" x "confirmadas" (20/11): mudança 035 (profissionais.confirmado_em e confirmado_por).
+   SQL_CONFIRMADA em inc/guia.php = conferida pela equipe OU com dono (SQL_TEM_DONO, automático); ficha_confirmada(),
+   marcar_confirmada(), confirmacao_por_cidade(), META_CONFIRMADAS = 50. Pendências (/admin/) mostra o quadro
+   "Fichas confirmadas por cidade" com a barra da meta; /admin/comercio.php tem o aviso ⏳/✅ e o botão "Conferi os
+   dados: marcar como confirmada" (e "Voltar para a confirmar"), registro confirmou_ficha/desconfirmou_ficha.
+   As 16.400 fichas copiadas entram a confirmar; hoje: São João 2, Poços 1, Vargem 0, Aguaí 0 confirmadas.
+   Admins (4) copiados do Acha Fácil, mesmos logins.
 7. ⬜ Regra do Google desde o 1º dia: no Google só cidade, categorias e fichas CONFIRMADAS
    (dono cadastrado ou dados conferidos pela equipe). Ficha a confirmar: noindex, fora do sitemap.
 8. ⬜ Ficha a confirmar mostra pouco (nome, tipo, bairro, "dados ainda não confirmados") e não copia tudo do Google Maps.
