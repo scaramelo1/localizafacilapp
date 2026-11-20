@@ -14,8 +14,10 @@ Cidades do lançamento: São João da Boa Vista, Poços de Caldas, Vargem Grande
 Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 
 ## Fase 0 — Decisões (usuário)
-1. 🟡 Escolher o nome novo (o usuário está estudando; Claude pode passar ideias com o domínio .com.br conferido).
-2. ⬜ Registrar o domínio no registro.br (por enquanto fica em fsadesigners.com.br/guia-novo).
+1. ✅ Nome: **Localiza Fácil** (20/11, escolha do usuário). Descartados: "Achei Fácil" (já existe acheifacil.net,
+   rede de negócios do mesmo ramo) e "Acha Fácil" (achafacil.com.br é de terceiros). localizafacil.com.br e .com estão
+   registrados por outros, mas parados. Cuidado avisado: "Localiza" (aluguel de carros) é marca forte; pesquisar no INPI.
+2. 🟡 Domínio escolhido: **localizafacilapp.com.br** (20/11 ainda livre no registro.br). Falta registrar e apontar o DNS (A) para 177.153.68.212.
 3. ⬜ Criar o Instagram e o e-mail com o nome novo.
 
 ## Fase 1 — Preparar o sistema (Claude)
