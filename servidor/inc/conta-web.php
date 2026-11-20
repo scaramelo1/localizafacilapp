@@ -45,6 +45,9 @@ function sair_web(): void {
 /** Só volta para uma página do próprio site ("/..."), nunca para outro endereço. */
 function volta_web(?string $v): string {
     $v = (string)$v;
+    // 20/11 (guia-novo em subpasta): quem manda o endereço com a pasta (/guia-novo/...) não pode ganhar a pasta duas vezes
+    $base = (string)config()['url'];
+    if ($base !== '' && ($v === $base || str_starts_with($v, $base . '/'))) $v = substr($v, strlen($base)) ?: '/';
     return strlen($v) <= 280 && preg_match('#^/(?![/\\\\])[^\s"<>]*$#', $v) && !preg_match('#^/(entrar|sair|google/)#', $v) ? $v : '/';
 }
 

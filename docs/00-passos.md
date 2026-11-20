@@ -31,8 +31,15 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    dados: marcar como confirmada" (e "Voltar para a confirmar"), registro confirmou_ficha/desconfirmou_ficha.
    As 16.400 fichas copiadas entram a confirmar; hoje: São João 2, Poços 1, Vargem 0, Aguaí 0 confirmadas.
    Admins (4) copiados do Acha Fácil, mesmos logins.
-7. ⬜ Regra do Google desde o 1º dia: no Google só cidade, categorias e fichas CONFIRMADAS
-   (dono cadastrado ou dados conferidos pela equipe). Ficha a confirmar: noindex, fora do sitemap.
+7. ✅ Quem vai para o Google (20/11, decisão do Claude a pedido do usuário), cidades_no_google()/sql_no_google() em inc/guia.php:
+   - nada enquanto 'sem_google' estiver no config (domínio da FSA);
+   - a cidade só abre quando tiver META_CONFIRMADAS (50) fichas confirmadas; antes, tudo dela fica fora;
+   - cidade aberta: página da cidade; área e tipo com 3+ confirmadas (web_contar_confirmadas); ficha confirmada com
+     telefone/WhatsApp; eventos só de cidade aberta. Ficha a confirmar nunca vai. Busca, bairro e Aberto agora: fora.
+   - sitemaps seguem a mesma regra (cidade fechada = sitemap vazio). Nas listas, confirmadas vêm antes (depois do Destaque e pagas).
+   Testado numa cópia com 50 confirmações de teste em Aguaí (desfeitas): Aguaí abriu, Poços ficou fechada, 50 fichas e 11 categorias no sitemap.
+   Login: volta_web() tirava a pasta /guia-novo em dobro (corrigido) e o Google login foi ligado com as chaves do Acha Fácil;
+   falta o usuário cadastrar https://fsadesigners.com.br/guia-novo/google/retorno.php no Google Cloud.
 8. ⬜ Ficha a confirmar mostra pouco (nome, tipo, bairro, "dados ainda não confirmados") e não copia tudo do Google Maps.
 9. ⬜ Robô do Google Maps não publica mais nada sozinho: só alimenta a lista interna de quem procurar.
 10. ⬜ Botão de confirmação rápida: link por WhatsApp para o dono conferir os dados, informar horário e foto, de graça.

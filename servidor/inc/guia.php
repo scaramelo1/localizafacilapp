@@ -131,11 +131,10 @@ function nome_curto(string $nome, int $max = 60): string {
     $c = preg_replace('/\s+\S*$/u', '', $c) ?: $c;
     return preg_replace('/[\s\-–,.:;]+$/u', '', $c) . '…';   // 20/11: rtrim com "–" cortava meio "Ó" ou "À"
 }
-/** Ficha no Google: a regra é SQL_NO_GOOGLE (20/11). Sem id (ficha montada à mão), vale só o telefone. */
+/** Ficha no Google: a regra é sql_no_google() (Plano D, passo 7). */
 function ficha_no_google(array $p): bool {
-    $tem_contato = trim((string)($p['telefone'] ?? '')) !== '' || trim((string)($p['whatsapp'] ?? '')) !== '';
-    if (!$tem_contato || empty($p['id'])) return $tem_contato;
-    return (bool)valor('SELECT ' . SQL_NO_GOOGLE . ' FROM profissionais p WHERE p.id = ?', [(int)$p['id']]);
+    if (empty($p['id']) || !cidade_no_google((string)($p['cidade'] ?? ''))) return false;
+    return (bool)valor('SELECT ' . sql_no_google() . ' FROM profissionais p WHERE p.id = ?', [(int)$p['id']]);
 }
 
 // Aparece no app: aprovado e com assinatura em dia.
@@ -153,16 +152,6 @@ function semente_dia(): int { return (int)date('Ymd'); }
 // "Este comércio é seu?" e ninguém mais pede para assumir ou tirar pelo site/app.
 const SQL_TEM_DONO = '(p.importado = 0 OR p.basico_pago_em IS NOT NULL OR ' . SQL_DESTAQUE . '
     OR EXISTS (SELECT 1 FROM acessos_dono ad WHERE ad.profissional_id = p.id AND ad.ativo = 1))';
-/**
- * Ficha no Google (20/11, pedido do usuário, depois da queda do tráfego do Google às 11:52 com 59 mil fichas novas):
- * com telefone ou WhatsApp E pelo menos um destes: tem dono/pagou, 5+ avaliações no Google (popularidade), site ou
- * Instagram, ou recebeu visita vinda do Google nos últimos 30 dias. As outras continuam no site e no app, mas com
- * noindex e fora do sitemap; voltam sozinhas quando ganharem avaliações, site/Instagram ou dono.
- */
-const SQL_NO_GOOGLE = '(' . SQL_TEM_CONTATO . ' AND (' . SQL_TEM_DONO . " OR p.popularidade >= 5
-    OR COALESCE(p.site, '') <> '' OR COALESCE(p.instagram, '') <> ''
-    OR p.id IN (SELECT CAST(SUBSTRING_INDEX(e.caminho, '-', -1) AS UNSIGNED) FROM entradas e
-        WHERE e.origem = 'google' AND e.dia >= CURDATE() - INTERVAL 30 DAY AND e.caminho LIKE '%/c/%')))";
 /**
  * Plano D, passo 6 (20/11): ficha confirmada = conferida pela equipe (confirmado_em) ou com dono (SQL_TEM_DONO,
  * automático). As outras estão "a confirmar": vieram da lista do Google Maps e ninguém conferiu ainda.
@@ -184,6 +173,29 @@ function confirmacao_por_cidade(): array {
     return $r;
 }
 const META_CONFIRMADAS = 50;   // por cidade, antes de abrir para o Google (docs/00-passos.md, passo 14)
+/**
+ * Plano D, passo 7 (20/11): quem vai para o Google. Decisão do Claude, a pedido do usuário:
+ *  - Nada enquanto 'sem_google' estiver no config (site no domínio da FSA, mesmas fichas do Acha Fácil).
+ *  - A cidade só abre para o Google quando tiver META_CONFIRMADAS fichas confirmadas. Antes disso, tudo dela fica fora.
+ *  - Cidade aberta: página da cidade; área e tipo com WEB_TIPO_MINIMO+ fichas confirmadas; ficha confirmada COM
+ *    telefone ou WhatsApp. Ficha a confirmar nunca vai (mostra pouco e é cópia do Google Maps).
+ *  - Busca, filtro de bairro e "Aberto agora" continuam fora (como antes).
+ */
+function cidades_no_google(): array {
+    static $r = null;
+    if ($r !== null) return $r;
+    $r = [];
+    if (!empty(config()['sem_google'])) return $r;
+    foreach (confirmacao_por_cidade() as $c => $l) if (isset(CIDADES[$c]) && $l['confirmadas'] >= META_CONFIRMADAS) $r[] = $c;
+    return $r;
+}
+function cidade_no_google(string $cidade): bool { return in_array($cidade, cidades_no_google(), true); }
+/** SQL da ficha que vai para o Google (slugs vêm de CIDADES, já validados em carregar_cidades()). */
+function sql_no_google(): string {
+    $cs = cidades_no_google();
+    if (!$cs) return '(1 = 0)';
+    return '(' . SQL_TEM_CONTATO . ' AND ' . SQL_CONFIRMADA . " AND p.cidade IN ('" . implode("','", $cs) . "'))";
+}
 /** Pagou o Básico ou se cadastrou sozinho (não veio da lista pública). */
 function ficha_paga(array $p): bool {
     if (array_key_exists('ficha_paga', $p)) return (bool)$p['ficha_paga'];

@@ -78,10 +78,15 @@ function web_contar(string $cidade, int $categoria_id, ?string $tipo, ?string $b
     [$sql, $par] = web_filtro($cidade, $categoria_id, $tipo, $bairro);
     return (int)valor("SELECT COUNT(*) FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE $sql", $par);
 }
+/** Plano D, passo 7: quantas fichas confirmadas a lista tem (área ou tipo vai para o Google com WEB_TIPO_MINIMO+). */
+function web_contar_confirmadas(string $cidade, int $categoria_id, ?string $tipo): int {
+    [$sql, $par] = web_filtro($cidade, $categoria_id, $tipo, null);
+    return (int)valor("SELECT COUNT(*) FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE $sql AND " . SQL_CONFIRMADA, $par);
+}
 function web_lista(string $cidade, int $categoria_id, ?string $tipo, ?string $bairro, int $pagina): array {
     [$sql, $par] = web_filtro($cidade, $categoria_id, $tipo, $bairro);
     return linhas('SELECT ' . CAMPOS_RESUMO . ", p.endereco FROM profissionais p JOIN categorias c ON c.id = p.categoria_id
-        WHERE $sql ORDER BY " . SQL_DESTAQUE . ' DESC, ' . SQL_FICHA_PAGA . ' DESC, ' . SQL_COM_HORARIO . ' DESC, p.total_avaliacoes > 0 DESC, RAND(?)
+        WHERE $sql ORDER BY " . SQL_DESTAQUE . ' DESC, ' . SQL_FICHA_PAGA . ' DESC, ' . SQL_CONFIRMADA . ' DESC, ' . SQL_COM_HORARIO . ' DESC, p.total_avaliacoes > 0 DESC, RAND(?)
         LIMIT ' . WEB_POR_PAGINA . ' OFFSET ' . (max(1, $pagina) - 1) * WEB_POR_PAGINA, [...$par, semente_dia()]);
 }
 /**
@@ -278,7 +283,8 @@ function web_pagina_cidade(string $cidade): void {
     [$trilha, $ld] = web_trilha([["$nome - $uf", null]]);
     pagina_inicio("Comércios e serviços em $nome - $uf | Acha Fácil!",
         web_num($total) . " comércios e serviços de $nome ($uf): restaurantes, mercados, oficinas, clínicas, lojas e muito mais. Endereço, horário e WhatsApp.",
-        'web', ['canonica' => web_absoluta(url_cidade($cidade)), 'head' => web_json_ld($ld), 'anuncios' => true]);
+        'web', ['canonica' => web_absoluta(url_cidade($cidade)), 'head' => web_json_ld($ld), 'anuncios' => true,
+            'noindex' => !cidade_no_google($cidade)]);   // Plano D, passo 7
     ?>
 <main>
   <section class="web-topo"><div class="conteudo">
@@ -350,7 +356,8 @@ function web_pagina_lista(string $cidade, array $area, ?string $tipo, ?string $b
     $titulo = ($tipo !== null ? "$tipo em $nome_cidade - $uf" : "{$area['nome']} em $nome_cidade - $uf") . ($pagina > 1 ? " (página $pagina)" : '') . ' | Acha Fácil!';
     $descricao = "$qtd de " . mb_strtolower($titulo_lista) . " em $nome_cidade ($uf): endereço, horário, WhatsApp e avaliações. Veja quem está aberto e chame direto.";
     // não vai para o Google: filtro de bairro e tipo com poucos comércios
-    $noindex = $aberto || $bairro !== null || ($tipo !== null && $total < WEB_TIPO_MINIMO);
+    $noindex = $aberto || $bairro !== null || ($tipo !== null && $total < WEB_TIPO_MINIMO)
+        || !cidade_no_google($cidade) || web_contar_confirmadas($cidade, (int)$area['id'], $tipo) < WEB_TIPO_MINIMO;   // Plano D, passo 7
     $canonica = web_absoluta($base_url) . ($pagina > 1 ? '?pagina=' . $pagina : '');
     $lista_ld = ['@context' => 'https://schema.org', '@type' => 'ItemList', 'name' => "$titulo_lista em $nome_cidade",
         'itemListElement' => array_map(fn($p, $i) => ['@type' => 'ListItem', 'position' => ($pagina - 1) * WEB_POR_PAGINA + $i + 1,
@@ -920,13 +927,13 @@ function web_sitemap_lista(array $arquivos): string {
 }
 /** Índice geral: páginas fixas + cada cidade × tipo (um índice não pode apontar para outro índice). */
 function web_sitemap_indice(): string {
-    $a = [url_publica('sitemap-paginas.xml')];
-    foreach (CIDADES as $slug => $_) foreach (web_sitemap_tipos() as $tipo => $_n) $a[] = web_sitemap_arquivo($slug, $tipo);
+    $a = empty(config()['sem_google']) ? [url_publica('sitemap-paginas.xml')] : [];   // Plano D: no domínio da FSA, nada
+    foreach (cidades_no_google() as $slug) foreach (web_sitemap_tipos() as $tipo => $_n) $a[] = web_sitemap_arquivo($slug, $tipo);   // Plano D, passo 7
     return web_sitemap_lista($a);
 }
 /** Índice de um tipo em todas as cidades. */
 function web_sitemap_indice_tipo(string $tipo): string {
-    return web_sitemap_lista(array_map(fn($slug) => web_sitemap_arquivo($slug, $tipo), array_keys(CIDADES)));
+    return web_sitemap_lista(array_map(fn($slug) => web_sitemap_arquivo($slug, $tipo), cidades_no_google()));
 }
 /** Índice de uma cidade com os tipos dela. */
 function web_sitemap_indice_cidade(string $cidade): string {
@@ -942,16 +949,18 @@ function web_sitemap_paginas(): string {
     return web_sitemap_urls(array_map(fn($c) => [url_publica($c), null], ['', 'planos.php', 'incluir.php', 'incluir-evento.php', 'termos.php', 'privacidade.php']));
 }
 /** Endereços de uma cidade num tipo: cidades = página da cidade; categorias = áreas e tipos com 3+;
- *  comercios = fichas visíveis que passam em SQL_NO_GOOGLE (as outras ficam fora do Google); eventos = agenda e próximos eventos. */
+ *  comercios = fichas que passam em sql_no_google() (confirmadas, com contato, cidade aberta); eventos = agenda e próximos eventos. */
 function web_sitemap_cidade(string $cidade, string $tipo): string {
     $urls = [];
+    if (!cidade_no_google($cidade)) return web_sitemap_urls([]);   // Plano D, passo 7: cidade ainda não aberta
     if ($tipo === 'cidades') $urls[] = [web_absoluta(url_cidade($cidade)), null];
     if ($tipo === 'categorias') foreach (web_areas($cidade) as $a) {
-        $urls[] = [web_absoluta(url_area($cidade, $a['slug'])), null];
-        foreach (web_tipos($cidade, (int)$a['id']) as $t) $urls[] = [web_absoluta(url_tipo($cidade, $a['slug'], $t['nome'])), null];
+        if (web_contar_confirmadas($cidade, (int)$a['id'], null) >= WEB_TIPO_MINIMO) $urls[] = [web_absoluta(url_area($cidade, $a['slug'])), null];
+        foreach (web_tipos($cidade, (int)$a['id']) as $t)
+            if (web_contar_confirmadas($cidade, (int)$a['id'], $t['nome']) >= WEB_TIPO_MINIMO) $urls[] = [web_absoluta(url_tipo($cidade, $a['slug'], $t['nome'])), null];
     }
     if ($tipo === 'comercios') foreach (q('SELECT p.id, p.nome, p.cidade, DATE(p.atualizado_em) AS mod_em FROM profissionais p JOIN categorias c ON c.id = p.categoria_id
-        WHERE ' . visivel($cidade) . ' AND ' . SQL_NO_GOOGLE . ' ORDER BY p.id') as $p) $urls[] = [web_absoluta(url_ficha($p)), $p['mod_em']];   // 20/11: regra SQL_NO_GOOGLE (guia.php)
+        WHERE ' . visivel($cidade) . ' AND ' . sql_no_google() . ' ORDER BY p.id') as $p) $urls[] = [web_absoluta(url_ficha($p)), $p['mod_em']];   // Plano D, passo 7 (guia.php)
     if ($tipo === 'eventos' && isset(web_sitemap_tipos()['eventos'])) {
         if (eventos_proximos($cidade)) $urls[] = [web_absoluta(url_eventos($cidade)), null];   // agenda vazia fica fora (noindex)
         foreach (eventos_proximos($cidade) as $e) $urls[] = [web_absoluta(url_evento($e)), substr((string)$e['atualizado_em'], 0, 10)];

@@ -159,7 +159,7 @@ function web_pagina_eventos(string $cidade): void {
     pagina_inicio("Eventos em $nome - $uf: agenda | Acha Fácil!",
         "Agenda de eventos em $nome ($uf): shows, festas, feiras e programação da cidade, em ordem de data, com local, horário e link oficial.",
         'web', ['canonica' => web_absoluta(url_eventos($cidade)), 'head' => web_json_ld($ld_trilha, $ld), 'anuncios' => true,
-            'noindex' => !$eventos]);   // 16/11: agenda vazia fica fora do Google e volta sozinha quando tiver evento
+            'noindex' => !$eventos || !cidade_no_google($cidade)]);   // Plano D, passo 7: cidade fechada fica fora   // 16/11: agenda vazia fica fora do Google e volta sozinha quando tiver evento
     ?>
 <main>
   <section class="web-topo"><div class="conteudo">
@@ -227,7 +227,7 @@ function web_pagina_evento(array $e): void {
     $descricao = $e['titulo'] . ' em ' . $nome_cidade . ' (' . $uf . '): ' . $quando . ($hr ? ", $hr" : '') . ($onde ? ", $onde" : '') . '.'
         . ($e['descricao'] ? ' ' . mb_substr(preg_replace('/\s+/u', ' ', $e['descricao']), 0, 160) : '');
     pagina_inicio($e['titulo'] . " - $nome_cidade | Eventos | Acha Fácil!", mb_substr($descricao, 0, 300), 'web',
-        ['canonica' => $url, 'imagem' => $imagem, 'noindex' => $terminou, 'head' => web_json_ld($ld, $ld_trilha), 'anuncios' => true]);
+        ['canonica' => $url, 'imagem' => $imagem, 'noindex' => $terminou || !cidade_no_google((string)$e['cidade']), 'head' => web_json_ld($ld, $ld_trilha), 'anuncios' => true]);
     ?>
 <main class="ficha">
   <div class="conteudo">
