@@ -9,7 +9,7 @@ Motivo: em 20/11 às 11:52 o Google rebaixou o achafacilapp.com.br inteiro (ver 
 Causa provável: ~111 mil fichas copiadas do Google Maps, entrando de uma vez. O site novo usa o mesmo sistema,
 mas nasce pequeno, com dados confirmados e sem levar o problema junto.
 
-Cidades do lançamento: São João da Boa Vista, Poços de Caldas, Vargem Grande do Sul e Aguaí.
+Cidades do lançamento: São João da Boa Vista, Poços de Caldas, Vargem Grande do Sul, Aguaí e Santa Rita do Sapucaí.
 
 Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 
@@ -31,6 +31,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    dados: marcar como confirmada" (e "Voltar para a confirmar"), registro confirmou_ficha/desconfirmou_ficha.
    As 16.400 fichas copiadas entram a confirmar; hoje: São João 2, Poços 1, Vargem 0, Aguaí 0 confirmadas.
    Admins (4) copiados do Acha Fácil, mesmos logins.
+   Santa Rita do Sapucaí (20/11, pedido do usuário): 5ª cidade, 1.915 fichas + foto da Rosa Maria Massoterapia. Atenção:
+   a lista dela veio quase sem número de avaliações (1.885 com popularidade 0), então só 15 passam na regra do Google.
+   Na cópia de fichas use a lista de colunas do acha_facil (o guia_novo tem confirmado_em/confirmado_por a mais).
    Fotos (20/11): copiadas de /var/lib/acha-facil/fotos as dos 3 comércios das 4 cidades que tinham (Agnes Veterinária,
    Studio Movimento Fit, Psicólogo Mário Souza; 10 arquivos).
 7. ✅ Quem vai para o Google EM ONDAS (20/11, regra do usuário + ondas sugeridas pelo Claude e aprovadas), inc/guia.php:
