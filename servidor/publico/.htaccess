@@ -1,10 +1,5 @@
 # Localiza Fácil no domínio próprio (copiado para servidor/publico/.htaccess por servidor/dominio/ativar.sh).
 # Quem abre fsadesigners.com.br/guia-novo/... vai para localizafacilapp.com.br/... (o endereço da FSA nunca foi para o Google).
-# >>> SEM_GOOGLE: enquanto o site não for lançado, nada vai para o Google. servidor/dominio/lancar.sh apaga este bloco.
-<IfModule mod_headers.c>
-  Header always set X-Robots-Tag "noindex, nofollow"
-</IfModule>
-# <<< SEM_GOOGLE
 RewriteEngine On
 RewriteCond %{HTTP_HOST} ^(www\.)?fsadesigners\.com\.br$ [NC]
 RewriteRule ^(.*)$ https://localizafacilapp.com.br/$1 [R=301,L,NE]

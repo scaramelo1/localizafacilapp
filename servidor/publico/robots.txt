@@ -16,5 +16,6 @@ Disallow: /*/buscar
 Disallow: /planos.php?
 Disallow: /suporte.php
 Disallow: /incluir.php?
+Disallow: /confirmar.php
 
 Sitemap: https://localizafacilapp.com.br/sitemap.xml
