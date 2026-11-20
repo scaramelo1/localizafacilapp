@@ -41,16 +41,17 @@ admin_inicio('Pendências', $admin);
 <h1>Pendências</h1>
 <p class="discreto">Olá, <?= h($admin['nome']) ?>. Tudo o que um dono muda fica aqui até alguém aprovar.</p>
 
-<?php // Plano D, passo 6 (20/11): quanto falta confirmar em cada cidade
-$conf = confirmacao_por_cidade(); ?>
-<h2>Fichas confirmadas por cidade</h2>
-<p class="discreto">Confirmada = o dono cadastrou/assumiu ou a equipe conferiu os dados. Meta: <?= META_CONFIRMADAS ?> por cidade antes de abrir para o Google.</p>
+<?php // Plano D, passos 6 e 7 (20/11): confirmadas e ondas do Google por cidade
+$conf = confirmacao_por_cidade(); $ondas = google_ondas_por_cidade(); $onda = google_onda_atual(); ?>
+<h2>Fichas por cidade</h2>
+<p class="discreto">Confirmada = o dono cadastrou/assumiu ou a equipe conferiu. No Google = ondas semanais (veja <a href="google.php">Google</a>):
+  <?= $onda ? 'onda ' . $onda . ', até ' . google_limite_por_cidade() . ' por cidade' : 'ainda fechado para o Google (site no domínio da FSA)' ?>.</p>
 <table class="tabela">
-  <tr><th>Cidade</th><th>Confirmadas</th><th>A confirmar</th><th>Meta</th></tr>
-  <?php foreach (CIDADES as $slug => $c): $l = $conf[$slug] ?? ['total' => 0, 'confirmadas' => 0]; $pct = min(100, (int)round($l['confirmadas'] * 100 / META_CONFIRMADAS)); ?>
+  <tr><th>Cidade</th><th>Confirmadas</th><th>A confirmar</th><th>No Google</th><th>Na fila</th></tr>
+  <?php foreach (CIDADES as $slug => $c): $l = $conf[$slug] ?? ['total' => 0, 'confirmadas' => 0]; $o = $ondas[$slug] ?? ['no_google' => 0, 'na_fila' => 0]; ?>
   <tr><td><?= h($c[0]) ?></td><td><strong><?= number_format($l['confirmadas'], 0, ',', '.') ?></strong></td>
     <td><?= number_format($l['total'] - $l['confirmadas'], 0, ',', '.') ?></td>
-    <td><span style="display:inline-block;width:120px;height:10px;background:#e5e7eb;border-radius:6px;vertical-align:middle"><span style="display:block;height:10px;width:<?= $pct ?>%;background:#005C38;border-radius:6px"></span></span> <?= $pct ?>%</td></tr>
+    <td><?= number_format($o['no_google'], 0, ',', '.') ?></td><td><?= number_format($o['na_fila'], 0, ',', '.') ?></td></tr>
   <?php endforeach ?>
 </table>
 

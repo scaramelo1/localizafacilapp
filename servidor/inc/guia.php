@@ -172,29 +172,73 @@ function confirmacao_por_cidade(): array {
         WHERE p.status = 'ativo' GROUP BY p.cidade") as $l) $r[$l['cidade']] = ['total' => (int)$l['total'], 'confirmadas' => (int)$l['confirmadas']];
     return $r;
 }
-const META_CONFIRMADAS = 50;   // por cidade, antes de abrir para o Google (docs/00-passos.md, passo 14)
 /**
- * Plano D, passo 7 (20/11): quem vai para o Google. Decisão do Claude, a pedido do usuário:
+ * Plano D, passo 7 (20/11, revisto a pedido do usuário): quem vai para o Google, sem precisar confirmar ninguém.
  *  - Nada enquanto 'sem_google' estiver no config (site no domínio da FSA, mesmas fichas do Acha Fácil).
- *  - A cidade só abre para o Google quando tiver META_CONFIRMADAS fichas confirmadas. Antes disso, tudo dela fica fora.
- *  - Cidade aberta: página da cidade; área e tipo com WEB_TIPO_MINIMO+ fichas confirmadas; ficha confirmada COM
- *    telefone ou WhatsApp. Ficha a confirmar nunca vai (mostra pouco e é cópia do Google Maps).
- *  - Busca, filtro de bairro e "Aberto agora" continuam fora (como antes).
+ *  - Ficha: telefone ou WhatsApp E (confirmada OU 5+ avaliações no Google [popularidade]), liberada EM ONDAS: começa com
+ *    as GOOGLE_ONDA mais conhecidas de cada cidade e a cada semana entram mais GOOGLE_ONDA, das mais para as menos
+ *    conhecidas. Confirmadas entram sempre, fora da fila. Pausar/retomar as ondas em /admin/google.php.
+ *  - Página da cidade sempre; área e tipo com 3+ fichas no Google; busca, bairro e "Aberto agora" fora.
+ * Motivo: o Acha Fácil caiu ao subir 59 mil fichas copiadas do Google Maps de uma vez; aqui o Google vê o site crescer devagar.
  */
+const GOOGLE_ONDA = 100;            // fichas por cidade em cada onda (1 onda por semana)
+const GOOGLE_MIN_AVALIACOES = 5;    // avaliações no Google para entrar na fila sem confirmação
 function cidades_no_google(): array {
+    return !empty(config()['sem_google']) ? [] : array_keys(CIDADES);
+}
+function cidade_no_google(string $cidade): bool { return in_array($cidade, cidades_no_google(), true); }
+
+/** Estado das ondas: ['inicio' => 'Y-m-d'|null, 'pausado_em' => 'Y-m-d'|null, 'dias_pausados' => int]. */
+function google_ondas_arquivo(): string { return config()['dados_dir'] . '/google-ondas.json'; }
+function google_ondas_estado(): array {
+    $e = is_file(google_ondas_arquivo()) ? (json_decode((string)file_get_contents(google_ondas_arquivo()), true) ?: []) : [];
+    return ['inicio' => $e['inicio'] ?? null, 'pausado_em' => $e['pausado_em'] ?? null, 'dias_pausados' => (int)($e['dias_pausados'] ?? 0)];
+}
+function google_ondas_gravar(array $e): void {
+    @file_put_contents(google_ondas_arquivo(), json_encode($e, JSON_PRETTY_PRINT), LOCK_EX);
+}
+/** Número da onda atual (1 = primeira). 0 = ainda fechado. A 1ª onda começa sozinha quando 'sem_google' sai do config. */
+function google_onda_atual(): int {
+    if (!empty(config()['sem_google'])) return 0;
+    $e = google_ondas_estado();
+    if (!$e['inicio']) { $e['inicio'] = hoje(); google_ondas_gravar($e); }
+    $fim = $e['pausado_em'] ?: hoje();
+    $dias = (int)floor((strtotime($fim) - strtotime($e['inicio'])) / 86400) - $e['dias_pausados'];
+    return 1 + intdiv(max(0, $dias), 7);
+}
+function google_limite_por_cidade(): int { return google_onda_atual() * GOOGLE_ONDA; }
+
+/** Corte de cada cidade: a N-ésima ficha da fila (popularidade desc, id asc) => [popularidade, id]. */
+function google_cortes(): array {
     static $r = null;
     if ($r !== null) return $r;
     $r = [];
-    if (!empty(config()['sem_google'])) return $r;
-    foreach (confirmacao_por_cidade() as $c => $l) if (isset(CIDADES[$c]) && $l['confirmadas'] >= META_CONFIRMADAS) $r[] = $c;
+    $n = google_limite_por_cidade();
+    if ($n < 1) return $r;
+    foreach (cidades_no_google() as $c) {
+        $l = linha("SELECT p.popularidade, p.id FROM profissionais p WHERE p.cidade = ? AND p.status = 'ativo' AND " . SQL_TEM_CONTATO
+            . ' AND p.popularidade >= ' . GOOGLE_MIN_AVALIACOES . ' ORDER BY p.popularidade DESC, p.id ASC LIMIT 1 OFFSET ' . ($n - 1), [$c]);
+        $r[$c] = $l ? [(int)$l['popularidade'], (int)$l['id']] : null;   // null = a fila inteira já cabe
+    }
     return $r;
 }
-function cidade_no_google(string $cidade): bool { return in_array($cidade, cidades_no_google(), true); }
 /** SQL da ficha que vai para o Google (slugs vêm de CIDADES, já validados em carregar_cidades()). */
 function sql_no_google(): string {
-    $cs = cidades_no_google();
-    if (!$cs) return '(1 = 0)';
-    return '(' . SQL_TEM_CONTATO . ' AND ' . SQL_CONFIRMADA . " AND p.cidade IN ('" . implode("','", $cs) . "'))";
+    $cortes = google_cortes();
+    if (!$cortes) return '(1 = 0)';
+    $fila = [];
+    foreach ($cortes as $c => $corte)
+        $fila[] = "(p.cidade = '$c'" . ($corte ? " AND (p.popularidade > {$corte[0]} OR (p.popularidade = {$corte[0]} AND p.id <= {$corte[1]}))" : '') . ')';
+    return '(' . SQL_TEM_CONTATO . " AND p.cidade IN ('" . implode("','", array_keys($cortes)) . "') AND (" . SQL_CONFIRMADA
+        . ' OR (p.popularidade >= ' . GOOGLE_MIN_AVALIACOES . ' AND (' . implode(' OR ', $fila) . '))))';
+}
+/** Quantas fichas de cada cidade estão no Google e quantas esperam na fila. */
+function google_ondas_por_cidade(): array {
+    $r = [];
+    $no = sql_no_google();
+    foreach (linhas("SELECT p.cidade, SUM($no) AS no_google, SUM(" . SQL_TEM_CONTATO . ' AND p.popularidade >= ' . GOOGLE_MIN_AVALIACOES . " AND NOT ($no)) AS na_fila
+        FROM profissionais p WHERE p.status = 'ativo' GROUP BY p.cidade") as $l) $r[$l['cidade']] = ['no_google' => (int)$l['no_google'], 'na_fila' => (int)$l['na_fila']];
+    return $r;
 }
 /** Pagou o Básico ou se cadastrou sozinho (não veio da lista pública). */
 function ficha_paga(array $p): bool {

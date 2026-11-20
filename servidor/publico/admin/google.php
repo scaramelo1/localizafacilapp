@@ -5,6 +5,21 @@ require __DIR__ . '/../../inc/admin.php';
 require_once __DIR__ . '/../../inc/numeros.php';
 $admin = exigir_admin();
 
+// Plano D, passo 7 (20/11): pausar/retomar as ondas do Google
+if (e_post() && in_array($_POST['acao'] ?? '', ['pausar_ondas', 'retomar_ondas'], true)) {
+    exigir_post();
+    $e = google_ondas_estado();
+    if ($_POST['acao'] === 'pausar_ondas' && !$e['pausado_em']) $e['pausado_em'] = hoje();
+    if ($_POST['acao'] === 'retomar_ondas' && $e['pausado_em']) {
+        $e['dias_pausados'] += (int)floor((strtotime(hoje()) - strtotime($e['pausado_em'])) / 86400);
+        $e['pausado_em'] = null;
+    }
+    google_ondas_gravar($e);
+    registrar((int)$admin['id'], $_POST['acao'], null, 'onda ' . google_onda_atual());
+    flash($_POST['acao'] === 'pausar_ondas' ? 'Ondas pausadas: nenhuma ficha nova entra no Google até retomar.' : 'Ondas retomadas.');
+    ir('admin/google.php');
+}
+
 $arq = config()['dados_dir'] . '/google/visitas.json';
 $d = is_file($arq) ? (json_decode((string)file_get_contents($arq), true) ?: []) : [];
 $fichas_vistas = $d['fichas'] ?? [];
@@ -47,6 +62,25 @@ admin_inicio('Google por cidade', $admin);
 ?>
 <p><a href="numeros.php">&larr; Números</a></p>
 <h1>Google por cidade</h1>
+<?php mostrar_flash(); $onda_g = google_onda_atual(); $est_g = google_ondas_estado(); ?>
+<div class="quadro">
+  <h2 style="margin-top:0">Ondas do Google</h2>
+  <?php if (!$onda_g): ?>
+    <p><strong>Fechado para o Google.</strong> Enquanto o site estiver no domínio da FSA ('sem_google' no config), nada vai. A 1ª onda começa sozinha no lançamento.</p>
+  <?php else: ?>
+    <p><strong>Onda <?= $onda_g ?></strong> (começou em <?= h(date('d/m/Y', strtotime($est_g['inicio']))) ?>): até <strong><?= google_limite_por_cidade() ?></strong> fichas por cidade
+      (telefone + <?= GOOGLE_MIN_AVALIACOES ?>+ avaliações no Google, das mais conhecidas para as menos; confirmadas entram sempre). A cada semana entram mais <?= GOOGLE_ONDA ?>.</p>
+    <form method="post"><?= campo_csrf() ?>
+      <?php if ($est_g['pausado_em']): ?>
+        <p class="aviso erro">⏸ Pausadas desde <?= h(date('d/m/Y', strtotime($est_g['pausado_em']))) ?>.</p>
+        <button class="botao" name="acao" value="retomar_ondas">Retomar as ondas</button>
+      <?php else: ?>
+        <button class="botao secundario" name="acao" value="pausar_ondas" onclick="return confirm('Pausar as ondas? Nenhuma ficha nova entra no Google até retomar.')">⏸ Pausar as ondas</button>
+        <span class="discreto">Use se o Search Console mostrar queda.</span>
+      <?php endif ?>
+    </form>
+  <?php endif ?>
+</div>
 <p class="discreto">O Google só mostra na pesquisa as fichas que o robô dele já visitou. Aqui está, por cidade, quanto do
   sitemap ele já leu e quantas pessoas chegaram pela pesquisa. Só conta o robô do Google de verdade (IP conferido).
   <?php if (!empty($d['atualizado'])): ?>Robô atualizado em <?= h(datahora_br($d['atualizado'])) ?> (de hora em hora).<?php endif ?></p>

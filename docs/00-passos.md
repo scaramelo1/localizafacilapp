@@ -31,13 +31,16 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    dados: marcar como confirmada" (e "Voltar para a confirmar"), registro confirmou_ficha/desconfirmou_ficha.
    As 16.400 fichas copiadas entram a confirmar; hoje: São João 2, Poços 1, Vargem 0, Aguaí 0 confirmadas.
    Admins (4) copiados do Acha Fácil, mesmos logins.
-7. ✅ Quem vai para o Google (20/11, decisão do Claude a pedido do usuário), cidades_no_google()/sql_no_google() em inc/guia.php:
+7. ✅ Quem vai para o Google EM ONDAS (20/11, regra do usuário + ondas sugeridas pelo Claude e aprovadas), inc/guia.php:
    - nada enquanto 'sem_google' estiver no config (domínio da FSA);
-   - a cidade só abre quando tiver META_CONFIRMADAS (50) fichas confirmadas; antes, tudo dela fica fora;
-   - cidade aberta: página da cidade; área e tipo com 3+ confirmadas (web_contar_confirmadas); ficha confirmada com
-     telefone/WhatsApp; eventos só de cidade aberta. Ficha a confirmar nunca vai. Busca, bairro e Aberto agora: fora.
-   - sitemaps seguem a mesma regra (cidade fechada = sitemap vazio). Nas listas, confirmadas vêm antes (depois do Destaque e pagas).
-   Testado numa cópia com 50 confirmações de teste em Aguaí (desfeitas): Aguaí abriu, Poços ficou fechada, 50 fichas e 11 categorias no sitemap.
+   - ficha: telefone/WhatsApp E (confirmada OU 5+ avaliações no Google), sem precisar confirmar ninguém;
+   - ondas: 1ª onda = as 100 mais conhecidas de cada cidade (popularidade desc, id asc); +100 por cidade a cada semana
+     (GOOGLE_ONDA); confirmadas entram sempre, fora da fila. Começa sozinha quando 'sem_google' sair do config
+     ($DADOS/google-ondas.json guarda início, pausa e dias pausados). Pausar/retomar em /admin/google.php ("Ondas do Google").
+   - página da cidade sempre; área e tipo com 3+ fichas no Google (web_contar_no_google); busca, bairro e Aberto agora: fora.
+   - Fila total: Poços 3.878, São João 2.233, Vargem 865, Aguaí 532 (7.508); tudo no Google em ~39 semanas em Poços,
+     ~23 em São João, ~9 em Vargem e ~6 em Aguaí. Pendências mostra Confirmadas / A confirmar / No Google / Na fila.
+   Testado em cópia: onda 1 = 100 por cidade (+ as com dono), onda 3 = 300, pausa congela; sitemaps e noindex conferidos.
    Login: volta_web() tirava a pasta /guia-novo em dobro (corrigido) e o Google login foi ligado com as chaves do Acha Fácil;
    falta o usuário cadastrar https://fsadesigners.com.br/guia-novo/google/retorno.php no Google Cloud.
 8. ⬜ Ficha a confirmar mostra pouco (nome, tipo, bairro, "dados ainda não confirmados") e não copia tudo do Google Maps.

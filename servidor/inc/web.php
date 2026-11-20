@@ -78,10 +78,11 @@ function web_contar(string $cidade, int $categoria_id, ?string $tipo, ?string $b
     [$sql, $par] = web_filtro($cidade, $categoria_id, $tipo, $bairro);
     return (int)valor("SELECT COUNT(*) FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE $sql", $par);
 }
-/** Plano D, passo 7: quantas fichas confirmadas a lista tem (área ou tipo vai para o Google com WEB_TIPO_MINIMO+). */
-function web_contar_confirmadas(string $cidade, int $categoria_id, ?string $tipo): int {
+/** Plano D, passo 7: quantas fichas da lista estão no Google (área ou tipo vai para o Google com WEB_TIPO_MINIMO+). */
+function web_contar_no_google(string $cidade, int $categoria_id, ?string $tipo): int {
+    if (!cidade_no_google($cidade)) return 0;
     [$sql, $par] = web_filtro($cidade, $categoria_id, $tipo, null);
-    return (int)valor("SELECT COUNT(*) FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE $sql AND " . SQL_CONFIRMADA, $par);
+    return (int)valor("SELECT COUNT(*) FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE $sql AND " . sql_no_google(), $par);
 }
 function web_lista(string $cidade, int $categoria_id, ?string $tipo, ?string $bairro, int $pagina): array {
     [$sql, $par] = web_filtro($cidade, $categoria_id, $tipo, $bairro);
@@ -357,7 +358,7 @@ function web_pagina_lista(string $cidade, array $area, ?string $tipo, ?string $b
     $descricao = "$qtd de " . mb_strtolower($titulo_lista) . " em $nome_cidade ($uf): endereço, horário, WhatsApp e avaliações. Veja quem está aberto e chame direto.";
     // não vai para o Google: filtro de bairro e tipo com poucos comércios
     $noindex = $aberto || $bairro !== null || ($tipo !== null && $total < WEB_TIPO_MINIMO)
-        || !cidade_no_google($cidade) || web_contar_confirmadas($cidade, (int)$area['id'], $tipo) < WEB_TIPO_MINIMO;   // Plano D, passo 7
+        || !cidade_no_google($cidade) || web_contar_no_google($cidade, (int)$area['id'], $tipo) < WEB_TIPO_MINIMO;   // Plano D, passo 7
     $canonica = web_absoluta($base_url) . ($pagina > 1 ? '?pagina=' . $pagina : '');
     $lista_ld = ['@context' => 'https://schema.org', '@type' => 'ItemList', 'name' => "$titulo_lista em $nome_cidade",
         'itemListElement' => array_map(fn($p, $i) => ['@type' => 'ListItem', 'position' => ($pagina - 1) * WEB_POR_PAGINA + $i + 1,
@@ -955,9 +956,9 @@ function web_sitemap_cidade(string $cidade, string $tipo): string {
     if (!cidade_no_google($cidade)) return web_sitemap_urls([]);   // Plano D, passo 7: cidade ainda não aberta
     if ($tipo === 'cidades') $urls[] = [web_absoluta(url_cidade($cidade)), null];
     if ($tipo === 'categorias') foreach (web_areas($cidade) as $a) {
-        if (web_contar_confirmadas($cidade, (int)$a['id'], null) >= WEB_TIPO_MINIMO) $urls[] = [web_absoluta(url_area($cidade, $a['slug'])), null];
+        if (web_contar_no_google($cidade, (int)$a['id'], null) >= WEB_TIPO_MINIMO) $urls[] = [web_absoluta(url_area($cidade, $a['slug'])), null];
         foreach (web_tipos($cidade, (int)$a['id']) as $t)
-            if (web_contar_confirmadas($cidade, (int)$a['id'], $t['nome']) >= WEB_TIPO_MINIMO) $urls[] = [web_absoluta(url_tipo($cidade, $a['slug'], $t['nome'])), null];
+            if (web_contar_no_google($cidade, (int)$a['id'], $t['nome']) >= WEB_TIPO_MINIMO) $urls[] = [web_absoluta(url_tipo($cidade, $a['slug'], $t['nome'])), null];
     }
     if ($tipo === 'comercios') foreach (q('SELECT p.id, p.nome, p.cidade, DATE(p.atualizado_em) AS mod_em FROM profissionais p JOIN categorias c ON c.id = p.categoria_id
         WHERE ' . visivel($cidade) . ' AND ' . sql_no_google() . ' ORDER BY p.id') as $p) $urls[] = [web_absoluta(url_ficha($p)), $p['mod_em']];   // Plano D, passo 7 (guia.php)
