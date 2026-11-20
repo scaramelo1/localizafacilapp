@@ -17,7 +17,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 1. ✅ Nome: **Localiza Fácil** (20/11, escolha do usuário). Descartados: "Achei Fácil" (já existe acheifacil.net,
    rede de negócios do mesmo ramo) e "Acha Fácil" (achafacil.com.br é de terceiros). localizafacil.com.br e .com estão
    registrados por outros, mas parados. Cuidado avisado: "Localiza" (aluguel de carros) é marca forte; pesquisar no INPI.
-2. 🟡 Domínio escolhido: **localizafacilapp.com.br** (20/11 ainda livre no registro.br). Falta registrar e apontar o DNS (A) para 177.153.68.212.
+2. 🟡 Domínio **localizafacilapp.com.br**: o usuário está registrando (20/11). Falta apontar o DNS (A @ e www) para 177.153.68.212.
+   Pronto para ligar: servidor/dominio/ativar.sh (confere o DNS, vhost localizafacilapp.conf, certbot, troca endereco_publico
+   e google_retorno, copia htaccess-dominio, que redireciona fsadesigners.com.br/guia-novo e MANTÉM o noindex).
+   Lançamento: servidor/dominio/lancar.sh (tira o bloco SEM_GOOGLE do .htaccess e 'sem_google' do config; 1ª onda começa sozinha).
 3. ✅ E-mail localizafacilapp@gmail.com (contato_email no config e reserva do pagador no Mercado Pago em inc/ofertas.php) e
    Instagram @localizafacilapp ('instagram' no config) (20/11).
 3b. ✅ Marca trocada no site novo (20/11): "Acha Fácil(!)" -> "Localiza Fácil" em 69 arquivos de servidor/ (textos, termos,

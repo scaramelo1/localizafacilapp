@@ -1,0 +1,35 @@
+# Localiza Fácil no domínio próprio (copiado para servidor/publico/.htaccess por servidor/dominio/ativar.sh).
+# Quem abre fsadesigners.com.br/guia-novo/... vai para localizafacilapp.com.br/... (o endereço da FSA nunca foi para o Google).
+# >>> SEM_GOOGLE: enquanto o site não for lançado, nada vai para o Google. servidor/dominio/lancar.sh apaga este bloco.
+<IfModule mod_headers.c>
+  Header always set X-Robots-Tag "noindex, nofollow"
+</IfModule>
+# <<< SEM_GOOGLE
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^(www\.)?fsadesigners\.com\.br$ [NC]
+RewriteRule ^(.*)$ https://localizafacilapp.com.br/$1 [R=301,L,NE]
+# www.localizafacilapp.com.br -> localizafacilapp.com.br
+RewriteCond %{HTTP_HOST} ^www\.localizafacilapp\.com\.br$ [NC]
+RewriteRule ^(.*)$ https://localizafacilapp.com.br/$1 [R=301,L,NE]
+# Páginas públicas de cidade, área, tipo e ficha: o que não é arquivo nem pasta vai para web.php
+RewriteCond %{HTTP_HOST} ^localizafacilapp\.com\.br$ [NC]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ web.php [L,QSA]
+# Divulgar um evento (passo 36): o cartaz pode ter até 8 MB (o php.ini global é 2M/8M)
+<Files "incluir-evento.php">
+  <IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+  </IfModule>
+</Files>
+# 19/11 (avaliação do site): cache no navegador. O CSS sempre vai com ?v=N (pagina.php e admin.php; subir o N ao mudar),
+# então pode ficar 1 ano. Ícones, logo e imagens de compartilhar (assets/og/) por 7 dias.
+<IfModule mod_headers.c>
+  <FilesMatch "\.css$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(png|ico|jpg|webp|svg)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
