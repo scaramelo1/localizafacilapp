@@ -59,7 +59,7 @@ function admin_inicio(string $titulo, ?array $admin): void {
   $cont = fn(int $n) => $n ? ' <span class="contador">' . $n . '</span>' : '';
   $grupos = [
       ['🏪', 'Comércios', $nov + $of, [
-          ['chamar.php', '📞 Quem chamar hoje', 0], ['comercios.php', 'Comércios (editar)', 0], ['ofertas.php', 'Ofertas da semana', $of],
+          ['confirmar.php', '✅ Confirmar fichas', 0], ['chamar.php', '📞 Quem chamar hoje', 0], ['comercios.php', 'Comércios (editar)', 0], ['ofertas.php', 'Ofertas da semana', $of],
           ['cupons.php', 'Cupons', 0], ['novidades.php', 'Novidades do robô', $nov], ['importar.php', 'Importar lista', 0],
           ['cidades.php', 'Cidades', 0], ['mapa.php', 'Mapa das cidades', 0]]],
       ['📊', 'Números', 0, [

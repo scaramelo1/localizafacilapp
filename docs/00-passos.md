@@ -80,8 +80,18 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    modo automático); a lista sempre espera "Importar para o app" em /admin/novidades.php, onde o modo automático ficou
    desligado de propósito (o botão só desliga). Novos entram "a confirmar" e só vão ao Google pelas ondas.
    20/11: o teste grátis da API do Google Maps acabou; a importação de Santa Rita (avaliações) ficou para depois (usuário).
-10. ⬜ Botão de confirmação rápida: link por WhatsApp para o dono conferir os dados, informar horário e foto, de graça.
-11. ⬜ Tela no admin "Confirmar por telefone" (a equipe liga, confere e marca como confirmada).
+10. ✅ Link de confirmação para o dono (20/11): mudança 036 (confirmacao_links: hash do token, aberto/usado/resultado;
+    confirmar_fila). inc/confirmacao.php: confirmacao_criar_link() (token 16 bytes, vale 60 dias), mensagem pronta de
+    WhatsApp (WhatsApp ou celular do comércio). publico/confirmar.php?c=...: sem conta; "Está tudo certo" confirma na hora
+    (confirmado_por = 'dono'); "Corrija aqui" (telefone, WhatsApp, endereço, bairro, horário) vira alteração pendente sem
+    acesso de dono ("Link de confirmação" em Pendências) e também confirma; avisa os admins no celular; convite para os planos.
+    Fotos e descrição continuam no plano (regra do negócio). Botão "💬 Mandar link de confirmação ao dono" em
+    /admin/comercio.php. Selo: "Dados confirmados pelo dono em mm/aaaa" (ficha) e "Confirmado pelo dono" (cartão).
+11. ✅ /admin/confirmar.php "✅ Confirmar fichas" (20/11, no menu Comércios): escolhe a cidade, mostra um comércio por vez
+    (fila: a confirmar com contato, ordem GOOGLE_PRIORIDADE_AREAS e mais conhecidos), barra da meta (META_CONFIRMADAS 50),
+    Ligar/WhatsApp/Mapa/Ver ficha/Editar tudo, roteiro da ligação, correção rápida (telefone, WhatsApp, endereço, bairro,
+    horário; campo que não veio não muda) e botões Confirmado / Mandar link (volta em 3 dias) / Não atende (volta amanhã) /
+    Pular (1 h) / Fechou (status pausado, sai da fila). Testado com fichas de Aguaí; dados de teste desfeitos.
 12. 🟡 App passado para o Localiza Fácil no código (20/11, pedido do usuário): app.json name "Localiza Fácil", versão
     1.14.0, texto da localização; 14 arquivos de src/ ("Acha Fácil(!)" -> "Localiza Fácil", Abertura e Cabecalho com o
     nome novo; Marca 21 px e traço tamanho*5), todos os endereços -> https://localizafacilapp.com.br; ícones novos

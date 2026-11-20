@@ -18,6 +18,16 @@ $erro = null;
 $valores = [];
 
 // Plano D, passo 6 (20/11): marcar como confirmada pela equipe (ou voltar para "a confirmar")
+// Plano D, passo 10: link de confirmação para o dono (WhatsApp com a mensagem pronta)
+if (e_post() && ($_POST['acao'] ?? '') === 'link_confirmacao') {
+    exigir_post();
+    require_once __DIR__ . '/../../inc/confirmacao.php';
+    $url_c = confirmacao_criar_link($id, (int)$admin['id']);
+    fila_marcar($id, 'link', (int)$admin['id'], FILA_DIAS_LINK);
+    registrar((int)$admin['id'], 'mandou_link_confirmacao', $id);
+    $_SESSION['confirmar_link'] = ['wa' => confirmacao_link_whats($p, $url_c), 'msg' => confirmacao_mensagem($p, $url_c)];
+    ir('admin/comercio.php?id=' . $id);
+}
 if (e_post() && in_array($_POST['acao'] ?? '', ['confirmar', 'desconfirmar'], true)) {
     exigir_post();
     $sim = $_POST['acao'] === 'confirmar';
@@ -148,8 +158,15 @@ admin_inicio('Editar ' . $p['nome'], $admin);
   <?php else: ?>
     <span><strong>⏳ A confirmar</strong> — veio da lista do Google Maps e ninguém conferiu ainda.</span>
     <button class="botao" name="acao" value="confirmar">Conferi os dados: marcar como confirmada</button>
+    <button class="botao contorno" name="acao" value="link_confirmacao">💬 Mandar link de confirmação ao dono</button>
   <?php endif ?>
 </form>
+<?php if ($lk = $_SESSION['confirmar_link'] ?? null): unset($_SESSION['confirmar_link']); // passo 10 ?>
+  <div class="aviso ok"><strong>Link de confirmação pronto.</strong>
+    <?php if ($lk['wa']): ?><a class="botao" href="<?= h($lk['wa']) ?>" target="_blank" rel="noopener">💬 Abrir o WhatsApp com a mensagem</a>
+    <?php else: ?>Sem WhatsApp nem celular: copie a mensagem.<?php endif ?>
+    <p style="margin:8px 0 0"><textarea readonly rows="3" style="width:100%" onclick="this.select()"><?= h($lk['msg']) ?></textarea></p></div>
+<?php endif ?>
 <div class="quadro">Aqui o que você salva vai <strong>direto</strong> para o app e o site, sem conferência. Depois de editado
   por um admin, o comércio não é mais mudado pela importação das listas do robô nem pela limpeza automática.</div>
 <?php if ($pend): ?>

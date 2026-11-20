@@ -72,7 +72,7 @@ $conf = confirmacao_por_cidade(); $ondas = google_ondas_por_cidade(); $onda = go
     <td><strong><?= adm_comercio((int)$a['pid'], $a['nome'], $a['cidade']) ?></strong></td>
     <td><?= adm_cidade($a['cidade'], null, true) ?></td>
     <td><?= h(implode(', ', $campos)) ?></td>
-    <td><?= h($a['dono'] ?? '?') ?></td>
+    <td><?= h($a['dono'] ?? 'Link de confirmação') ?></td>
     <td><?= h(datahora_br($a['criado_em'])) ?></td>
     <td><a class="botao pequeno" href="alteracao.php?id=<?= (int)$a['id'] ?>">Conferir</a></td>
   </tr>
