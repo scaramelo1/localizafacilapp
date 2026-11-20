@@ -1,0 +1,28 @@
+# Guia novo (Plano D, nome provisório), em https://fsadesigners.com.br/guia-novo/ enquanto não tem domínio.
+# NADA daqui vai para o Google (mesmas fichas do Acha Fácil): noindex em toda resposta.
+<IfModule mod_headers.c>
+  Header always set X-Robots-Tag "noindex, nofollow"
+</IfModule>
+RewriteEngine On
+RewriteBase /guia-novo/
+# Páginas públicas de cidade, área, tipo e ficha: o que não é arquivo nem pasta vai para web.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ web.php [L,QSA]
+# Divulgar um evento (passo 36): o cartaz pode ter até 8 MB (o php.ini global é 2M/8M)
+<Files "incluir-evento.php">
+  <IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+  </IfModule>
+</Files>
+# 19/11 (avaliação do site): cache no navegador. O CSS sempre vai com ?v=N (pagina.php e admin.php; subir o N ao mudar),
+# então pode ficar 1 ano. Ícones, logo e imagens de compartilhar (assets/og/) por 7 dias.
+<IfModule mod_headers.c>
+  <FilesMatch "\.css$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(png|ico|jpg|webp|svg)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>

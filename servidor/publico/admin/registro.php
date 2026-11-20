@@ -1,0 +1,21 @@
+<?php
+// O que cada administrador fez (últimas 200 ações)
+require __DIR__ . '/../../inc/admin.php';
+$admin = exigir_admin();
+$itens = linhas('SELECT r.*, a.nome AS admin_nome, p.nome AS comercio FROM registro_admin r
+    LEFT JOIN admins a ON a.id = r.admin_id LEFT JOIN profissionais p ON p.id = r.profissional_id
+    ORDER BY r.id DESC LIMIT 200');
+const ACOES = ['autorizou_evento' => 'Autorizou evento', 'recusou_evento' => 'Recusou evento', 'versao_play' => 'Versão da Play Store', 'criou_evento' => 'Cadastrou evento', 'editou_evento' => 'Editou evento', 'apagou_evento' => 'Apagou evento', 'importou_lista' => 'Importou lista do robô', 'entrou' => 'Entrou', 'trocou_senha' => 'Trocou a senha', 'incluiu' => 'Publicou negócio novo', 'apagou_cidade' => 'Tirou cidade da lista', 'acesso_pago' => 'Dono entrou pelo pagamento', 'liberou_acesso' => 'Liberou o painel', 'cortou_acesso' => 'Cortou o acesso',
+    'aprovou_alteracao' => 'Aprovou alteração', 'recusou_alteracao' => 'Recusou alteração', 'tirou_do_app' => 'Tirou do app', 'editou_comercio' => 'Editou comércio',
+    'pedido_feito' => 'Resolveu pedido', 'criou_cupom' => 'Criou cupom', 'ligou_cupom' => 'Ligou cupom', 'desligou_cupom' => 'Desligou cupom', 'encerrou_cortesia' => 'Encerrou cortesia', 'recusou_pedido' => 'Recusou pedido'];
+admin_inicio('Registro', $admin);
+?>
+<h1>Registro</h1>
+<div class="tabela"><table>
+  <tr><th>Quando</th><th>Quem</th><th>O quê</th><th>Comércio</th><th>Detalhe</th></tr>
+  <?php foreach ($itens as $r): ?>
+  <tr><td><?= h(datahora_br($r['criado_em'])) ?></td><td><?= h($r['admin_nome'] ?? '?') ?></td>
+    <td><?= h(ACOES[$r['acao']] ?? $r['acao']) ?></td><td><?= $r['comercio'] ? adm_comercio((int)$r['profissional_id'], $r['comercio']) : '' ?></td><td><?= h($r['detalhe'] ?? '') ?></td></tr>
+  <?php endforeach ?>
+</table></div>
+<?php admin_fim();

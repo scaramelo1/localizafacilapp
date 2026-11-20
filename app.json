@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "name": "Acha Fácil",
+    "slug": "acha-facil",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "version": "1.13.0",
+    "scheme": "achafacil",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#005C38"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "O Acha Fácil usa sua localização só para mostrar os comércios perto de você. Ela não é guardada."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#005C38"
+        }
+      ]
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "br.com.fsadesigner.achafacil",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "br.com.fsadesigner.achafacil",
+      "adaptiveIcon": {
+        "backgroundColor": "#005C38",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "blockedPermissions": [
+        "com.google.android.gms.permission.AD_ID"
+      ]
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "e4e21f3e-3cff-4763-a2aa-5ae7c288b1fe"
+      }
+    },
+    "owner": "scaramelo"
+  }
+}

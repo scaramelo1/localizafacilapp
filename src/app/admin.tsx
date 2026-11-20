@@ -1,0 +1,363 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
+import { useFocusEffect, useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import { useCallback, useState } from 'react';
+import { Alert, Linking, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+
+import { chamar, type AlteracaoPendente, type EventoPendente, type Pendencias } from '../api/cliente';
+import { Cabecalho } from '../componentes/Cabecalho';
+import { Botao, Carregando, Falha, useCarregar } from '../componentes/ui';
+import { useConta } from '../conta';
+import { cartao, cores, fonte } from '../tema';
+
+// Administração no app (só e-mails de admin): enviar notificação aos usuários (tela notificar), eventos enviados pelo
+// público para autorizar, alterações dos donos
+// para aprovar ou recusar, pedidos novos e cidades pedidas. Os avisos no celular abrem esta tela. Pedidos de assumir/tirar do app abrem o /admin do site.
+export default function TelaAdmin() {
+  const { usuario } = useConta();
+  const router = useRouter();
+  const { dados, erro, carregando, recarregar } = useCarregar(() => chamar<Pendencias>('admin.php'), 'admin');
+
+  // voltando para a tela (ou tocando num aviso com ela aberta): recarrega
+  useFocusEffect(
+    useCallback(() => {
+      recarregar();
+    }, [recarregar]),
+  );
+
+  if (!usuario?.admin) {
+    return (
+      <View style={{ flex: 1 }}>
+        <Cabecalho voltar titulo="Administração" />
+        <Text style={[estilos.texto, { padding: 16 }]}>Só para administradores.</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView
+      contentContainerStyle={{ paddingBottom: 32 }}
+      refreshControl={<RefreshControl refreshing={carregando && !!dados} onRefresh={recarregar} colors={[cores.verde]} />}
+    >
+      <Cabecalho voltar titulo="Administração" />
+      <View style={{ padding: 16 }}>
+        {!dados && carregando ? (
+          <Carregando />
+        ) : erro && !dados ? (
+          <Falha mensagem={erro} tentar={recarregar} />
+        ) : dados ? (
+          <>
+            <Botao titulo="Enviar notificação aos usuários" icone="bell-ring-outline" tipo="amarelo" onPress={() => router.push('/notificar')} />
+
+            {(dados.eventos?.length ?? 0) > 0 && (
+              <>
+                <Text style={estilos.secao}>Eventos para autorizar ({dados.eventos?.length})</Text>
+                {dados.eventos?.map((e) => (
+                  <CartaoEvento key={e.id} e={e} aoDecidir={recarregar} />
+                ))}
+              </>
+            )}
+
+            <Text style={estilos.secao}>Alterações para aprovar ({dados.alteracoes.length})</Text>
+            {dados.alteracoes.length === 0 && <Text style={estilos.vazio}>Nada esperando. Tudo em dia!</Text>}
+            {dados.alteracoes.map((a) => (
+              <CartaoAlteracao key={a.id} a={a} aoDecidir={recarregar} />
+            ))}
+
+            <Text style={estilos.secao}>Pedidos de donos ({dados.pedidos.length})</Text>
+            {dados.pedidos.length === 0 && <Text style={estilos.vazio}>Nenhum pedido novo.</Text>}
+            {dados.pedidos.map((p) => (
+              <View key={p.id} style={estilos.cartao}>
+                <Text style={estilos.titulo}>
+                  {p.tipo === 'remover' ? 'Tirar do app' : p.tipo === 'incluir' ? 'Incluir negócio' : 'Assumir o perfil'}
+                  {p.plano ? ` · plano ${p.plano}` : ''}
+                  {p.pago ? ' · pago' : ''}
+                </Text>
+                <Text style={estilos.texto}>
+                  {p.comercio ? <LinkComercio id={p.profissionalId} nome={p.comercio} /> : 'Negócio novo'}
+                  {p.cidade ? ' · ' : ''}
+                  {p.cidade ? <LinkCidade nome={p.cidade} link={p.linkCidade} /> : null}
+                </Text>
+                <Text style={estilos.sub}>
+                  {p.nome} · {p.telefone} · {p.quando}
+                </Text>
+                <Botao
+                  titulo="Abrir no site"
+                  icone="open-in-new"
+                  tipo="contorno"
+                  onPress={() => WebBrowser.openBrowserAsync(`${dados.site}pedido.php?id=${p.id}`)}
+                  estilo={{ marginTop: 10 }}
+                />
+              </View>
+            ))}
+
+            <Text style={estilos.secao}>Quero minha Cidade!</Text>
+            {dados.cidades.length === 0 && <Text style={estilos.vazio}>Ninguém pediu ainda.</Text>}
+            {dados.cidades.map((c) => (
+              <View key={`${c.cidade}-${c.uf ?? ''}`} style={[estilos.cartao, estilos.linha]}>
+                <MaterialCommunityIcons name="map-marker-plus" size={26} color={cores.verde} />
+                <View style={{ flex: 1 }}>
+                  <Text style={estilos.titulo}>
+                    {c.cidade}
+                    {c.uf ? ` (${c.uf})` : ''}
+                  </Text>
+                  <Text style={estilos.sub}>Último pedido: {c.ultimo}</Text>
+                </View>
+                <Text style={estilos.total}>{c.total}</Text>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Excluir ${c.cidade} da lista`}
+                  hitSlop={10}
+                  onPress={() =>
+                    Alert.alert('Excluir da lista?', `Tirar ${c.cidade} da lista do Quero minha Cidade?`, [
+                      { text: 'Cancelar', style: 'cancel' },
+                      {
+                        text: 'Excluir',
+                        style: 'destructive',
+                        onPress: async () => {
+                          try {
+                            await chamar('admin.php', 'POST', { acao: 'apagar_cidade', cidade: c.cidade, uf: c.uf ?? '' });
+                            recarregar();
+                          } catch (e) {
+                            Alert.alert('Não deu certo', e instanceof Error ? e.message : 'Tente de novo.');
+                          }
+                        },
+                      },
+                    ])
+                  }
+                >
+                  <MaterialCommunityIcons name="trash-can-outline" size={26} color={cores.erro} />
+                </Pressable>
+              </View>
+            ))}
+
+            <Botao titulo="Abrir a administração no site" icone="web" tipo="contorno" onPress={() => WebBrowser.openBrowserAsync(dados.site)} estilo={{ marginTop: 16 }} />
+          </>
+        ) : null}
+      </View>
+    </ScrollView>
+  );
+}
+
+/** Evento enviado pelo publico: tudo o que vai aparecer na agenda, quem enviou, e Autorizar ou Recusar. */
+/** 19/11 (passo 109): nome do comercio abre a ficha no app (sem id, so o texto). */
+function LinkComercio({ id, nome }: { id?: number | null; nome: string }) {
+  const router = useRouter();
+  if (!id) return <Text>{nome}</Text>;
+  return (
+    <Text accessibilityRole="link" onPress={() => router.push(`/profissional/${id}`)} style={estilos.linkNome}>
+      {nome}
+    </Text>
+  );
+}
+
+/** 19/11 (passo 109): nome da cidade abre a pagina da cidade no site, com todos os comercios. */
+function LinkCidade({ nome, link }: { nome: string; link?: string | null }) {
+  if (!link) return <Text>{nome}</Text>;
+  return (
+    <Text accessibilityRole="link" onPress={() => WebBrowser.openBrowserAsync(link).catch(() => Linking.openURL(link))} style={estilos.linkNome}>
+      {nome}
+    </Text>
+  );
+}
+
+function CartaoEvento({ e, aoDecidir }: { e: EventoPendente; aoDecidir: () => void }) {
+  const [enviando, setEnviando] = useState(false);
+  const decidir = (acao: 'autorizar_evento' | 'recusar_evento') =>
+    Alert.alert(
+      acao === 'autorizar_evento' ? 'Autorizar e publicar?' : 'Recusar o evento?',
+      acao === 'autorizar_evento' ? `${e.titulo} vai para a agenda do site e do app agora.` : `${e.titulo} não vai aparecer na agenda.`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: acao === 'autorizar_evento' ? 'Autorizar' : 'Recusar',
+          style: acao === 'autorizar_evento' ? 'default' : 'destructive',
+          onPress: async () => {
+            setEnviando(true);
+            try {
+              await chamar('admin.php', 'POST', { acao, id: e.id });
+              aoDecidir();
+            } catch (err) {
+              Alert.alert('Não deu certo', err instanceof Error ? err.message : 'Tente de novo.');
+              setEnviando(false);
+            }
+          },
+        },
+      ],
+    );
+
+  return (
+    <View style={estilos.cartao}>
+      {e.imagem && <Image source={e.imagem} style={[estilos.foto, { width: '100%', height: 180 }]} contentFit="cover" accessibilityLabel="Cartaz do evento" />}
+      <Text style={[estilos.titulo, { marginTop: e.imagem ? 10 : 0 }]}>{e.titulo}</Text>
+      <Text style={estilos.texto}>
+        {e.quando}
+        {e.horario ? ` - ${e.horario}` : ''} · <LinkCidade nome={e.cidade} link={e.linkCidade} />
+      </Text>
+      {e.local && <Text style={estilos.texto}>{e.local}</Text>}
+      {e.preco && <Text style={estilos.texto}>Entrada: {e.preco}</Text>}
+      {e.linkOficial && (
+        <Text style={[estilos.texto, estilos.link]} onPress={() => WebBrowser.openBrowserAsync(e.linkOficial!)}>
+          {e.linkOficial}
+        </Text>
+      )}
+      {e.descricao && (
+        <Text style={[estilos.texto, { marginTop: 8 }]} numberOfLines={8}>
+          {e.descricao}
+        </Text>
+      )}
+      <Text style={[estilos.sub, { marginTop: 8 }]}>
+        Enviado por {e.enviadoPor ?? '?'} · {e.telefone} · {e.enviadoEm}
+      </Text>
+      {e.recado && <Text style={estilos.sub}>Recado: {e.recado}</Text>}
+      <View style={{ gap: 8, marginTop: 12 }}>
+        <Botao titulo="Autorizar e publicar" icone="check" desativado={enviando} onPress={() => decidir('autorizar_evento')} />
+        {e.whatsapp && <Botao titulo="Falar no WhatsApp" icone="whatsapp" tipo="whatsapp" desativado={enviando} onPress={() => Linking.openURL(e.whatsapp!)} />}
+        <Botao titulo="Recusar" icone="close" tipo="perigo" desativado={enviando} onPress={() => decidir('recusar_evento')} />
+      </View>
+    </View>
+  );
+}
+
+/** Uma alteração: como está no app x como vai ficar, com Aprovar e Recusar (recusa pede o motivo). */
+function CartaoAlteracao({ a, aoDecidir }: { a: AlteracaoPendente; aoDecidir: () => void }) {
+  const [recusando, setRecusando] = useState(false);
+  const [motivo, setMotivo] = useState('');
+  const [enviando, setEnviando] = useState(false);
+
+  const decidir = async (acao: 'aprovar' | 'recusar') => {
+    if (acao === 'recusar' && motivo.trim() === '') return Alert.alert('Falta o motivo', 'Escreva por que a alteração foi recusada. O dono vê no painel.');
+    setEnviando(true);
+    try {
+      await chamar('admin.php', 'POST', { acao, id: a.id, motivo: motivo.trim() });
+      aoDecidir();
+    } catch (e) {
+      Alert.alert('Não deu certo', e instanceof Error ? e.message : 'Tente de novo.');
+      setEnviando(false);
+    }
+  };
+
+  const aprovar = () =>
+    Alert.alert('Aprovar e publicar?', `As mudanças de ${a.comercio} vão para o app agora.`, [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Aprovar', onPress: () => decidir('aprovar') },
+    ]);
+
+  return (
+    <View style={estilos.cartao}>
+      <Text style={estilos.titulo}>
+        <LinkComercio id={a.profissionalId} nome={a.comercio} />
+      </Text>
+      <Text style={estilos.sub}>
+        <LinkCidade nome={a.cidade} link={a.linkCidade} /> · pedido por {a.dono ?? '?'} em {a.quando}
+      </Text>
+      {a.pago && (
+        <Text style={estilos.sub}>
+          Plano {a.pago.plano ?? ''} pago por {a.pago.nome} · {a.pago.telefone}
+        </Text>
+      )}
+
+      {a.primeira && (
+        <View style={estilos.alerta}>
+          <MaterialCommunityIcons name="phone-alert" size={24} color={cores.erro} />
+          <View style={{ flex: 1 }}>
+            <Text style={estilos.alertaTexto}>
+              Primeira mudança deste dono. Antes de aprovar telefone, WhatsApp, endereço ou nome, ligue para o telefone que já está no app e
+              confirme que é o responsável.
+            </Text>
+            {a.conferirTelefone && (
+              <Text style={[estilos.alertaTexto, estilos.link]} onPress={() => Linking.openURL(`tel:${a.conferirTelefone?.replace(/\D/g, '')}`)}>
+                Ligar para {a.conferirTelefone}
+              </Text>
+            )}
+          </View>
+        </View>
+      )}
+
+      {a.campos.map((c) => (
+        <View key={c.campo} style={estilos.campo}>
+          <Text style={estilos.rotulo}>{c.rotulo}</Text>
+          <View style={[estilos.valor, estilos.antes]}>
+            <Text style={estilos.legenda}>Hoje no app</Text>
+            <Valor campo={c.campo} texto={c.antes} />
+          </View>
+          <View style={[estilos.valor, estilos.depois]}>
+            <Text style={estilos.legenda}>Vai ficar</Text>
+            <Valor campo={c.campo} texto={c.depois} />
+          </View>
+        </View>
+      ))}
+
+      {recusando ? (
+        <>
+          <Text style={[estilos.rotulo, { marginTop: 12 }]}>Motivo da recusa (o dono vê)</Text>
+          <TextInput
+            value={motivo}
+            onChangeText={setMotivo}
+            maxLength={500}
+            multiline
+            placeholder="Ex.: o telefone não é do comércio"
+            placeholderTextColor={cores.textoSuave}
+            style={estilos.motivo}
+          />
+          <Botao titulo="Recusar" icone="close" tipo="perigo" desativado={enviando} onPress={() => decidir('recusar')} estilo={{ marginTop: 10 }} />
+          <Botao titulo="Voltar" tipo="contorno" desativado={enviando} onPress={() => setRecusando(false)} estilo={{ marginTop: 8 }} />
+        </>
+      ) : (
+        <View style={{ gap: 8, marginTop: 12 }}>
+          <Botao titulo="Aprovar e publicar" icone="check" desativado={enviando} onPress={aprovar} />
+          <Botao titulo="Recusar" icone="close" tipo="perigo" desativado={enviando} onPress={() => setRecusando(true)} />
+        </View>
+      )}
+    </View>
+  );
+}
+
+function Valor({ campo, texto }: { campo: string; texto: string | null }) {
+  if (!texto) return <Text style={[estilos.texto, { color: cores.textoSuave }]}>(vazio)</Text>;
+  if (campo === 'foto') return <Image source={texto} style={[estilos.foto, { width: 120, backgroundColor: '#fff' }]} contentFit="contain" accessibilityLabel="Logo" />;
+  if (campo === 'fotos')
+    return (
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+        {texto.split('\n').map((u, i) => (
+          <Image key={u} source={u} style={estilos.miniatura} contentFit="cover" accessibilityLabel={`Foto ${i + 1}`} />
+        ))}
+      </View>
+    );
+  return <Text style={estilos.texto}>{texto}</Text>;
+}
+
+const estilos = StyleSheet.create({
+  linkNome: { textDecorationLine: 'underline', color: cores.verde },
+  secao: { fontSize: fonte.grande, fontWeight: '900', color: cores.texto, marginTop: 14, marginBottom: 10 },
+  vazio: { fontSize: fonte.pequena, color: cores.textoSuave, marginBottom: 8 },
+  cartao: { ...cartao, padding: 14, marginBottom: 12 },
+  linha: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  titulo: { fontSize: fonte.normal, fontWeight: '900', color: cores.texto },
+  texto: { fontSize: fonte.pequena, color: cores.texto, lineHeight: 22 },
+  sub: { fontSize: 14, color: cores.textoSuave, marginTop: 2 },
+  total: { fontSize: fonte.grande, fontWeight: '900', color: cores.verde },
+  alerta: { flexDirection: 'row', gap: 10, backgroundColor: '#FDECEC', borderRadius: 12, padding: 12, marginTop: 10 },
+  alertaTexto: { fontSize: 15, color: cores.erro, lineHeight: 21, fontWeight: '700' },
+  link: { textDecorationLine: 'underline', marginTop: 6 },
+  campo: { marginTop: 12 },
+  rotulo: { fontSize: fonte.pequena, fontWeight: '900', color: cores.texto, marginBottom: 6 },
+  valor: { borderRadius: 12, padding: 10, marginBottom: 6 },
+  antes: { backgroundColor: '#FDF0EF' },
+  depois: { backgroundColor: cores.verdeClaro },
+  legenda: { fontSize: 13, fontWeight: '800', color: cores.textoSuave, marginBottom: 2 },
+  foto: { width: 180, height: 120, borderRadius: 10 },
+  miniatura: { width: 96, height: 72, borderRadius: 8 },
+  motivo: {
+    borderWidth: 1,
+    borderColor: cores.borda,
+    borderRadius: 12,
+    padding: 12,
+    minHeight: 80,
+    fontSize: fonte.pequena,
+    color: cores.texto,
+    textAlignVertical: 'top',
+    backgroundColor: cores.cartao,
+  },
+});

@@ -1,0 +1,99 @@
+<?php
+// Termos de uso do app e do site (exigidos pelas lojas). Texto simples, em linguagem do dia a dia.
+require __DIR__ . '/../inc/base.php';
+require __DIR__ . '/../inc/pagina.php';
+require_once __DIR__ . '/../inc/ofertas.php';   // 19/11: preço e regras da Oferta da semana
+$base = config()['url'];
+pagina_inicio('Termos de uso | Acha Fácil!', 'Regras de uso do app Acha Fácil, para quem procura e para profissionais.');
+?>
+<main class="documento">
+  <h1>Termos de uso</h1>
+  <p class="atualizado">Última atualização: 10 de novembro de 2026</p>
+
+  <div class="quadro">
+    <strong>Resumo:</strong> o Acha Fácil é uma vitrine de profissionais e comércios de <?= h(texto_cidades()) ?>.
+    Usar é grátis. O Acha Fácil não faz nem cobra pelos serviços: o combinado é direto entre você e o profissional.
+    Avalie com respeito e verdade.
+  </div>
+
+  <h2>1. O que é o Acha Fácil</h2>
+  <p>O Acha Fácil é um aplicativo e site que reúne profissionais e comércios de <?= h(texto_cidades()) ?>.
+  Ele mostra informações de contato, serviços e avaliações.
+  Ao usar o app ou o site, você concorda com estes termos e com a <a href="<?= $base ?>/privacidade.php">Política de Privacidade</a>.</p>
+
+  <h2>2. Usar sem conta e com conta</h2>
+  <p>Procurar, ver perfis e chamar profissionais não precisa de conta. A conta é feita com a sua conta Google (o app recebe só nome, e-mail e foto) e serve para avaliar,
+  comentar e salvar profissionais. Para criar uma conta, você precisa ter 18 anos ou mais (ou autorização de pai, mãe ou responsável),
+  manter a sua conta Google protegida. Você pode excluir sua conta quando quiser, pelo app
+  (aba Conta → Excluir minha conta).</p>
+
+  <h2>3. Avaliações e comentários</h2>
+  <ul>
+    <li>Avalie só quem você realmente contratou ou atendeu você.</li>
+    <li>Nada de ofensas, palavrões, preconceito, ameaças, dados pessoais de outras pessoas, propaganda ou informações falsas.</li>
+    <li>Cada pessoa tem uma avaliação por profissional e pode mudá-la depois.</li>
+    <li>No app, o comentário aparece com o seu primeiro nome e a inicial do sobrenome (ex.: "Maria S.").</li>
+    <li>O profissional pode responder publicamente à sua avaliação.</li>
+    <li>O Acha Fácil pode ocultar comentários que desrespeitem estas regras e suspender contas que insistam nisso.</li>
+  </ul>
+
+  <h2>4. A contratação é entre você e o profissional</h2>
+  <p>O Acha Fácil não presta os serviços anunciados, não participa do combinado e não recebe pagamento pelos serviços.
+  Preço, prazo, qualidade, garantia e nota fiscal são de responsabilidade do profissional. A aprovação do cadastro e o selo
+  "Verificado pelo Acha Fácil" indicam que o cadastro foi conferido, mas não são uma garantia do serviço.
+  Antes de contratar, converse, peça orçamento e veja as avaliações.</p>
+
+  <h2>5. Para profissionais e comércios</h2>
+  <ul>
+    <li>Os comércios que o dono ainda não assumiu aparecem com informações públicas do próprio negócio na internet
+    (nome, endereço, telefone, WhatsApp, site e redes sociais). Cada comércio tem uma página no app e no site
+    (por exemplo, achafacilapp.com.br/<?= h(cidade_web(CIDADE_PADRAO)) ?>/), que pode aparecer em buscadores como o Google.
+    O dono pode assumir a página de graça (plano Grátis) e corrigir os dados, ou pedir para tirar, sem custo, pela <a href="<?= $base ?>/busca.php">busca do site</a>.</li>
+    <li>No plano Grátis, o dono entra com a conta Google, declara ser o responsável pelo comércio e pode corrigir nome, telefone,
+    WhatsApp, endereço, bairro, site e horário. A página ganha o selo "Dados confirmados pelo dono". Quem se cadastrar como dono
+    de um comércio que não é seu perde o acesso, e a página volta para o responsável de verdade.</li>
+    <li>Você é responsável pelas informações, fotos e textos da sua página, e garante que tem direito de usá-los.</li>
+    <li>Todo cadastro passa pela aprovação da equipe do Acha Fácil, que pode recusar ou retirar cadastros falsos, enganosos,
+    ilegais ou que recebam reclamações graves.</li>
+    <li>O plano Básico é pago uma vez só, pelo Mercado Pago, e não tem mensalidade: libera logo, até 2 fotos, descrição, produtos e
+    serviços, Instagram, "atende em casa / faz entrega" e os números da página no mês, e a página fica no app enquanto seguir estes termos.
+    O plano Destaque permite até 10 fotos; com o Destaque vencido, a página volta a mostrar só as 2 primeiras.
+    Fichas do Grátis e do Básico podem mostrar anúncios do Google; fichas do Destaque, não.
+    O plano Destaque é uma assinatura mensal no cartão, pelo Mercado Pago, que pode ser cancelada a qualquer momento e vale até
+    o fim do mês já pago. O plano Destaque + Site é uma assinatura mensal do mesmo jeito, com tudo do Destaque e um site
+    próprio (landing page) feito pela equipe do Acha Fácil, com domínio incluso; o site e o domínio ficam no ar enquanto a assinatura estiver em dia. Com o Destaque em atraso ou cancelado, a página perde os recursos do Destaque; se o Básico foi pago,
+    continua no app com o Básico, e se não foi, sai do ar até a regularização.</li>
+    <li>A ordem em que os profissionais aparecem muda todos os dias. Quem assina o plano Destaque aparece também no carrossel
+    do topo da tela inicial. Avaliações não podem ser compradas, trocadas nem apagadas a pedido.</li>
+    <li>O selo "Verificado pelo Acha Fácil", responder as avaliações e ver os números da página são recursos do plano Destaque.
+    O selo aparece depois que a equipe confere o comércio; não vem automaticamente com o pagamento.</li>
+    <li>Quem tem o plano Destaque em dia pode colocar uma <strong>Oferta da semana</strong>, paga à parte por oferta (pagamento
+    único pelo Mercado Pago, <?= h(oferta_preco_texto()) ?>). A oferta aparece na página do comércio e na página da cidade pelos dias
+    escolhidos (no máximo <?= OFERTA_MAX_DIAS ?>), contados a partir da aprovação da equipe. Se a equipe pedir um ajuste, o dono corrige e
+    manda de novo sem pagar outra vez. Encerrar a oferta antes do prazo, ou o Destaque vencer, não devolve o valor. A oferta tem que
+    ser verdadeira e valer para quem chegar pelo Acha Fácil.</li>
+    <li>Quem tem o Básico pago ou o Destaque em dia recebe, no dia 1 de cada mês, um aviso no celular com o resumo do mês anterior
+    (visitas à página e toques no WhatsApp, em ligar e no mapa) e o link para o relatório completo.</li>
+  </ul>
+
+  <h2>6. Uso correto</h2>
+  <p>Não é permitido usar o Acha Fácil para enviar spam, copiar em massa os dados dos profissionais, tentar invadir ou sobrecarregar o sistema,
+  ou se passar por outra pessoa. A marca, o nome e o visual do Acha Fácil não podem ser usados sem autorização.</p>
+
+  <h2>7. Disponibilidade</h2>
+  <p>Fazemos o possível para manter o app funcionando, mas ele pode ficar fora do ar por manutenção ou problemas técnicos.
+  Os telefones, endereços e horários são informados pelos próprios profissionais e podem mudar.</p>
+
+  <h2>8. Mudanças nestes termos</h2>
+  <p>Estes termos podem ser atualizados. A data no topo da página mostra a última mudança. Se a mudança for importante,
+  avisaremos no app.</p>
+
+  <h2>9. Lei e foro</h2>
+  <p>Estes termos seguem as leis do Brasil, incluindo o Código de Defesa do Consumidor, o Marco Civil da Internet e a
+  Lei Geral de Proteção de Dados. Fica eleito o foro da Comarca de São João da Boa Vista – SP, sem prejuízo do direito do
+  consumidor de usar o foro do seu domicílio.</p>
+
+  <h2>10. Fale conosco</h2>
+  <p>Dúvidas, reclamações ou pedidos: <?= contatos_html() ?>.</p>
+</main>
+<?php pagina_fim();
