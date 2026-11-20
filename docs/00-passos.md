@@ -64,7 +64,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    Testado em cópia: onda 1 = 100 por cidade (+ as com dono), onda 3 = 300, pausa congela; sitemaps e noindex conferidos.
    Prioridade das áreas (20/11, pedido do usuário, "sempre"): GOOGLE_PRIORIDADE_AREAS = Veículos, Saúde, Alimentação,
    Casa e construção, Mercados e bebidas, Lojas e varejo, depois as outras; em cada área, das mais conhecidas.
-   Efeito (simulado): Poços passa ~4 semanas só com Veículos (872 na fila); Aguaí já tem todas as áreas na 4ª onda.
+   20/11 (opção B, escolhida pelo usuário depois de explicadas A e B): cada onda de 100 é DIVIDIDA entre as áreas com
+   GOOGLE_ONDA_PESOS = Veículos 25, Saúde 20, Alimentação 15, Casa 12, Mercados 10, Lojas 10, outras 8; área que esgota
+   passa as vagas para as próximas (google_dividir). Cortes por cidade e área guardados 1 h em $DADOS/cache/google-cortes.json.
+   Simulado: onda 1 = 25/20/15/12/10/10/8 em Poços e Aguaí; onda 10 em Aguaí = a fila inteira (532).
    Login: volta_web() tirava a pasta /guia-novo em dobro (corrigido) e o Google login foi ligado com as chaves do Acha Fácil;
    falta o usuário cadastrar https://fsadesigners.com.br/guia-novo/google/retorno.php no Google Cloud.
 8. ✅ Selo na ficha (20/11, sugestão aprovada; troca o "mostrar pouco", porque com as ondas fichas a confirmar também vão ao Google):

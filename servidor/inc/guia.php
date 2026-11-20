@@ -176,8 +176,9 @@ function confirmacao_por_cidade(): array {
  * Plano D, passo 7 (20/11, revisto a pedido do usuário): quem vai para o Google, sem precisar confirmar ninguém.
  *  - Nada enquanto 'sem_google' estiver no config (site no domínio da FSA, mesmas fichas do Localiza Fácil).
  *  - Ficha: telefone ou WhatsApp E (confirmada OU 5+ avaliações no Google [popularidade]), liberada EM ONDAS: começa com
- *    GOOGLE_ONDA fichas de cada cidade e a cada semana entram mais GOOGLE_ONDA, na ordem das áreas de
- *    GOOGLE_PRIORIDADE_AREAS (Veículos, Saúde, Alimentação, Casa, Mercados, Lojas, outras) e, em cada área, das mais conhecidas. Confirmadas entram sempre, fora da fila. Pausar/retomar as ondas em /admin/google.php.
+ *    GOOGLE_ONDA fichas de cada cidade e a cada semana entram mais GOOGLE_ONDA, divididas entre as áreas com os pesos de
+ *    GOOGLE_ONDA_PESOS (Veículos 25, Saúde 20, Alimentação 15, Casa 12, Mercados 10, Lojas 10, outras 8) e, em cada área,
+ *    das mais conhecidas. Confirmadas entram sempre, fora da fila. Pausar/retomar as ondas em /admin/google.php.
  *  - Página da cidade sempre; área e tipo com 3+ fichas no Google; busca, bairro e "Aberto agora" fora.
  * Motivo: o Localiza Fácil caiu ao subir 59 mil fichas copiadas do Google Maps de uma vez; aqui o Google vê o site crescer devagar.
  */
@@ -219,29 +220,69 @@ function google_onda_atual(): int {
 }
 function google_limite_por_cidade(): int { return google_onda_atual() * GOOGLE_ONDA; }
 
-/** Corte de cada cidade: a N-ésima ficha da fila (popularidade desc, id asc) => [popularidade, id]. */
+/**
+ * 20/11 (opção B, escolhida pelo usuário): cada onda de GOOGLE_ONDA fichas é dividida entre as áreas, na ordem de
+ * GOOGLE_PRIORIDADE_AREAS + "outras", com estes pesos (somam 100). Área que esgota a fila na cidade passa as vagas
+ * para as próximas, na ordem de prioridade.
+ */
+const GOOGLE_ONDA_PESOS = [25, 20, 15, 12, 10, 10, 8];   // Veículos, Saúde, Alimentação, Casa, Mercados, Lojas, outras
+
+/** Divide $total vagas entre os grupos (pesos, fila de cada um); sobra vai para os próximos, na ordem. */
+function google_dividir(int $onda, array $fila): array {
+    $pesos = GOOGLE_ONDA_PESOS;
+    $vagas = [];
+    $usado = 0;
+    foreach ($pesos as $i => $peso) { $g = $i + 1; $vagas[$g] = min((int)($fila[$g] ?? 0), $peso * $onda); $usado += $vagas[$g]; }
+    $sobra = $onda * GOOGLE_ONDA - $usado;
+    foreach ($vagas as $g => $v) {
+        if ($sobra <= 0) break;
+        $mais = min($sobra, (int)($fila[$g] ?? 0) - $v);
+        if ($mais > 0) { $vagas[$g] += $mais; $sobra -= $mais; }
+    }
+    return $vagas;
+}
+/** Cortes: [cidade => [grupo => null (o grupo inteiro) | [popularidade, id] (até essa ficha)]]. Guardado 1 h por onda. */
 function google_cortes(): array {
     static $r = null;
     if ($r !== null) return $r;
     $r = [];
-    $n = google_limite_por_cidade();
-    if ($n < 1) return $r;
-    foreach (cidades_no_google() as $c) {
-        $l = linha('SELECT ' . sql_prioridade_area() . " AS prio, p.popularidade, p.id FROM profissionais p WHERE p.cidade = ? AND p.status = 'ativo' AND " . SQL_TEM_CONTATO
-            . ' AND p.popularidade >= ' . GOOGLE_MIN_AVALIACOES . ' ORDER BY prio ASC, p.popularidade DESC, p.id ASC LIMIT 1 OFFSET ' . ($n - 1), [$c]);
-        $r[$c] = $l ? [(int)$l['prio'], (int)$l['popularidade'], (int)$l['id']] : null;   // null = a fila inteira já cabe
+    $onda = google_onda_atual();
+    if ($onda < 1) return $r;
+    $arq = config()['dados_dir'] . '/cache/google-cortes.json';
+    $c = is_file($arq) ? (json_decode((string)file_get_contents($arq), true) ?: []) : [];
+    if (($c['onda'] ?? 0) === $onda && ($c['quando'] ?? 0) > time() - 3600 && ($c['cidades'] ?? null) === cidades_no_google())
+        return $r = $c['cortes'];
+    $prio = sql_prioridade_area();
+    $base = "p.status = 'ativo' AND " . SQL_TEM_CONTATO . ' AND p.popularidade >= ' . GOOGLE_MIN_AVALIACOES;
+    foreach (cidades_no_google() as $cid) {
+        $fila = array_map('intval', array_column(linhas("SELECT $prio AS g, COUNT(*) AS n FROM profissionais p WHERE p.cidade = ? AND $base GROUP BY g", [$cid]), 'n', 'g'));
+        foreach (google_dividir($onda, $fila) as $g => $n) {
+            if ($n < 1) continue;
+            if ($n >= ($fila[$g] ?? 0)) { $r[$cid][$g] = null; continue; }
+            $l = linha("SELECT p.popularidade, p.id FROM profissionais p WHERE p.cidade = ? AND $base AND $prio = ?
+                ORDER BY p.popularidade DESC, p.id ASC LIMIT 1 OFFSET " . ($n - 1), [$cid, $g]);
+            if ($l) $r[$cid][$g] = [(int)$l['popularidade'], (int)$l['id']];
+        }
+        $r[$cid] ??= [];
     }
+    @mkdir(dirname($arq), 0775, true);
+    @file_put_contents($arq, json_encode(['onda' => $onda, 'quando' => time(), 'cidades' => cidades_no_google(), 'cortes' => $r]), LOCK_EX);
     return $r;
 }
 /** SQL da ficha que vai para o Google (slugs vêm de CIDADES, já validados em carregar_cidades()). */
 function sql_no_google(): string {
     $cortes = google_cortes();
     if (!$cortes) return '(1 = 0)';
+    $prio = sql_prioridade_area();
     $fila = [];
-    foreach ($cortes as $c => $corte)
-        $fila[] = "(p.cidade = '$c'" . ($corte ? ' AND (' . sql_prioridade_area() . " < {$corte[0]} OR (" . sql_prioridade_area() . " = {$corte[0]} AND (p.popularidade > {$corte[1]} OR (p.popularidade = {$corte[1]} AND p.id <= {$corte[2]}))))" : '') . ')';
+    foreach ($cortes as $c => $grupos) {
+        $partes = [];
+        foreach ($grupos as $g => $corte)
+            $partes[] = "($prio = " . (int)$g . ($corte ? " AND (p.popularidade > {$corte[0]} OR (p.popularidade = {$corte[0]} AND p.id <= {$corte[1]}))" : '') . ')';
+        if ($partes) $fila[] = "(p.cidade = '$c' AND (" . implode(' OR ', $partes) . '))';
+    }
     return '(' . SQL_TEM_CONTATO . " AND p.cidade IN ('" . implode("','", array_keys($cortes)) . "') AND (" . SQL_CONFIRMADA
-        . ' OR (p.popularidade >= ' . GOOGLE_MIN_AVALIACOES . ' AND (' . implode(' OR ', $fila) . '))))';
+        . ($fila ? ' OR (p.popularidade >= ' . GOOGLE_MIN_AVALIACOES . ' AND (' . implode(' OR ', $fila) . '))' : '') . '))';
 }
 /** Quantas fichas de cada cidade estão no Google e quantas esperam na fila. */
 function google_ondas_por_cidade(): array {
