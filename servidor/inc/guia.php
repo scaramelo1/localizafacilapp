@@ -176,13 +176,24 @@ function confirmacao_por_cidade(): array {
  * Plano D, passo 7 (20/11, revisto a pedido do usuário): quem vai para o Google, sem precisar confirmar ninguém.
  *  - Nada enquanto 'sem_google' estiver no config (site no domínio da FSA, mesmas fichas do Localiza Fácil).
  *  - Ficha: telefone ou WhatsApp E (confirmada OU 5+ avaliações no Google [popularidade]), liberada EM ONDAS: começa com
- *    as GOOGLE_ONDA mais conhecidas de cada cidade e a cada semana entram mais GOOGLE_ONDA, das mais para as menos
- *    conhecidas. Confirmadas entram sempre, fora da fila. Pausar/retomar as ondas em /admin/google.php.
+ *    GOOGLE_ONDA fichas de cada cidade e a cada semana entram mais GOOGLE_ONDA, na ordem das áreas de
+ *    GOOGLE_PRIORIDADE_AREAS (Veículos, Saúde, Alimentação, Casa, Mercados, Lojas, outras) e, em cada área, das mais conhecidas. Confirmadas entram sempre, fora da fila. Pausar/retomar as ondas em /admin/google.php.
  *  - Página da cidade sempre; área e tipo com 3+ fichas no Google; busca, bairro e "Aberto agora" fora.
  * Motivo: o Localiza Fácil caiu ao subir 59 mil fichas copiadas do Google Maps de uma vez; aqui o Google vê o site crescer devagar.
  */
 const GOOGLE_ONDA = 100;            // fichas por cidade em cada onda (1 onda por semana)
 const GOOGLE_MIN_AVALIACOES = 5;    // avaliações no Google para entrar na fila sem confirmação
+/** 20/11 (pedido do usuário): ordem das áreas na fila do Google. Dentro de cada área, das mais conhecidas para as menos. */
+const GOOGLE_PRIORIDADE_AREAS = ['veiculos', 'saude', 'alimentacao', 'casa', 'mercados', 'lojas'];   // depois: todas as outras
+/** SQL com o lugar da área na fila (1 = Veículos ... 7 = outras), pelo id da categoria (não precisa do JOIN). */
+function sql_prioridade_area(): string {
+    static $sql = null;
+    if ($sql !== null) return $sql;
+    $ids = array_column(linhas('SELECT id, slug FROM categorias'), 'id', 'slug');
+    $casos = '';
+    foreach (GOOGLE_PRIORIDADE_AREAS as $i => $slug) if (isset($ids[$slug])) $casos .= ' WHEN ' . (int)$ids[$slug] . ' THEN ' . ($i + 1);
+    return $sql = '(CASE p.categoria_id' . $casos . ' ELSE ' . (count(GOOGLE_PRIORIDADE_AREAS) + 1) . ' END)';
+}
 function cidades_no_google(): array {
     return !empty(config()['sem_google']) ? [] : array_keys(CIDADES);
 }
@@ -216,9 +227,9 @@ function google_cortes(): array {
     $n = google_limite_por_cidade();
     if ($n < 1) return $r;
     foreach (cidades_no_google() as $c) {
-        $l = linha("SELECT p.popularidade, p.id FROM profissionais p WHERE p.cidade = ? AND p.status = 'ativo' AND " . SQL_TEM_CONTATO
-            . ' AND p.popularidade >= ' . GOOGLE_MIN_AVALIACOES . ' ORDER BY p.popularidade DESC, p.id ASC LIMIT 1 OFFSET ' . ($n - 1), [$c]);
-        $r[$c] = $l ? [(int)$l['popularidade'], (int)$l['id']] : null;   // null = a fila inteira já cabe
+        $l = linha('SELECT ' . sql_prioridade_area() . " AS prio, p.popularidade, p.id FROM profissionais p WHERE p.cidade = ? AND p.status = 'ativo' AND " . SQL_TEM_CONTATO
+            . ' AND p.popularidade >= ' . GOOGLE_MIN_AVALIACOES . ' ORDER BY prio ASC, p.popularidade DESC, p.id ASC LIMIT 1 OFFSET ' . ($n - 1), [$c]);
+        $r[$c] = $l ? [(int)$l['prio'], (int)$l['popularidade'], (int)$l['id']] : null;   // null = a fila inteira já cabe
     }
     return $r;
 }
@@ -228,7 +239,7 @@ function sql_no_google(): string {
     if (!$cortes) return '(1 = 0)';
     $fila = [];
     foreach ($cortes as $c => $corte)
-        $fila[] = "(p.cidade = '$c'" . ($corte ? " AND (p.popularidade > {$corte[0]} OR (p.popularidade = {$corte[0]} AND p.id <= {$corte[1]}))" : '') . ')';
+        $fila[] = "(p.cidade = '$c'" . ($corte ? ' AND (' . sql_prioridade_area() . " < {$corte[0]} OR (" . sql_prioridade_area() . " = {$corte[0]} AND (p.popularidade > {$corte[1]} OR (p.popularidade = {$corte[1]} AND p.id <= {$corte[2]}))))" : '') . ')';
     return '(' . SQL_TEM_CONTATO . " AND p.cidade IN ('" . implode("','", array_keys($cortes)) . "') AND (" . SQL_CONFIRMADA
         . ' OR (p.popularidade >= ' . GOOGLE_MIN_AVALIACOES . ' AND (' . implode(' OR ', $fila) . '))))';
 }
