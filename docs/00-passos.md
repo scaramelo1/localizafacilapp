@@ -18,7 +18,8 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    rede de negócios do mesmo ramo) e "Acha Fácil" (achafacil.com.br é de terceiros). localizafacil.com.br e .com estão
    registrados por outros, mas parados. Cuidado avisado: "Localiza" (aluguel de carros) é marca forte; pesquisar no INPI.
 2. 🟡 Domínio escolhido: **localizafacilapp.com.br** (20/11 ainda livre no registro.br). Falta registrar e apontar o DNS (A) para 177.153.68.212.
-3. 🟡 E-mail: localizafacilapp@gmail.com (20/11; contato_email no config e reserva do pagador no Mercado Pago em inc/ofertas.php). Falta o Instagram.
+3. ✅ E-mail localizafacilapp@gmail.com (contato_email no config e reserva do pagador no Mercado Pago em inc/ofertas.php) e
+   Instagram @localizafacilapp ('instagram' no config) (20/11).
 3b. ✅ Marca trocada no site novo (20/11): "Acha Fácil(!)" -> "Localiza Fácil" em 69 arquivos de servidor/ (textos, termos,
     privacidade, e-mails do sistema, títulos, CSVs, logs "localiza-facil ...", sessão LOCALIZAFACIL, MP "LOCALIZAFACIL",
     achafacilapp.com.br -> localizafacilapp.com.br). Ficaram DE PROPÓSITO: pacote br.com.fsadesigner.achafacil e o esquema
