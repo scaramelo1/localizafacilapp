@@ -47,7 +47,7 @@ function web_top_bairros(string $cidade, ?int $categoria_id = null, ?string $tip
         WHERE $sql GROUP BY p.bairro HAVING total >= 2 ORDER BY total DESC, p.bairro LIMIT $n", $par);
 }
 
-/** Mais conhecidos (mais avaliações no Google + avaliações no Acha Fácil), ordem fixa: nome, bairro, id. */
+/** Mais conhecidos (mais avaliações no Google + avaliações no Localiza Fácil), ordem fixa: nome, bairro, id. */
 function web_mais_conhecidos(string $cidade, ?int $categoria_id = null, ?string $tipo = null, int $n = 5): array {
     $sql = visivel($cidade);
     $par = [];
@@ -106,7 +106,7 @@ function web_conteudo_lista(string $cidade, array $area, ?string $tipo): string 
     $irmaos = $tipo !== null ? array_values(array_filter(web_tipos($cidade, $cat), fn($t) => $t['nome'] !== $tipo)) : [];
 
     // texto com os números desta página
-    $frases = ['O Acha Fácil reúne <b>' . web_qtd($total, 'lugar', 'lugares') . '</b> de ' . h($o_que) . ' em ' . h("$nome_cidade ($uf)") . '.'];
+    $frases = ['O Localiza Fácil reúne <b>' . web_qtd($total, 'lugar', 'lugares') . '</b> de ' . h($o_que) . ' em ' . h("$nome_cidade ($uf)") . '.'];
     $partes = [];
     if ($num['whats']) $partes[] = web_num($num['whats']) . ' atendem pelo WhatsApp';
     if ($num['contato'] > $num['whats']) $partes[] = web_num($num['contato']) . ' têm telefone ou WhatsApp para chamar direto';
@@ -120,7 +120,7 @@ function web_conteudo_lista(string $cidade, array $area, ?string $tipo): string 
     // perguntas com resposta dos dados
     $perguntas = [];
     $perguntas[] = ['Quantos lugares de ' . $o_que . ' há em ' . $nome_cidade . '?',
-        'No Acha Fácil há ' . web_qtd($total, 'lugar', 'lugares') . ' de ' . h($o_que) . ' em ' . h($nome_cidade) . ', com endereço e contato.'];
+        'No Localiza Fácil há ' . web_qtd($total, 'lugar', 'lugares') . ' de ' . h($o_que) . ' em ' . h($nome_cidade) . ', com endereço e contato.'];
     if ($conhecidos) $perguntas[] = ['Quais lugares de ' . $o_que . ' são mais conhecidos em ' . $nome_cidade . '?',
         'Entre os mais procurados estão ' . web_e(array_map(fn($p) => '<a href="' . h(url_ficha($p)) . '">' . h(nome_curto($p['nome'])) . '</a>', array_slice($conhecidos, 0, 3))) . '.'];
     if ($bairros) $perguntas[] = ['Em que bairro de ' . $nome_cidade . ' tem mais ' . $o_que . '?',
@@ -166,15 +166,15 @@ function web_conteudo_cidade(string $cidade, array $areas): string {
     usort($maiores, fn($a, $b) => $b['total'] <=> $a['total']);
     $maiores = array_slice($maiores, 0, 3);
 
-    $frases = ['<b>' . h($nome) . '</b> (' . h(NOMES_ESTADOS[$uf] ?? $uf) . ') tem <b>' . web_qtd($total, 'comércio e serviço', 'comércios e serviços') . '</b> no Acha Fácil'
+    $frases = ['<b>' . h($nome) . '</b> (' . h(NOMES_ESTADOS[$uf] ?? $uf) . ') tem <b>' . web_qtd($total, 'comércio e serviço', 'comércios e serviços') . '</b> no Localiza Fácil'
         . ($num['bairros'] > 1 ? ', em ' . web_num($num['bairros']) . ' bairros' : '') . '.'];
     if ($maiores) $frases[] = 'As áreas com mais lugares são ' . web_e(array_map(fn($a) => h(mb_strtolower($a['nome'])) . ' (' . web_num((int)$a['total']) . ')', $maiores)) . '.';
     if ($top_tipos) $frases[] = 'O que mais tem na cidade: ' . web_e(array_map(fn($t) => h(mb_strtolower($t['nome'])), array_slice($top_tipos, 0, 4))) . '.';
     if ($num['contato']) $frases[] = web_pct($num['contato'], $total) . ' têm telefone ou WhatsApp para chamar direto' . ($num['online'] ? ' e ' . web_num($num['online']) . ' têm site ou Instagram' : '') . '.';
 
-    $perguntas = [['Quantos comércios há em ' . $nome . ' no Acha Fácil?', web_qtd($total, 'lugar', 'lugares') . ' com endereço e contato, separados por área e tipo de negócio.']];
+    $perguntas = [['Quantos comércios há em ' . $nome . ' no Localiza Fácil?', web_qtd($total, 'lugar', 'lugares') . ' com endereço e contato, separados por área e tipo de negócio.']];
     if ($bairros) $perguntas[] = ['Quais bairros de ' . $nome . ' têm mais comércios?', web_e(array_map(fn($b) => h($b['bairro']) . ' (' . web_num((int)$b['total']) . ')', array_slice($bairros, 0, 4))) . '.'];
-    if ($perto) $perguntas[] = ['Quais cidades ficam perto de ' . $nome . '?', web_e(array_map(fn($s, $km) => h(CIDADES[$s][0]) . ' (' . (int)round($km) . ' km)', array_keys(array_slice($perto, 0, 4, true)), array_slice($perto, 0, 4, true))) . ', em linha reta. Todas têm guia no Acha Fácil.'];
+    if ($perto) $perguntas[] = ['Quais cidades ficam perto de ' . $nome . '?', web_e(array_map(fn($s, $km) => h(CIDADES[$s][0]) . ' (' . (int)round($km) . ' km)', array_keys(array_slice($perto, 0, 4, true)), array_slice($perto, 0, 4, true))) . ', em linha reta. Todas têm guia no Localiza Fácil.'];
     $perguntas[] = ['Tenho um comércio em ' . $nome . '. Como apareço?', 'Procure o seu negócio na busca acima: se já estiver aqui, toque em "É o dono?". Se não estiver, <a href="' . h(url('incluir.php')) . '">inclua de graça</a>.'];
 
     ob_start(); ?>

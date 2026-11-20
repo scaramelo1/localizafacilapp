@@ -1,6 +1,6 @@
 <?php
 // Avisos do Mercado Pago (configurar em Suas integrações > a aplicação > Webhooks, eventos "Pagamentos" e "Planos e assinaturas":
-// https://achafacilapp.com.br/mp-webhook.php; o endereço antigo em fsadesigners.com.br continua recebendo). Cada aviso é conferido direto na API (inc/mercadopago.php).
+// https://localizafacilapp.com.br/mp-webhook.php; o endereço antigo em fsadesigners.com.br continua recebendo). Cada aviso é conferido direto na API (inc/mercadopago.php).
 require __DIR__ . '/../inc/base.php';
 require_once __DIR__ . '/../inc/guia.php';
 require __DIR__ . '/../inc/mercadopago.php';
@@ -19,7 +19,7 @@ try {
     elseif ($tipo === 'subscription_authorized_payment') mp_conferir_mensalidade($id);
     elseif ($tipo === 'payment') mp_conferir_pagamento($id);   // pagamento único do Básico (os outros são ignorados lá)
 } catch (Throwable $e) {
-    error_log("acha-facil mp-webhook $tipo $id: " . $e->getMessage());
+    error_log("localiza-facil mp-webhook $tipo $id: " . $e->getMessage());
     // não existe no Mercado Pago (ex.: "Simular notificação" com id 1): nada a fazer, não adianta mandar de novo
     if (str_contains($e->getMessage(), 'respondeu 404')) { echo '{"ok":true}'; exit; }
     http_response_code(500);   // o Mercado Pago tenta de novo mais tarde

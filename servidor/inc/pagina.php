@@ -9,13 +9,13 @@ function site(string $chave): string {
     return trim((string)(config()[$chave] ?? ''));
 }
 
-/** Como falar com o Acha Fácil: e-mail, WhatsApp e Instagram que estiverem no config. */
+/** Como falar com o Localiza Fácil: e-mail, WhatsApp e Instagram que estiverem no config. */
 function contatos_html(): string {
     $itens = [];
     if ($e = site('contato_email')) $itens[] = '<a href="mailto:' . h($e) . '">' . h($e) . '</a>';
-    if ($w = site('contato_whatsapp')) $itens[] = '<a href="' . h(link_whatsapp($w, 'Olá! Vim pelo site do Acha Fácil.')) . '">WhatsApp ' . h(telefone_formatado($w)) . '</a>';
+    if ($w = site('contato_whatsapp')) $itens[] = '<a href="' . h(link_whatsapp($w, 'Olá! Vim pelo site do Localiza Fácil.')) . '">WhatsApp ' . h(telefone_formatado($w)) . '</a>';
     if ($i = site('instagram')) $itens[] = '<a href="https://instagram.com/' . h(ltrim($i, '@')) . '">Instagram @' . h(ltrim($i, '@')) . '</a>';
-    return $itens ? implode(' · ', $itens) : 'pelo Instagram do Acha Fácil';
+    return $itens ? implode(' · ', $itens) : 'pelo Instagram do Localiza Fácil';
 }
 
 // Emoji de enfeite por ícone da área (o site não carrega a fonte de ícones do app)
@@ -82,7 +82,7 @@ function pagina_inicio(string $titulo, string $descricao, string $classe = '', a
 </head>
 <body class="<?= h($classe) ?>">
 <header class="topo">
-  <a class="marca" href="<?= $base ?>/"><img src="<?= $base ?>/assets/logo.png" alt="" width="40" height="40"><span>Acha <b>Fácil!</b></span></a>
+  <a class="marca" href="<?= $base ?>/"><img src="<?= $base ?>/assets/logo.png" alt="" width="40" height="40"><span>Localiza <b>Fácil</b></span></a>
   <nav><a href="<?= $base ?>/#cidades">Cidades</a><a href="<?= $base ?>/#seu-negocio">Seu negócio</a><a href="<?= $base ?>/#baixar" class="nav-botao">Baixar o app</a>
     <a href="<?= $base ?>/entrar.php" class="nav-conta" id="conta-topo" rel="nofollow">Entrar</a></nav>
 </header>
@@ -117,11 +117,11 @@ function pagina_fim(): void {
     $base = config()['url'];
     ?>
 <footer class="rodape">
-  <p class="rodape-marca"><img src="<?= $base ?>/assets/logo.png" alt="" width="36" height="36"> <strong>Acha <b>Fácil!</b></strong></p>
+  <p class="rodape-marca"><img src="<?= $base ?>/assets/logo.png" alt="" width="36" height="36"> <strong>Localiza <b>Fácil</b></strong></p>
   <p class="lema">O comércio da sua cidade, pertinho de você.</p>
   <p>Atendemos <?= h(resumo_cidades(true)) ?> · <a href="<?= $base ?>/#cidades">Ver as cidades</a></p>
   <p><a href="<?= $base ?>/busca.php">Procurar meu negócio</a> · <a href="<?= $base ?>/termos.php">Termos de uso</a> · <a href="<?= $base ?>/privacidade.php">Privacidade</a> · <a href="<?= $base ?>/privacidade.php#excluir-conta">Excluir minha conta</a></p>
-  <p class="discreto">Acha Fácil · <?= date('Y') ?></p>
+  <p class="discreto">Localiza Fácil · <?= date('Y') ?></p>
 </footer>
 <div class="convite-avaliar" id="convite-avaliar" hidden>
   <span class="convite-estrela" aria-hidden="true">★</span>

@@ -19,7 +19,7 @@ if (isset($_GET['t'])) {
         q('UPDATE acessos_dono SET ultimo_uso = NOW() WHERE id = ?', [$acesso['id']]);
     } else {
         login_falhou();
-        flash('Este link não vale mais. Peça um novo para a equipe do Acha Fácil.', 'erro');
+        flash('Este link não vale mais. Peça um novo para a equipe do Localiza Fácil.', 'erro');
     }
     ir('painel/');
 }
@@ -121,7 +121,7 @@ if ($erro) $f = array_merge($f, $valores);
 $val = fn(string $c) => h($f[$c] ?? '');
 $galeria_form = lista_fotos($f['fotos'] ?? null);
 
-pagina_inicio('Painel do comércio | Acha Fácil!', 'Painel do dono do comércio no Acha Fácil.');
+pagina_inicio('Painel do comércio | Localiza Fácil', 'Painel do dono do comércio no Localiza Fácil.');
 ?>
 <main class="documento">
 <?php mostrar_flash(); ?>
@@ -189,7 +189,7 @@ pagina_inicio('Painel do comércio | Acha Fácil!', 'Painel do dono do comércio
     <br>Preencha abaixo e a informação aparece no app depois da conferência.</div>
   <?php endif ?>
 
-  <div class="quadro"><strong>Como funciona:</strong> você pede as mudanças aqui e a equipe do Acha Fácil confere antes de
+  <div class="quadro"><strong>Como funciona:</strong> você pede as mudanças aqui e a equipe do Localiza Fácil confere antes de
     publicar. Assim ninguém consegue mudar o telefone ou o endereço de um comércio para enganar clientes.</div>
 
   <?php if ($pend): ?>

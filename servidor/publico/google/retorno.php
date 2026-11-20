@@ -35,7 +35,7 @@ try {
     if (empty($p['sub']) || empty($p['email']) || empty($p['email_verified'])) $falhar('Sua conta Google não tem um e-mail confirmado.');
     $uid = conta_do_google($p);
 } catch (Throwable $e) {
-    error_log('acha-facil google: ' . $e->getMessage());
+    error_log('localiza-facil google: ' . $e->getMessage());
     $falhar('Não foi possível entrar com o Google agora. Tente de novo.');
 }
 
@@ -47,4 +47,4 @@ if ($site !== null) {
     exit;
 }
 q('UPDATE logins_google SET usuario_id = ?, criado_em = NOW() WHERE estado = ?', [$uid, $estado]);
-pagina_google('Pronto, você entrou!', 'Agora é só voltar para o Acha Fácil.');
+pagina_google('Pronto, você entrou!', 'Agora é só voltar para o Localiza Fácil.');

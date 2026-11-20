@@ -1,6 +1,6 @@
 <?php
 // Acha a localização (lat/lng) dos comércios para o "Perto de você". Rodar na VPS como root (pode levar ~1 h na 1ª vez):
-//   nohup php servidor/geocodificar.php > /var/log/acha-facil-geo.log 2>&1 &
+//   nohup php servidor/geocodificar.php > /var/log/guia-novo-geo.log 2>&1 &
 // 1) Link do Google Maps com coordenadas (!3d…!4d…) → usa direto.
 // 2) Senão, procura o endereço no OpenStreetMap (Nominatim): 1 pedido a cada 1,2 s, como pede a política de uso deles.
 //    Sem número exato, fica na rua; sem rua, no bairro. Quem não for achado fica sem localização (não entra no "Perto").
@@ -33,7 +33,7 @@ function nominatim(string $consulta): ?array {
         'q' => $consulta, 'format' => 'json', 'limit' => 1, 'countrycodes' => 'br',
         'viewbox' => CAIXA['lng'][0] . ',' . CAIXA['lat'][1] . ',' . CAIXA['lng'][1] . ',' . CAIXA['lat'][0], 'bounded' => 1,   // mesma área da CAIXA
     ]);
-    $ctx = stream_context_create(['http' => ['timeout' => 20, 'header' => "User-Agent: AchaFacil/1.0 (guia de comercios locais; geocodificacao unica)\r\nAccept-Language: pt-BR\r\n"]]);
+    $ctx = stream_context_create(['http' => ['timeout' => 20, 'header' => "User-Agent: LocalizaFacil/1.0 (guia de comercios locais; geocodificacao unica)\r\nAccept-Language: pt-BR\r\n"]]);
     $r = @file_get_contents($url, false, $ctx);
     $j = $r ? json_decode($r, true) : null;
     if (!$j || !isset($j[0]['lat'])) return null;

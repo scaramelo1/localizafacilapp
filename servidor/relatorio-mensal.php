@@ -1,5 +1,5 @@
 <?php
-// Relatório mensal automático (19/11; regras em inc/relatorio-mensal.php). Roda pelo cron no dia 1 (/etc/cron.d/acha-facil):
+// Relatório mensal automático (19/11; regras em inc/relatorio-mensal.php). Roda pelo cron no dia 1 (/etc/cron.d/guia-novo):
 //   php servidor/relatorio-mensal.php                 → gera o do mês passado e avisa os donos no celular
 //   php servidor/relatorio-mensal.php --ver           → só mostra o que mandaria (nada é gravado nem enviado)
 //   php servidor/relatorio-mensal.php --mes=2026-10   → outro mês

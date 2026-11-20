@@ -50,13 +50,13 @@ foreach ($por_uf as &$cidades_do_uf) uksort($cidades_do_uf, fn($a, $b) => strcmp
 unset($cidades_do_uf);
 
 // dados do site para o Google (16/11): nome do site e marca nos resultados
-$ld_site = ['@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => 'Acha Fácil!', 'alternateName' => 'Acha Fácil',
+$ld_site = ['@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => 'Localiza Fácil', 'alternateName' => 'Localiza Fácil',
     'url' => url_publica(), 'inLanguage' => 'pt-BR'];
-$ld_org = ['@context' => 'https://schema.org', '@type' => 'Organization', 'name' => 'Acha Fácil!', 'url' => url_publica(),
+$ld_org = ['@context' => 'https://schema.org', '@type' => 'Organization', 'name' => 'Localiza Fácil', 'url' => url_publica(),
     'logo' => url_publica('assets/logo.png'), 'slogan' => 'O comércio da sua cidade, pertinho de você.'];
 // descrição até ~155 caracteres (o Google corta perto de 160)
 $mil = $total >= 1000 ? number_format(intdiv($total, 1000), 0, ',', '.') . ' mil' : (string)$total;
-pagina_inicio('Acha Fácil! O comércio da sua cidade no seu celular',
+pagina_inicio('Localiza Fácil: o comércio da sua cidade no seu celular',
     "Guia grátis com $mil comércios em " . count(CIDADES) . ' cidades de ' . implode(' e ', array_keys($por_uf)) . '. Ache restaurante, mercado, oficina ou clínica e chame no WhatsApp.',
     '', ['anuncios' => true, 'head' => web_json_ld($ld_site, $ld_org)]);
 ?>
@@ -99,7 +99,7 @@ pagina_inicio('Acha Fácil! O comércio da sua cidade no seu celular',
         <input type="search" id="cid-filtro" placeholder="Digite o nome da sua cidade..." autocomplete="off" aria-label="Procurar cidade">
       </div>
       <p class="cid-nada" id="cid-nada" hidden>Ainda não chegamos nessa cidade.<?php if ($e_cont = site('contato_email')): ?>
-        <a href="mailto:<?= h($e_cont) ?>?subject=<?= rawurlencode('Quero o Acha Fácil na minha cidade') ?>">Peça a sua cidade</a>.<?php endif ?></p>
+        <a href="mailto:<?= h($e_cont) ?>?subject=<?= rawurlencode('Quero o Localiza Fácil na minha cidade') ?>">Peça a sua cidade</a>.<?php endif ?></p>
       <div id="cid-top">
         <h3 class="cidades-uf">Mais procuradas</h3>
         <div class="cidades-lista">
@@ -152,7 +152,7 @@ pagina_inicio('Acha Fácil! O comércio da sua cidade no seu celular',
   <section id="eventos">
     <div class="conteudo">
       <h2>Próximos eventos na região</h2>
-      <p class="intro">Shows, festas e feiras das cidades do Acha Fácil, em ordem de data.</p>
+      <p class="intro">Shows, festas e feiras das cidades do Localiza Fácil, em ordem de data.</p>
       <ol class="agenda-lista agenda-inicio">
         <?php foreach ($eventos as $e): ?>
           <li><a class="evento-cartao" href="<?= h(url_evento($e)) ?>">
@@ -199,13 +199,13 @@ pagina_inicio('Acha Fácil! O comércio da sua cidade no seu celular',
   <section id="seu-negocio">
     <div class="conteudo duas">
       <div>
-        <h2>Seu negócio já pode estar no Acha Fácil</h2>
+        <h2>Seu negócio já pode estar no Localiza Fácil</h2>
         <p class="intro">Montamos o guia com os dados públicos dos comércios das cidades atendidas. Procure o seu e assuma a sua ficha de graça para corrigir os dados.</p>
         <?= numeros_publicos_html() /* 19/11 (passo 116): números de verdade */ ?>
         <ul class="lista-check">
           <li>Grátis: corrija telefone, WhatsApp, endereço e horário</li>
           <li>No Básico: coloque logo, 2 fotos, descrição e o que você vende ou faz</li>
-          <li>No Destaque: selo "Verificado pelo Acha Fácil", responder as avaliações e ver quantas pessoas abriram sua página</li>
+          <li>No Destaque: selo "Verificado pelo Localiza Fácil", responder as avaliações e ver quantas pessoas abriram sua página</li>
         </ul>
         <p class="discreto">Não está no app? <a href="<?= $base ?>/incluir.php">Inclua o seu negócio de graça</a>; a equipe confere antes de publicar.</p>
         <p class="discreto">Não quer aparecer? Procure o seu negócio e toque em "Tirar do app". Retiramos sem perguntas.</p>
@@ -221,7 +221,7 @@ pagina_inicio('Acha Fácil! O comércio da sua cidade no seu celular',
           <div class="plano"><h3>Grátis <span class="preco">R$ 0</span></h3><p>Assuma a sua ficha com a conta Google e corrija nome, telefone, WhatsApp, endereço, site e horário. Selo "Dados confirmados pelo dono".</p></div>
           <div class="plano"><h3>Básico <span class="preco"><?= h(preco_plano('basico')) ?> uma vez só</span></h3><p>Tudo do Grátis e mais logo, 2 fotos, descrição, o que você vende ou faz, Instagram, "atende em casa / entrega" e quantas pessoas viram sua ficha. Sem mensalidade.</p></div>
           <div class="plano destaque"><h3>Destaque <span class="preco"><?= h(preco_plano('destaque')) ?>/mês</span></h3><p>Tudo do Básico, até 10 fotos, selo de verificado, responder as avaliações, números completos da sua página e aparecer no topo da tela inicial e da sua área.</p></div>
-          <?php if (plano_site_pronto()): ?><div class="plano destaque"><h3>Destaque + Site <span class="preco"><?= h(preco_plano('site')) ?>/mês</span></h3><p>Tudo do Destaque e um site próprio do seu negócio, feito pela equipe do Acha Fácil, com domínio incluso.</p></div><?php endif ?>
+          <?php if (plano_site_pronto()): ?><div class="plano destaque"><h3>Destaque + Site <span class="preco"><?= h(preco_plano('site')) ?>/mês</span></h3><p>Tudo do Destaque e um site próprio do seu negócio, feito pela equipe do Localiza Fácil, com domínio incluso.</p></div><?php endif ?>
         </div>
         <p style="margin:16px 0 0"><a class="botao" href="<?= $base ?>/planos.php">Conferir os planos</a></p>
       </div>
@@ -234,11 +234,11 @@ pagina_inicio('Acha Fácil! O comércio da sua cidade no seu celular',
       <details><summary>Quanto custa para usar o app?</summary><p>Nada. Procurar, ver avaliações e chamar no WhatsApp é grátis.</p></details>
       <details><summary>Preciso criar conta?</summary><p>Não. A conta (só nome, e-mail e senha) serve para quem quer avaliar, comentar ou salvar lugares. Você pode excluir sua conta a qualquer momento pelo próprio app.</p></details>
       <details><summary>De onde vêm os comércios?</summary><p>De informações públicas (nome, endereço, telefone e redes sociais que o próprio comércio divulga na internet). O dono pode assumir o perfil e corrigir tudo, ou pedir para tirar do app pela <a href="<?= $base ?>/busca.php">busca do site</a>.</p></details>
-      <details><summary>O Acha Fácil vende ou faz os serviços?</summary><p>Não. O Acha Fácil só mostra quem é quem. Preço, prazo e garantia são combinados direto com o comércio.</p></details>
+      <details><summary>O Localiza Fácil vende ou faz os serviços?</summary><p>Não. O Localiza Fácil só mostra quem é quem. Preço, prazo e garantia são combinados direto com o comércio.</p></details>
       <details><summary>Em que ordem aparecem?</summary><p>Quem paga o Destaque aparece primeiro. Depois vêm as fichas completas (dos donos que pagaram o Básico) e os demais. Dentro de cada grupo, a ordem muda todo dia, para ser justa com todos.</p></details>
       <details id="instalar-apk"><summary>Como instalar o APK no Android?</summary>
         <p>1. Toque em <strong>Baixar APK</strong> e espere terminar o download.<br>
-        2. Toque na notificação do download (ou abra o arquivo <strong>acha-facil.apk</strong> na pasta Downloads).<br>
+        2. Toque na notificação do download (ou abra o arquivo <strong>localiza-facil.apk</strong> na pasta Downloads).<br>
         3. Se o celular avisar que é de "fonte desconhecida", toque em <strong>Configurações</strong>, ligue <strong>Permitir desta fonte</strong> e volte.<br>
         4. Toque em <strong>Instalar</strong> e depois em <strong>Abrir</strong>.<br>
         Para atualizar, é só baixar de novo e instalar por cima. No iPhone, o app virá pela App Store.</p></details>
@@ -249,7 +249,7 @@ pagina_inicio('Acha Fácil! O comércio da sua cidade no seu celular',
   <section class="verde" id="baixar">
     <div class="conteudo baixe-app">
       <div>
-        <h2>Baixe o Acha Fácil!</h2>
+        <h2>Baixe o Localiza Fácil</h2>
         <p class="intro">O comércio da sua cidade, pertinho de você. No app ainda tem "Perto de você", favoritos e avisos.</p>
         <div class="lojas"><?= botoes_lojas() ?></div>
       </div>

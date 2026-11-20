@@ -12,11 +12,11 @@ require __DIR__ . '/inc/guia.php';
 const MARCA = 'logs-entradas-antes-022';
 $teste = in_array('--teste', $argv, true);
 $arquivos = array_values(array_filter(array_slice($argv, 1), fn($a) => $a !== '--teste'));
-if (!$arquivos) $arquivos = glob('/var/log/apache2/achafacilapp_acesso.log*') ?: [];
+if (!$arquivos) $arquivos = glob('/var/log/apache2/localizafacilapp_acesso.log*') ?: [];
 if (!$teste && valor('SELECT 1 FROM migracoes WHERE nome = ?', [MARCA])) exit("Já importado antes.\n");
 $corte = valor("SELECT aplicada_em FROM migracoes WHERE nome = '022-entradas-site.sql'");
 if (!$corte) exit("Falta aplicar a mudança 022.\n");
-$_SERVER['HTTP_HOST'] = 'achafacilapp.com.br';
+$_SERVER['HTTP_HOST'] = 'localizafacilapp.com.br';
 
 $linhas = [];
 foreach ($arquivos as $f) {

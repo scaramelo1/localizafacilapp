@@ -1,5 +1,5 @@
 <?php
-// Roda a cada 10 minutos (/etc/cron.d/acha-facil, instalar.sh). Pedido de plano que não foi pago em 30 minutos:
+// Roda a cada 10 minutos (/etc/cron.d/guia-novo, instalar.sh). Pedido de plano que não foi pago em 30 minutos:
 // avisa os admins uma vez ("Cadastro sem pagamento"), para mandarem mensagem à pessoa. Pago, o aviso é o do Mercado Pago.
 declare(strict_types=1);
 // 17/11 (pedido do usuário, passo 88): DESLIGADO. Os admins só recebem aviso quando a pessoa paga (Mercado Pago,

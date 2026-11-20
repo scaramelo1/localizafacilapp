@@ -86,7 +86,7 @@ admin_inicio('Google por cidade', $admin);
   <?php if (!empty($d['atualizado'])): ?>Robô atualizado em <?= h(datahora_br($d['atualizado'])) ?> (de hora em hora).<?php endif ?></p>
 
 <?php if (!$d): ?>
-  <div class="aviso erro">Ainda sem dados do robô. Rode como root: <code>php /var/www/acha-facil/servidor/google-visitas.php</code>
+  <div class="aviso erro">Ainda sem dados do robô. Rode como root: <code>php /var/www/guia-novo/servidor/google-visitas.php</code>
     (o instalar.sh deixa isso de hora em hora).</div>
 <?php elseif (strtotime((string)($d['atualizado'] ?? '')) < time() - 3 * 3600): ?>
   <div class="aviso erro">Os dados do robô não são atualizados há mais de 3 horas. Confira o cron (rode o instalar.sh de novo).</div>

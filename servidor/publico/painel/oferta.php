@@ -24,7 +24,7 @@ $conta = usuario_web();
 
 // volta do Mercado Pago (?payment_id=...): confere na hora, sem esperar o aviso
 if (isset($_GET['payment_id']) && preg_match('/^\d{1,30}$/', (string)$_GET['payment_id'])) {
-    try { mp_conferir_pagamento((string)$_GET['payment_id']); } catch (Throwable $e) { error_log('acha-facil oferta volta: ' . $e->getMessage()); }
+    try { mp_conferir_pagamento((string)$_GET['payment_id']); } catch (Throwable $e) { error_log('localiza-facil oferta volta: ' . $e->getMessage()); }
     $o = oferta_do_dono($pid);
     if ($o && $o['status'] === 'em_analise') flash('Pagamento confirmado! A equipe confere a oferta e ela entra no ar (normalmente em até 1 dia útil).');
     elseif (($_GET['status'] ?? '') === 'pending' || ($_GET['collection_status'] ?? '') === 'pending') flash('Pagamento em processamento (Pix ou boleto). Assim que o Mercado Pago confirmar, a oferta vai para a conferência.');
@@ -52,7 +52,7 @@ if (e_post()) {
     }
     if ($acao === 'pagar' && $o && $o['status'] === 'aguardando_pagamento') {
         try { header('Location: ' . mp_pagar_oferta($o)); exit; }
-        catch (Throwable $e) { error_log('acha-facil oferta pagar: ' . $e->getMessage()); $erro = mp_erro_para_dono($e); }
+        catch (Throwable $e) { error_log('localiza-facil oferta pagar: ' . $e->getMessage()); $erro = mp_erro_para_dono($e); }
     }
     if ($acao === 'salvar') {
         // pode escrever quando não tem nenhuma em andamento, quando ainda não pagou ou quando foi recusada
@@ -88,7 +88,7 @@ if (e_post()) {
             $o = linha('SELECT * FROM ofertas WHERE id = ?', [$id]);
             try { header('Location: ' . mp_pagar_oferta($o)); exit; }
             catch (Throwable $e) {
-                error_log('acha-facil oferta pagar: ' . $e->getMessage());
+                error_log('localiza-facil oferta pagar: ' . $e->getMessage());
                 flash('Oferta guardada, mas ' . mb_strtolower(mp_erro_para_dono($e)) . ' Use o botão "Pagar" abaixo.', 'erro');
                 ir('painel/oferta.php');
             }
@@ -96,7 +96,7 @@ if (e_post()) {
     }
 }
 
-pagina_inicio('Oferta da semana | Acha Fácil!', 'Oferta da semana do seu comércio no Acha Fácil.', '', ['noindex' => true]);
+pagina_inicio('Oferta da semana | Localiza Fácil', 'Oferta da semana do seu comércio no Localiza Fácil.', '', ['noindex' => true]);
 $v = fn(string $k) => h((string)($dados[$k] ?? ''));
 $preco_campo = fn(string $k) => isset($dados[$k]) && $dados[$k] !== null && $dados[$k] !== 'erro' ? h(number_format((float)$dados[$k], 2, ',', '')) : '';
 $pode_escrever = !$o || in_array($o['status'], ['aguardando_pagamento', 'recusada'], true);

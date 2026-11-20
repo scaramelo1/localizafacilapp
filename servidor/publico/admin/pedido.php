@@ -38,7 +38,7 @@ if (e_post()) {
         acesso_do_incluir(['status' => 'feito'] + $pe);   // passo 93: quem incluiu já entra no painel com a conta Google
         web_cache_limpar();
         $n = avisar_usuario(isset($pe['usuario_id']) ? (int)$pe['usuario_id'] : null, 'Seu comércio foi aceito!',
-            "{$p['nome']} já aparece no Acha Fácil. Toque para ver.", ['tela' => 'profissional', 'id' => (int)$p['id']]);
+            "{$p['nome']} já aparece no Localiza Fácil. Toque para ver.", ['tela' => 'profissional', 'id' => (int)$p['id']]);
         flash($p['nome'] . ' já aparece no app. ' . ($n ? 'A pessoa recebeu o aviso no celular; ' : '') . 'Avise também pelo WhatsApp abaixo.');
         ir('admin/pedido.php?id=' . $id);
     } elseif ($acao === 'tirar' && $p && $pe['tipo'] === 'remover') {
@@ -92,7 +92,7 @@ $ja_dono = $p ? linha('SELECT a.criado_em, pe2.plano FROM acessos_dono a LEFT JO
     crie um <a href="cupons.php">cupom de 100%</a> e mande o link da assinatura abaixo para ela usar.
     <?php if ($p && $pe['tipo'] === 'assumir'): ?>O comércio <strong><?= adm_comercio((int)$p['id'], $p['nome'], $p['cidade']) ?></strong> <em>já estava no app</em> (veio da lista do Google), não é um negócio novo.<?php endif ?></div>
   <?php if (!empty($pe['codigo'])):
-      $msg_pag = "Olá, {$pe['nome']}! Aqui é do Acha Fácil. Vimos que você escolheu o plano " . (PLANOS_NOME[$pe['plano']] ?? $pe['plano'])
+      $msg_pag = "Olá, {$pe['nome']}! Aqui é do Localiza Fácil. Vimos que você escolheu o plano " . (PLANOS_NOME[$pe['plano']] ?? $pe['plano'])
           . ($p ? " para {$p['nome']}" : '') . ", mas o pagamento não foi concluído. Para terminar, é só abrir este link:\n"
           . url_publica('assinatura.php?c=' . $pe['codigo']) . "\nQualquer dúvida, é só responder aqui."; ?>
     <div class="quadro"><strong>Lembrar do pagamento</strong>
@@ -102,7 +102,7 @@ $ja_dono = $p ? linha('SELECT a.criado_em, pe2.plano FROM acessos_dono a LEFT JO
   <?php endif ?>
 <?php endif ?>
 <?php if ($pe['tipo'] === 'incluir' && $pe['status'] === 'feito' && $p && $p['status'] === 'ativo'):
-    $msg_ok = "Olá, {$pe['nome']}! Aqui é do Acha Fácil. O seu comércio {$p['nome']} foi aceito e já aparece no app e no site:\n" . url_publica(caminho_ficha((int)$p['id'], (string)$p['nome'], (string)$p['cidade']))
+    $msg_ok = "Olá, {$pe['nome']}! Aqui é do Localiza Fácil. O seu comércio {$p['nome']} foi aceito e já aparece no app e no site:\n" . url_publica(caminho_ficha((int)$p['id'], (string)$p['nome'], (string)$p['cidade']))
             . "\nQuer colocar fotos, descrição e aparecer em destaque? Veja os planos: " . url_publica('planos.php?id=' . (int)$p['id']); ?>
   <div class="quadro">
     <strong>Avisar que foi aceito</strong>
@@ -111,7 +111,7 @@ $ja_dono = $p ? linha('SELECT a.criado_em, pe2.plano FROM acessos_dono a LEFT JO
 <?php endif ?>
 
 <?php if ($link):
-    $msg = "Olá, {$pe['nome']}! Aqui é do Acha Fácil. Este é o link do painel do seu comércio" . ($p ? " ({$p['nome']})" : '') . ":\n$link\n"
+    $msg = "Olá, {$pe['nome']}! Aqui é do Localiza Fácil. Este é o link do painel do seu comércio" . ($p ? " ({$p['nome']})" : '') . ":\n$link\n"
          . "Não passe para ninguém. Toda mudança que você fizer passa pela nossa conferência antes de aparecer no app."; ?>
   <div class="quadro">
     <label for="link">Link do painel (só aparece agora)</label>

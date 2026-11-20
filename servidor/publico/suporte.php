@@ -8,7 +8,7 @@ require_once __DIR__ . '/../inc/conta-web.php';
 require_once __DIR__ . '/../inc/suporte.php';
 iniciar_sessao();
 header('Cache-Control: no-store');
-$u = exigir_login_web('Fale com a equipe', 'Mande uma mensagem para a equipe do Acha Fácil: informação errada, dúvida, problema ou sugestão.');
+$u = exigir_login_web('Fale com a equipe', 'Mande uma mensagem para a equipe do Localiza Fácil: informação errada, dúvida, problema ou sugestão.');
 
 $pid = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
 $com = $pid ? linha('SELECT id, nome, cidade FROM profissionais WHERE id = ?', [$pid]) : null;
@@ -46,7 +46,7 @@ unset($_SESSION['flash']);
 $meus = suporte_pronto() ? linhas('SELECT c.*, p.nome AS comercio FROM chamados c LEFT JOIN profissionais p ON p.id = c.profissional_id
     WHERE c.usuario_id = ? ORDER BY c.atualizado_em DESC LIMIT 50', [$u['id']]) : [];
 
-pagina_inicio('Fale com a equipe | Acha Fácil!', 'Mande uma mensagem para a equipe do Acha Fácil.', 'web', ['noindex' => true]);
+pagina_inicio('Fale com a equipe | Localiza Fácil', 'Mande uma mensagem para a equipe do Localiza Fácil.', 'web', ['noindex' => true]);
 ?>
 <main class="documento suporte">
   <?php foreach ($avisos as [$tipo, $msg]): ?><p class="aviso <?= h($tipo) ?>"><?= h($msg) ?></p><?php endforeach ?>

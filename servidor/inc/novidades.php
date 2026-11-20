@@ -163,7 +163,7 @@ function nov_importar(array $m, ?int $admin_id): array {
     nov_rodar([nov_raiz() . '/limpar-dados.php', '--aplicar']);
     web_cache_limpar();
     // passo 65: lista nova pode ter trazido o WhatsApp que alguém pediu
-    try { require_once __DIR__ . '/avisos-info.php'; avisar_infos_completas(); } catch (Throwable $e) { error_log('acha-facil avisos info: ' . $e->getMessage()); }
+    try { require_once __DIR__ . '/avisos-info.php'; avisar_infos_completas(); } catch (Throwable $e) { error_log('localiza-facil avisos info: ' . $e->getMessage()); }
     registrar($admin_id, 'importou_lista', null, nome_cidade($slug) . ': ' . strtok($saida, "\n"));
     // localização dos novos, em segundo plano (OpenStreetMap: ~1,3 s por endereço sem coordenadas no link)
     if (!geo_rodando()) exec('nohup php ' . escapeshellarg(nov_raiz() . '/geocodificar.php') . ' > ' . escapeshellarg("$dados/geocodificar.log") . ' 2>&1 &');

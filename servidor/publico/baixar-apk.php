@@ -23,7 +23,7 @@ $conta = $_SERVER['REQUEST_METHOD'] === 'GET' && !e_robo();
 if ($conta && $inicio === 0) apk_contar();
 
 header('Content-Type: application/vnd.android.package-archive');
-header('Content-Disposition: attachment; filename="acha-facil.apk"');
+header('Content-Disposition: attachment; filename="localiza-facil.apk"');
 header('Content-Length: ' . ($fim - $inicio + 1));
 header('Accept-Ranges: bytes');
 header('Cache-Control: no-store');

@@ -59,7 +59,7 @@ admin_inicio('App e downloads', $admin);
 
 <h1>Versões do app</h1>
 <p class="discreto">Ao abrir o app, ele compara a versão instalada com a daqui. Se a dele for mais velha, aparece
-  "Nova versão do Acha Fácil" com o botão <strong>Atualizar</strong> (ou Depois).</p>
+  "Nova versão do Localiza Fácil" com o botão <strong>Atualizar</strong> (ou Depois).</p>
 
 <div class="quadro">
   <h2>Play Store</h2>

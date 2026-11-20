@@ -100,7 +100,7 @@ if (e_post()) {
             atualizar('profissionais', $id, $dados);
         } catch (Throwable $e) {
             apagar_foto($foto); array_map('apagar_foto', $enviadas);
-            error_log('acha-facil admin editar comercio ' . $id . ': ' . $e->getMessage());
+            error_log('localiza-facil admin editar comercio ' . $id . ': ' . $e->getMessage());
             flash('Não foi possível salvar. Confira os dados.', 'erro');
             ir('admin/comercio.php?id=' . $id);
         }
@@ -112,7 +112,7 @@ if (e_post()) {
         // 19/11: quem pediu "Quer saber quando colocarem...?" é avisado também quando o admin completa a ficha
         $avisados = 0;
         try { require_once __DIR__ . '/../../inc/avisos-info.php'; $avisados = avisar_infos_completas([$id]); }
-        catch (Throwable $e) { error_log('acha-facil avisos-info admin: ' . $e->getMessage()); }
+        catch (Throwable $e) { error_log('localiza-facil avisos-info admin: ' . $e->getMessage()); }
         flash('Salvo. Já está no app e no site.' . ($avisados ? " $avisados pessoa(s) que pediram a informação foram avisadas." : ''));
         ir('admin/comercio.php?id=' . $id);
     }
@@ -166,7 +166,7 @@ admin_inicio('Editar ' . $p['nome'], $admin);
   <select id="status" name="status">
     <?php foreach (STATUS_NOME as $k => $n): ?><option value="<?= $k ?>"<?= $f['status'] === $k ? ' selected' : '' ?>><?= h($n) ?></option><?php endforeach ?>
   </select>
-  <label class="marcar"><input type="checkbox" name="verificado" value="1"<?= (string)$f['verificado'] === '1' ? ' checked' : '' ?>> Selo "Verificado pelo Acha Fácil"</label>
+  <label class="marcar"><input type="checkbox" name="verificado" value="1"<?= (string)$f['verificado'] === '1' ? ' checked' : '' ?>> Selo "Verificado pelo Localiza Fácil"</label>
 
   <h2>Dados</h2>
   <label for="nome">Nome do comércio</label>

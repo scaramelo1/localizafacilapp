@@ -12,7 +12,7 @@ $teste = in_array('--teste', $argv, true);
 if (!pre_carregamento_pronto()) exit("Falta aplicar a mudança 027.\n");
 
 $marcadas = $achadas = 0;
-foreach (glob('/var/log/apache2/achafacilapp_acesso.log*') ?: [] as $f) {
+foreach (glob('/var/log/apache2/localizafacilapp_acesso.log*') ?: [] as $f) {
     $gz = str_ends_with($f, '.gz');
     $h = $gz ? gzopen($f, 'r') : fopen($f, 'r');
     if (!$h) continue;

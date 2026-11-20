@@ -63,12 +63,12 @@ if (e_post() && $pronto) {
 
 $sel = fn(string $campo, $valor) => (string)($f[$campo] ?? '') === (string)$valor ? ' selected' : '';
 $v = fn(string $campo) => h((string)($f[$campo] ?? ''));
-pagina_inicio('Divulgar um evento | Acha Fácil!', 'Divulgue de graça o seu show, festa, feira ou encontro na agenda de eventos do Acha Fácil.');
+pagina_inicio('Divulgar um evento | Localiza Fácil', 'Divulgue de graça o seu show, festa, feira ou encontro na agenda de eventos do Localiza Fácil.');
 ?>
 <main class="documento">
   <h1>Divulgar um evento</h1>
   <?php if ($enviado): ?>
-    <div class="aviso ok">Recebemos! A equipe do Acha Fácil vai conferir (normalmente em até 2 dias úteis) e o evento aparece na
+    <div class="aviso ok">Recebemos! A equipe do Localiza Fácil vai conferir (normalmente em até 2 dias úteis) e o evento aparece na
       agenda do site e do app assim que for autorizado.</div>
     <p><a class="botao contorno" href="<?= h(isset(CIDADES[$f['cidade'] ?? '']) ? url_eventos($f['cidade']) : url('#eventos')) ?>">Ver a agenda</a>
       <a class="botao contorno" href="<?= h(url('incluir-evento.php')) ?>">Divulgar outro evento</a></p>

@@ -8,7 +8,7 @@ require __DIR__ . '/../inc/pagina.php';
 iniciar_sessao();
 // incluir negócio: só com a conta Google (para receber o aviso de "aceito" no celular)
 require_once __DIR__ . '/../inc/conta-web.php';
-$conta = exigir_login_web('Incluir meu negócio', 'Inclua o seu negócio no Acha Fácil de graça.');
+$conta = exigir_login_web('Incluir meu negócio', 'Inclua o seu negócio no Localiza Fácil de graça.');
 
 $areas = linhas("SELECT id, nome FROM categorias WHERE ativa = 1 ORDER BY ordem, nome");
 // 17/11 (passos 94–96): tipo na caixa de seleção da área (inc/tipos.php), para não criar tipos repetidos
@@ -59,12 +59,12 @@ if (e_post() && $pronto) {
 }
 
 $sel = fn(string $campo, $valor) => (string)($f[$campo] ?? '') === (string)$valor ? ' selected' : '';
-pagina_inicio('Incluir meu negócio | Acha Fácil!', 'Inclua o seu negócio no Acha Fácil de graça.');
+pagina_inicio('Incluir meu negócio | Localiza Fácil', 'Inclua o seu negócio no Localiza Fácil de graça.');
 ?>
 <main class="documento">
   <h1>Incluir meu negócio</h1>
   <?php if ($enviado): ?>
-    <div class="aviso ok">Recebemos! A equipe do Acha Fácil vai conferir os dados (normalmente em até 2 dias úteis) e o seu negócio
+    <div class="aviso ok">Recebemos! A equipe do Localiza Fácil vai conferir os dados (normalmente em até 2 dias úteis) e o seu negócio
       aparece no app assim que for aprovado.</div>
     <p>Quer colocar fotos, descrição e o que você vende? Depois que aparecer no app, <a href="<?= h(config()['url']) ?>/busca.php">procure o seu negócio</a> e confira os planos.</p>
   <?php elseif (!$pronto): ?>

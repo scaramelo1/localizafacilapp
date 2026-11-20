@@ -43,7 +43,7 @@ function suporte_responder(array $ch, string $texto, ?int $admin_id): void {
     inserir('chamados_mensagens', ['chamado_id' => $ch['id'], 'admin_id' => $admin_id, 'texto' => $texto, 'ip' => ip()]);
     q('UPDATE chamados SET status = ?, atualizado_em = NOW() WHERE id = ?', [$admin_id ? 'respondido' : 'aberto', $ch['id']]);
     if ($admin_id) {
-        avisar_usuario((int)$ch['usuario_id'], 'A equipe do Acha Fácil respondeu', mb_substr($texto, 0, 150), ['chamado' => (int)$ch['id']]);
+        avisar_usuario((int)$ch['usuario_id'], 'A equipe do Localiza Fácil respondeu', mb_substr($texto, 0, 150), ['chamado' => (int)$ch['id']]);
     } else {
         $nome = (string)valor('SELECT nome FROM usuarios WHERE id = ?', [$ch['usuario_id']]);
         avisar_admins('Suporte: nova mensagem', primeiro_nome($nome) . ': ' . mb_substr($texto, 0, 120), ['chamado' => (int)$ch['id']]);
@@ -60,7 +60,7 @@ function suporte_conversa_html(array $msgs, string $nome_pessoa): string {
     $h = '<div class="conversa">';
     foreach ($msgs as $m) {
         $equipe = $m['admin_id'] !== null;
-        $h .= '<div class="msg ' . ($equipe ? 'equipe' : 'pessoa') . '"><div class="msg-quem">' . h($equipe ? 'Equipe Acha Fácil' : $nome_pessoa)
+        $h .= '<div class="msg ' . ($equipe ? 'equipe' : 'pessoa') . '"><div class="msg-quem">' . h($equipe ? 'Equipe Localiza Fácil' : $nome_pessoa)
             . ' · ' . h(datahora_br($m['criado_em'])) . '</div>' . nl2br(h($m['texto'])) . '</div>';
     }
     return $h . '</div>';

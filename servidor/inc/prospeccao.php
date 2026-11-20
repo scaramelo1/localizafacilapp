@@ -44,7 +44,7 @@ function prospeccao_mensagem(array $l, int $dias): string {
         if ((int)($l["ped_$k"] ?? 0) > 0) $pedidos[] = $txt;
     $lista_ped = count($pedidos) > 1 ? implode(', ', array_slice($pedidos, 0, -1)) . ' e ' . end($pedidos) : ($pedidos[0] ?? '');
     $vis = (int)$l['vis'];
-    $msg = 'Olá! Aqui é da equipe do Acha Fácil, o guia de comércios de ' . nome_cidade((string)$l['cidade']) . ' (achafacilapp.com.br). '
+    $msg = 'Olá! Aqui é da equipe do Localiza Fácil, o guia de comércios de ' . nome_cidade((string)$l['cidade']) . ' (localizafacilapp.com.br). '
         . 'A página do ' . $l['nome'] . ' foi vista ' . $vis . ($vis === 1 ? ' vez' : ' vezes') . ' nos últimos ' . $dias . ' dias'
         . ((int)$l['pedidos'] > 0 ? ', e recebeu ' . (int)$l['pedidos'] . ((int)$l['pedidos'] === 1 ? ' pedido' : ' pedidos') . ' de informação de quem queria saber ' . $lista_ped : '')
         . ".\n\nVocê pode assumir a sua página de graça e corrigir telefone, WhatsApp, endereço e horário (com horário, ela aparece no \"Aberto agora\"). "

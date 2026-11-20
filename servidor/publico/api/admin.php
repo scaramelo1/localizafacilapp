@@ -107,7 +107,7 @@ $eventos = array_map(fn($e) => [
     'local' => implode(', ', array_filter([$e['local_nome'], $e['endereco']])) ?: null, 'preco' => $e['preco'],
     'descricao' => $e['descricao'], 'linkOficial' => evento_link_oficial($e), 'imagem' => $e['imagem'] ? foto_url($e['imagem']) : null,
     'enviadoPor' => $e['enviado_nome'], 'telefone' => telefone_formatado($e['enviado_contato']), 'whatsapp' => link_whatsapp((string)$e['enviado_contato'],
-        'Olá! Aqui é do Acha Fácil, sobre o evento ' . $e['titulo'] . ' que você enviou.'),
+        'Olá! Aqui é do Localiza Fácil, sobre o evento ' . $e['titulo'] . ' que você enviou.'),
     'recado' => $e['enviado_recado'], 'enviadoEm' => datahora_br($e['criado_em']),
 ], eventos_pendentes());
 

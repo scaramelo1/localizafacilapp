@@ -13,7 +13,7 @@ header('X-Robots-Tag: noindex');
 
 $codigo = (string)($_GET['c'] ?? '');
 $pedido = pedido_por_codigo($codigo);
-if (!$pedido) { http_response_code(404); pagina_inicio('Assinatura | Acha Fácil!', 'Assinatura do plano.');
+if (!$pedido) { http_response_code(404); pagina_inicio('Assinatura | Localiza Fácil', 'Assinatura do plano.');
     echo '<main class="documento"><h1>Assinatura não encontrada</h1><p>Confira o endereço ou escolha um plano de novo.</p><p><a class="botao amarelo" href="' . h(config()['url']) . '/planos.php">Ver os planos</a></p></main>';
     pagina_fim(); exit; }
 
@@ -23,7 +23,7 @@ $volta = (string)($_GET['preapproval_id'] ?? '');
 $volta_pg = (string)($_GET['payment_id'] ?? $_GET['collection_id'] ?? '');
 if (($volta !== '' || $volta_pg !== '') && mp_modo() !== 'desligado') {
     try { $pedido = ($volta !== '' ? mp_conferir_assinatura($volta) : mp_conferir_pagamento($volta_pg)) ?? $pedido; }
-    catch (Throwable $e) { error_log('acha-facil assinatura retorno: ' . $e->getMessage()); }
+    catch (Throwable $e) { error_log('localiza-facil assinatura retorno: ' . $e->getMessage()); }
 }
 // cartão digitado no formulário do Mercado Pago desta página (Destaque): chega só o token, nunca o número do cartão
 if (e_post() && isset($_GET['cartao'])) {
@@ -37,7 +37,7 @@ if (e_post() && isset($_GET['cartao'])) {
             : ['erro' => 'O Mercado Pago não autorizou a assinatura (' . mp_status_nome($novo['mp_status'] ?? null) . '). Confira o cartão ou use outro.'],
             JSON_UNESCAPED_UNICODE);
     } catch (Throwable $e) {
-        error_log('acha-facil cartao: ' . $e->getMessage());
+        error_log('localiza-facil cartao: ' . $e->getMessage());
         echo json_encode(['erro' => mp_erro_para_dono($e)], JSON_UNESCAPED_UNICODE);
     }
     exit;
@@ -61,10 +61,10 @@ if (e_post()) {
                 mp_api('PUT', '/preapproval/' . rawurlencode((string)$pedido['mp_assinatura']), ['status' => 'cancelled']);
                 $pedido = mp_conferir_assinatura((string)$pedido['mp_assinatura']) ?? $pedido;
             }
-        } catch (Throwable $e) { error_log('acha-facil cancelar: ' . $e->getMessage()); $erro = 'Não foi possível cancelar agora. Tente de novo em alguns minutos.'; }
+        } catch (Throwable $e) { error_log('localiza-facil cancelar: ' . $e->getMessage()); $erro = 'Não foi possível cancelar agora. Tente de novo em alguns minutos.'; }
     } else {
         try { header('Location: ' . mp_assinar($pedido)); exit; }
-        catch (Throwable $e) { error_log('acha-facil assinar: ' . $e->getMessage()); $erro = mp_erro_para_dono($e); }
+        catch (Throwable $e) { error_log('localiza-facil assinar: ' . $e->getMessage()); $erro = mp_erro_para_dono($e); }
     }
 }
 
@@ -80,7 +80,7 @@ $desconto = (int)($pedido['desconto'] ?? 0);
 $cortesia = $desconto === 100;
 $cupom = $desconto ? (string)valor('SELECT codigo FROM cupons WHERE id = ?', [$pedido['cupom_id']]) : '';
 $preco_html = $desconto && !$cortesia ? '<s>' . h(preco_plano($plano)) . '</s> ' . h(reais($valor)) : h(reais($valor));
-pagina_inicio('Plano ' . PLANOS_NOME[$plano] . ' | Acha Fácil!', 'Pagamento do plano do seu comércio.');
+pagina_inicio('Plano ' . PLANOS_NOME[$plano] . ' | Localiza Fácil', 'Pagamento do plano do seu comércio.');
 ?>
 <main class="documento">
   <h1>Plano <?= h(PLANOS_NOME[$plano]) ?></h1>
@@ -104,7 +104,7 @@ pagina_inicio('Plano ' . PLANOS_NOME[$plano] . ' | Acha Fácil!', 'Pagamento do 
     <?php if ($p): ?>
       <p><a class="botao" href="<?= h(config()['url']) ?>/painel/?c=<?= h($codigo) ?>">Editar os dados do meu comércio</a></p>
       <p class="discreto">Você já pode corrigir os dados e colocar fotos. Para evitar fraudes, cada mudança aparece no app
-        depois que a equipe do Acha Fácil confere (normalmente em até 1 dia útil).</p>
+        depois que a equipe do Localiza Fácil confere (normalmente em até 1 dia útil).</p>
     <?php endif ?>
     <p class="discreto">Quer o selo de verificado, responder as avaliações, ver os números da sua página e aparecer no topo?
       <a href="<?= h(config()['url']) ?>/perfil.php?acao=assumir&amp;plano=destaque<?= $p ? '&amp;id=' . (int)$pedido['profissional_id'] : '' ?>">Conheça o Destaque</a>.</p>
@@ -112,14 +112,14 @@ pagina_inicio('Plano ' . PLANOS_NOME[$plano] . ' | Acha Fácil!', 'Pagamento do 
     <div class="aviso ok">Cortesia liberada! O plano <?= h(PLANOS_NOME[$plano]) ?> já está ligado, sem cobrança.</div>
     <?php if ($p): ?>
       <p><a class="botao" href="<?= h(config()['url']) ?>/painel/?c=<?= h($codigo) ?>">Editar os dados do meu comércio</a></p>
-      <p class="discreto">Para evitar fraudes, cada mudança aparece no app depois que a equipe do Acha Fácil confere (normalmente em até 1 dia útil).</p>
+      <p class="discreto">Para evitar fraudes, cada mudança aparece no app depois que a equipe do Localiza Fácil confere (normalmente em até 1 dia útil).</p>
     <?php endif ?>
   <?php elseif ($pago): ?>
     <div class="aviso ok">Assinatura ativa! O plano já está ligado<?= $p && $p['assinatura_ate'] ? ' até ' . h(data_br($p['assinatura_ate'])) . ' e renova sozinho a cada mês' : '' ?>.</div>
     <?php if ($p): ?>
       <p><a class="botao" href="<?= h(config()['url']) ?>/painel/?c=<?= h($codigo) ?>">Editar os dados do meu comércio</a></p>
       <p class="discreto">Você já pode corrigir os dados e colocar foto. Para evitar fraudes, cada mudança aparece no app
-        depois que a equipe do Acha Fácil confere (normalmente em até 1 dia útil).</p>
+        depois que a equipe do Localiza Fácil confere (normalmente em até 1 dia útil).</p>
     <?php endif ?>
     <?php if ($plano === 'site'): ?><p class="discreto">Site próprio: vamos chamar você no WhatsApp em até 2 dias úteis para montar o site e registrar o domínio.</p><?php endif ?>
     <form method="post" onsubmit="return confirm('Cancelar a assinatura do <?= h(PLANOS_NOME[$plano]) ?>? Ele continua até o fim do mês já pago.')">
@@ -156,7 +156,7 @@ pagina_inicio('Plano ' . PLANOS_NOME[$plano] . ' | Acha Fácil!', 'Pagamento do 
     <?php elseif ($cartao_no_site): ?>
       <?php if (in_array($status, ['cancelled', 'paused'], true)): ?><div class="aviso erro">A assinatura está <?= h(mp_status_nome($status)) ?>. Assine de novo abaixo.</div><?php endif ?>
       <p>Digite o cartão de crédito abaixo. Não precisa ter conta no Mercado Pago: o cartão vai direto para o Mercado Pago,
-        com segurança, e não fica guardado no Acha Fácil.</p>
+        com segurança, e não fica guardado no Localiza Fácil.</p>
       <div id="erro-cartao" class="aviso erro" hidden></div>
       <div id="cartao"></div>
       <p class="discreto">A cobrança de <?= h(reais($valor)) ?> se repete todo mês no mesmo cartão. Você pode cancelar nesta página quando quiser.

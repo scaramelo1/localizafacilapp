@@ -86,7 +86,7 @@ function texto_cidades(): string {
 //   Destaque: assinatura mensal no cartão (tudo do Básico + selo "Verificado", responder avaliações, números da página
 //             e o topo da tela inicial e da área)
 //   Destaque + Site (10/11, mudança 018): assinatura mensal no cartão com tudo do Destaque + landing page própria feita
-//             pela equipe do Acha Fácil e domínio incluso (a equipe faz o site depois do pagamento; o endereço vai no campo `site` da ficha)
+//             pela equipe do Localiza Fácil e domínio incluso (a equipe faz o site depois do pagamento; o endereço vai no campo `site` da ficha)
 const PLANOS_PRECO = ['basico' => 9.90, 'destaque' => 29.90, 'site' => 89.90];
 const PLANOS_NOME = ['basico' => 'Básico', 'destaque' => 'Destaque', 'site' => 'Destaque + Site'];
 const PLANOS_DESTAQUE = ['destaque', 'site'];   // planos que dão os recursos do Destaque
@@ -174,12 +174,12 @@ function confirmacao_por_cidade(): array {
 }
 /**
  * Plano D, passo 7 (20/11, revisto a pedido do usuário): quem vai para o Google, sem precisar confirmar ninguém.
- *  - Nada enquanto 'sem_google' estiver no config (site no domínio da FSA, mesmas fichas do Acha Fácil).
+ *  - Nada enquanto 'sem_google' estiver no config (site no domínio da FSA, mesmas fichas do Localiza Fácil).
  *  - Ficha: telefone ou WhatsApp E (confirmada OU 5+ avaliações no Google [popularidade]), liberada EM ONDAS: começa com
  *    as GOOGLE_ONDA mais conhecidas de cada cidade e a cada semana entram mais GOOGLE_ONDA, das mais para as menos
  *    conhecidas. Confirmadas entram sempre, fora da fila. Pausar/retomar as ondas em /admin/google.php.
  *  - Página da cidade sempre; área e tipo com 3+ fichas no Google; busca, bairro e "Aberto agora" fora.
- * Motivo: o Acha Fácil caiu ao subir 59 mil fichas copiadas do Google Maps de uma vez; aqui o Google vê o site crescer devagar.
+ * Motivo: o Localiza Fácil caiu ao subir 59 mil fichas copiadas do Google Maps de uma vez; aqui o Google vê o site crescer devagar.
  */
 const GOOGLE_ONDA = 100;            // fichas por cidade em cada onda (1 onda por semana)
 const GOOGLE_MIN_AVALIACOES = 5;    // avaliações no Google para entrar na fila sem confirmação
@@ -415,7 +415,7 @@ function prof_completo(array $p, ?int $usuario_id): array {
         'telefone' => $p['telefone'] && telefone_central($p['telefone']) ? telefone_discar($p['telefone']) : $p['telefone'],   // central: sem DDD
         'telefoneFormatado' => $p['telefone'] ? telefone_formatado($p['telefone']) : null,
         'telefoneCentral' => $p['telefone'] ? telefone_central($p['telefone']) : false,   // 16/11: número nacional da rede, não da loja
-        'whatsapp' => $p['whatsapp'] ? link_whatsapp($p['whatsapp'], 'Olá! Encontrei você no Acha Fácil.') : null,
+        'whatsapp' => $p['whatsapp'] ? link_whatsapp($p['whatsapp'], 'Olá! Encontrei você no Localiza Fácil.') : null,
         'instagram' => $p['instagram'] ? 'https://instagram.com/' . ltrim($p['instagram'], '@') : null,
         'endereco' => $p['endereco'],
         'mapa' => $p['mapa'] ?: ($p['endereco'] ? 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($p['endereco'] . ', ' . nome_cidade($p['cidade']) . ' - ' . uf_cidade($p['cidade'])) : null),
@@ -478,7 +478,7 @@ function municipio_oficial(string $uf, string $nome): ?string {
 }
 
 // ---------- endereços das páginas públicas (passo 21: versão web com SEO) ----------
-// Cidade com o nome completo no endereço (pedido do usuário): achafacilapp.com.br/sao-joao-da-boa-vista/saude/dentista/
+// Cidade com o nome completo no endereço (pedido do usuário): localizafacilapp.com.br/sao-joao-da-boa-vista/saude/dentista/
 /** "Clínica Odontológica São José" -> "clinica-odontologica-sao-jose". */
 function slug_web(string $s): string {
     return trim(preg_replace('/[^a-z0-9]+/', '-', sem_acento($s)), '-');

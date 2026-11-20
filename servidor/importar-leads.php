@@ -1,7 +1,7 @@
 <?php
-// Importa (ou atualiza) os comércios de uma lista de leads para o Acha Fácil. Rodar na VPS como root:
+// Importa (ou atualiza) os comércios de uma lista de leads para o Localiza Fácil. Rodar na VPS como root:
 //   php servidor/importar-leads.php [arquivo leads.html] [cidade]
-//   cidade: o slug cadastrado em /admin/cidades.php (sao-joao é o padrão). Ex.: php servidor/importar-leads.php /var/lib/acha-facil/leads/aguas-da-prata.html aguas-da-prata
+//   cidade: o slug cadastrado em /admin/cidades.php (sao-joao é o padrão). Ex.: php servidor/importar-leads.php /var/lib/guia-novo/leads/aguas-da-prata.html aguas-da-prata
 // Padrão: a lista de São João publicada em fsadesigners.com.br/leads/. Linhas cujo endereço é de outra cidade atendida
 // vão para aquela cidade. Listas sem área (data-seg) usam a área mais comum do mesmo tipo de negócio já cadastrado. Pode rodar de novo sempre que a lista mudar:
 // atualiza quem já veio dos leads (pelo nome) e não mexe em quem assumiu o perfil nem em quem foi removido.

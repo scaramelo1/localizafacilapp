@@ -42,7 +42,7 @@ $lista = linhas("SELECT u.id, u.nome, u.email, u.foto, u.google_id, u.ativo, u.c
 
 if (!empty($_GET['csv'])) {
     header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename="acha-facil-pessoas-' . date('Ymd') . '.csv"');
+    header('Content-Disposition: attachment; filename="localiza-facil-pessoas-' . date('Ymd') . '.csv"');
     $out = fopen('php://output', 'w');
     fwrite($out, "\xEF\xBB\xBF");   // BOM: o Excel abre com acentos
     fputcsv($out, ['ID', 'Nome', 'E-mail', 'Cadastro', 'Último uso do app', 'Favoritos', 'Avaliações', 'Conta Google', 'Ativa'], ';');

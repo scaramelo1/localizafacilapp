@@ -31,7 +31,7 @@ $planos = [
         'Tudo o que tem no Básico',
         'Até 10 fotos na sua página',
         'Sem anúncios na sua página',
-        'Selo "Verificado pelo Acha Fácil"',
+        'Selo "Verificado pelo Localiza Fácil"',
         'Responder as avaliações dos clientes',
         'Ver quantas pessoas abriram sua página e chamaram no WhatsApp',
         'Aparece em "Em destaque" no topo da tela inicial',
@@ -40,7 +40,7 @@ $planos = [
     ]],
     'site' => ['Destaque + Site', 'O Destaque e um site só seu, feito por nós', [
         'Tudo o que tem no Destaque',
-        'Site próprio do seu negócio (landing page) feito pela equipe do Acha Fácil',
+        'Site próprio do seu negócio (landing page) feito pela equipe do Localiza Fácil',
         'Domínio incluso (ex.: seunegocio.com.br), registro e renovação por nossa conta',
         'Botões de WhatsApp, mapa e horário no site, ligado à sua página no app',
         'Mudanças de texto e fotos do site quando você precisar',
@@ -48,7 +48,7 @@ $planos = [
 ];
 if (!plano_site_pronto()) unset($planos['site']);
 
-pagina_inicio('Planos para o seu negócio | Acha Fácil!', 'Corrija os dados, coloque fotos, apareça em destaque e tenha um site próprio com o Acha Fácil.');
+pagina_inicio('Planos para o seu negócio | Localiza Fácil', 'Corrija os dados, coloque fotos, apareça em destaque e tenha um site próprio com o Localiza Fácil.');
 ?>
 <main class="documento" style="max-width:1200px">
   <h1>Planos para o seu negócio</h1>

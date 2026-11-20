@@ -63,7 +63,7 @@ function relatorios_do_mes(string $mes, bool $avisar, bool $so_ver = false): arr
         if ($so_ver) continue;
         $avisados = 0;
         if ($avisar) foreach ($contas as $u) {
-            $avisados += avisar_usuario($u, '📊 Seu ' . mes_nome($mes) . ' no Acha Fácil', mb_substr($p['nome'] . ': ' . relatorio_frase($r), 0, 178),
+            $avisados += avisar_usuario($u, '📊 Seu ' . mes_nome($mes) . ' no Localiza Fácil', mb_substr($p['nome'] . ': ' . relatorio_frase($r), 0, 178),
                 // app antigo abre a ficha; o novo abre o relatório (url)
                 ['tela' => 'profissional', 'id' => $pid, 'url' => relatorio_link($pid, $mes)]);
         }

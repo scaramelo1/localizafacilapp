@@ -60,7 +60,7 @@ admin_inicio('Notificações', $admin);
   <?php endforeach ?>
 
   <label for="profissional">Ao tocar, abrir a ficha de um comércio (opcional): cole o link da ficha no site ou o número dela</label>
-  <input id="profissional" name="profissional" maxlength="300" value="<?= h($rascunho['profissional'] ?? '') ?>" placeholder="vazio = só abre o app · ex.: https://achafacilapp.com.br/sao-joao-da-boa-vista/c/padaria-123">
+  <input id="profissional" name="profissional" maxlength="300" value="<?= h($rascunho['profissional'] ?? '') ?>" placeholder="vazio = só abre o app · ex.: https://localizafacilapp.com.br/sao-joao-da-boa-vista/c/padaria-123">
 
   <p><button class="botao" id="enviar">Enviar notificação</button></p>
 </form>

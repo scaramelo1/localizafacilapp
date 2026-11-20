@@ -26,7 +26,7 @@ function guardar_aparelho(string $token, ?int $usuario_id, ?string $cidade): voi
             ON DUPLICATE KEY UPDATE usuario_id = COALESCE(VALUES(usuario_id), usuario_id), cidade = COALESCE(VALUES(cidade), cidade), atualizado_em = NOW()',
             [$token, $usuario_id, $cidade]);
     } catch (Throwable $e) {
-        error_log('acha-facil notificações: ' . $e->getMessage());
+        error_log('localiza-facil notificações: ' . $e->getMessage());
     }
 }
 

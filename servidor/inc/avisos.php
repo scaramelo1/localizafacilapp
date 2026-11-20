@@ -18,7 +18,7 @@ function avisar_admins(string $titulo, string $texto, array $dados = []): void {
             JOIN admins a ON a.email = u.email AND a.ativo = 1'), 'token');
         expo_enviar($tokens, $titulo, $texto, $dados + ['tela' => 'admin'], 'admin');
     } catch (Throwable $e) {
-        error_log('acha-facil aviso: ' . $e->getMessage());
+        error_log('localiza-facil aviso: ' . $e->getMessage());
     }
 }
 
@@ -45,7 +45,7 @@ function avisar_usuario(?int $usuario_id, string $titulo, string $texto, array $
         catch (PDOException) {}
         return expo_enviar(array_values(array_unique($tokens)), $titulo, $texto, $dados, 'novidades')[0];
     } catch (Throwable $e) {
-        error_log('acha-facil aviso usuario: ' . $e->getMessage());
+        error_log('localiza-facil aviso usuario: ' . $e->getMessage());
         return 0;
     }
 }
@@ -70,7 +70,7 @@ function expo_enviar(array $tokens, string $titulo, string $texto, array $dados,
             $st = (int)curl_getinfo($c, CURLINFO_HTTP_CODE);
             curl_close($c);
             $j = is_string($r) ? json_decode($r, true) : null;
-            if ($st !== 200 || !is_array($j)) { error_log("acha-facil aviso: Expo respondeu $st"); $falhas += count($lote); continue; }
+            if ($st !== 200 || !is_array($j)) { error_log("localiza-facil aviso: Expo respondeu $st"); $falhas += count($lote); continue; }
             foreach ($lote as $i => $msg) {
                 $recibo = $j['data'][$i] ?? null;
                 if (($recibo['status'] ?? '') === 'ok') { $ok++; continue; }
@@ -79,10 +79,10 @@ function expo_enviar(array $tokens, string $titulo, string $texto, array $dados,
                 if (($recibo['details']['error'] ?? '') === 'DeviceNotRegistered') {
                     q('DELETE FROM avisos_aparelhos WHERE token = ?', [$msg['to']]);
                     try { q('DELETE FROM avisos_publico WHERE token = ?', [$msg['to']]); } catch (PDOException) {}
-                } elseif ($recibo) error_log('acha-facil aviso: ' . ($recibo['message'] ?? 'erro'));
+                } elseif ($recibo) error_log('localiza-facil aviso: ' . ($recibo['message'] ?? 'erro'));
             }
         } catch (Throwable $e) {
-            error_log('acha-facil aviso: ' . $e->getMessage());
+            error_log('localiza-facil aviso: ' . $e->getMessage());
             $falhas += count($lote);
         }
     }

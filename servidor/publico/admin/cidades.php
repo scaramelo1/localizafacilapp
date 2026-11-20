@@ -16,7 +16,7 @@ function slug_cidade(string $nome): string {
 function centro_cidade(string $nome, string $uf): ?array {
     $url = 'https://nominatim.openstreetmap.org/search?' . http_build_query([
         'city' => $nome, 'state' => NOMES_ESTADOS[$uf] ?? $uf, 'country' => 'Brasil', 'format' => 'json', 'limit' => 1]);
-    $ctx = stream_context_create(['http' => ['timeout' => 10, 'header' => "User-Agent: AchaFacil/1.0 (cadastro de cidade)\r\nAccept-Language: pt-BR\r\n"]]);
+    $ctx = stream_context_create(['http' => ['timeout' => 10, 'header' => "User-Agent: LocalizaFacil/1.0 (cadastro de cidade)\r\nAccept-Language: pt-BR\r\n"]]);
     $j = json_decode((string)@file_get_contents($url, false, $ctx), true);
     return isset($j[0]['lat']) ? [round((float)$j[0]['lat'], 6), round((float)$j[0]['lon'], 6)] : null;
 }

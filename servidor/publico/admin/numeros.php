@@ -53,7 +53,7 @@ foreach ($lista as $l) foreach ($soma as $k => $_) $soma[$k] += (int)$l[$k];
 
 if (!empty($_GET['csv'])) {
     header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename="acha-facil-numeros-' . ($cidade ?: 'todas') . '-' . $dias . 'd-' . date('Ymd') . '.csv"');
+    header('Content-Disposition: attachment; filename="localiza-facil-numeros-' . ($cidade ?: 'todas') . '-' . $dias . 'd-' . date('Ymd') . '.csv"');
     $out = fopen('php://output', 'w');
     fwrite($out, "\xEF\xBB\xBF");   // BOM: o Excel abre com acentos
     fputcsv($out, ['ID', 'Comércio', 'Tipo', 'Área', 'Cidade', 'Bairro', 'Plano', 'WhatsApp do comércio', 'Telefone', 'Tem site', ...array_values(COLUNAS), 'Taxa de contato', 'Ficha no admin'], ';');

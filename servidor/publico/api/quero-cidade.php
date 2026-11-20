@@ -1,5 +1,5 @@
 <?php
-// "Quero minha Cidade!": a pessoa pede o Acha Fácil na cidade dela (não precisa de conta). {cidade, uf}
+// "Quero minha Cidade!": a pessoa pede o Localiza Fácil na cidade dela (não precisa de conta). {cidade, uf}
 // O estado e a cidade precisam existir na lista do IBGE (dados/municipios.json); grava o nome oficial.
 require __DIR__ . '/../../inc/api.php';
 require_once __DIR__ . '/../../inc/guia.php';
@@ -12,5 +12,5 @@ if ((int)valor('SELECT COUNT(*) FROM cidades_pedidas WHERE ip = ? AND criado_em 
 inserir('cidades_pedidas', ['cidade' => $cidade, 'uf' => $uf, 'ip' => ip()]);
 require_once __DIR__ . '/../../inc/avisos.php';
 $total = (int)valor('SELECT COUNT(*) FROM cidades_pedidas WHERE cidade = ? AND uf = ?', [$cidade, $uf]);
-avisar_admins('Quero minha Cidade!', "Pediram o Acha Fácil em $cidade ($uf)" . ($total > 1 ? " ({$total}º pedido)" : '') . '.');
+avisar_admins('Quero minha Cidade!', "Pediram o Localiza Fácil em $cidade ($uf)" . ($total > 1 ? " ({$total}º pedido)" : '') . '.');
 responder(['ok' => true]);

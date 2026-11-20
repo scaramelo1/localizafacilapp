@@ -4,20 +4,20 @@
 require __DIR__ . '/../inc/base.php';
 require __DIR__ . '/../inc/pagina.php';
 $base = config()['url'];
-pagina_inicio('Privacidade | Acha Fácil!', 'Quais dados o Acha Fácil usa, para quê, e como excluir sua conta.');
+pagina_inicio('Privacidade | Localiza Fácil', 'Quais dados o Localiza Fácil usa, para quê, e como excluir sua conta.');
 ?>
 <main class="documento">
   <h1>Política de privacidade</h1>
   <p class="atualizado">Última atualização: 15 de novembro de 2026</p>
 
   <div class="quadro">
-    <strong>Resumo:</strong> dá para usar o Acha Fácil sem dar nenhum dado pessoal. Se você entrar com a sua conta Google, guardamos só nome, e-mail,
+    <strong>Resumo:</strong> dá para usar o Localiza Fácil sem dar nenhum dado pessoal. Se você entrar com a sua conta Google, guardamos só nome, e-mail,
     foto do perfil e o que você fizer no app (avaliações, comentários e salvos). Não vendemos dados. O <strong>app</strong> não tem anúncios; algumas páginas do <strong>site</strong>
     mostram anúncios do Google, que usam cookies (veja o item 4). Pode excluir tudo pelo próprio app.
   </div>
 
   <h2>1. Quem cuida dos seus dados</h2>
-  <p>O <strong>Acha Fácil</strong> é o responsável (controlador) pelos dados tratados no app e neste site,
+  <p>O <strong>Localiza Fácil</strong> é o responsável (controlador) pelos dados tratados no app e neste site,
   conforme a Lei Geral de Proteção de Dados (LGPD, Lei 13.709/2018). Fale com a gente sobre privacidade: <?= contatos_html() ?>.</p>
 
   <h2>2. Quais dados usamos e para quê</h2>
@@ -28,10 +28,10 @@ pagina_inicio('Privacidade | Acha Fácil!', 'Quais dados o Acha Fácil usa, para
       <tr><td>Entrar com o Google</td><td>Nome, e-mail e foto do perfil, enviados pelo Google quando você escolhe entrar. Não recebemos a sua senha do Google nem outros dados da sua conta.</td><td>Entrar no app ou no site, avaliar, comentar e salvar profissionais.</td></tr>
       <tr><td>Cookies do site</td><td>Se você entrar no site: um cookie com um código da sua sessão (dura até 180 dias ou até você sair). Sem entrar: um cookie de 30 minutos que diz só de onde você chegou ao site (Google, redes sociais...), sem dado pessoal.</td><td>Manter você na sua conta e contar, sem saber quem foi, de onde vêm as visitas.</td></tr>
       <tr><td>Avaliar e salvar</td><td>Estrelas, comentário, data e a lista de salvos.</td><td>Mostrar as avaliações (com primeiro nome e inicial, ex.: "Maria S.") e seus salvos.</td></tr>
-      <tr><td>Notificações</td><td>Só se você permitir os avisos no celular: o endereço de aviso do aparelho (um código criado pelo serviço de avisos do celular), a última cidade escolhida no app e, se você entrou, a ligação com a sua conta.</td><td>Mandar novidades do Acha Fácil da sua cidade. Você pode desligar quando quiser nas configurações do celular; se desinstalar o app, o endereço é apagado.</td></tr>
+      <tr><td>Notificações</td><td>Só se você permitir os avisos no celular: o endereço de aviso do aparelho (um código criado pelo serviço de avisos do celular), a última cidade escolhida no app e, se você entrou, a ligação com a sua conta.</td><td>Mandar novidades do Localiza Fácil da sua cidade. Você pode desligar quando quiser nas configurações do celular; se desinstalar o app, o endereço é apagado.</td></tr>
       <tr><td>Segurança</td><td>Endereço IP de tentativas de entrada que falharam (apagado em 1 dia) e registros de acesso ao servidor (data, hora e IP).</td><td>Proteger contas contra invasão. Os registros de acesso são guardados por 6 meses, como manda o Marco Civil da Internet.</td></tr>
       <tr><td>Profissionais</td><td>Nome, telefone, WhatsApp, endereço, Instagram, foto, serviços e horários informados no cadastro; nome e telefone de quem cuida do painel do comércio.</td><td>Montar a página pública do profissional no guia (essas informações ficam visíveis para todos, por escolha do profissional) e dar acesso ao painel.</td></tr>
-      <tr><td>Assinatura (profissionais)</td><td>Situação da assinatura e identificador do Mercado Pago. Os dados do cartão são digitados no Mercado Pago e <strong>nunca passam pelo Acha Fácil</strong>.</td><td>Saber se o plano está em dia.</td></tr>
+      <tr><td>Assinatura (profissionais)</td><td>Situação da assinatura e identificador do Mercado Pago. Os dados do cartão são digitados no Mercado Pago e <strong>nunca passam pelo Localiza Fácil</strong>.</td><td>Saber se o plano está em dia.</td></tr>
     </tbody>
   </table>
   <p>As bases legais são: execução do contrato (sua conta e o anúncio do profissional), legítimo interesse (segurança e estatísticas sem identificação)
@@ -63,11 +63,11 @@ pagina_inicio('Privacidade | Acha Fácil!', 'Quais dados o Acha Fácil usa, para
   <h2>4. Com quem compartilhamos</h2>
   <ul>
     <li><strong>Ninguém compra seus dados.</strong> Não vendemos nem alugamos dados.</li>
-    <li>Hospedagem: os dados ficam em servidor contratado pelo Acha Fácil, com acesso protegido.</li>
+    <li>Hospedagem: os dados ficam em servidor contratado pelo Localiza Fácil, com acesso protegido.</li>
     <li>Mercado Pago: apenas para as assinaturas dos profissionais.</li>
     <li><strong>Anúncios do Google (só no site):</strong> algumas páginas do site (inicial, listas, eventos e fichas de comércios sem o plano Destaque)
       mostram anúncios do Google AdSense. O Google e seus parceiros podem usar cookies para mostrar anúncios com base nas suas visitas
-      a este e a outros sites. O Acha Fácil não envia ao Google o seu nome, e-mail nem dados da sua conta. Você pode desligar os anúncios
+      a este e a outros sites. O Localiza Fácil não envia ao Google o seu nome, e-mail nem dados da sua conta. Você pode desligar os anúncios
       personalizados em <a href="https://adssettings.google.com" target="_blank" rel="noopener">Configurações de anúncios do Google</a>
       e ver como o Google usa os dados em <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">policies.google.com</a>.
       O app não tem anúncios.</li>
@@ -88,7 +88,7 @@ pagina_inicio('Privacidade | Acha Fácil!', 'Quais dados o Acha Fácil usa, para
   <div class="quadro">
     <p style="margin-top:0"><strong>Pelo app (na hora):</strong></p>
     <ol>
-      <li>Abra o Acha Fácil e entre na sua conta.</li>
+      <li>Abra o Localiza Fácil e entre na sua conta.</li>
       <li>Toque na aba <strong>Conta</strong>, embaixo.</li>
       <li>Toque em <strong>Excluir minha conta</strong> e confirme.</li>
     </ol>
@@ -103,7 +103,7 @@ pagina_inicio('Privacidade | Acha Fácil!', 'Quais dados o Acha Fácil usa, para
   Nenhum sistema é 100% invulnerável; se acontecer um incidente que possa trazer risco a você, avisaremos e comunicaremos a ANPD.</p>
 
   <h2>9. Crianças</h2>
-  <p>O Acha Fácil é para o público em geral. Para criar conta é preciso ter 18 anos ou mais, ou autorização de pai, mãe ou responsável.</p>
+  <p>O Localiza Fácil é para o público em geral. Para criar conta é preciso ter 18 anos ou mais, ou autorização de pai, mãe ou responsável.</p>
 
   <h2>10. Mudanças</h2>
   <p>Esta política pode ser atualizada. A data no topo mostra a última mudança; mudanças importantes serão avisadas no app.

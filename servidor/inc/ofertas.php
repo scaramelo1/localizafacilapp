@@ -113,15 +113,15 @@ function mp_pagar_oferta(array $o): string {
         ?: 'achafacilcontato@gmail.com');
     $volta = url_publica('painel/oferta.php');
     $pref = mp_api('POST', '/checkout/preferences', [
-        'items' => [['id' => 'oferta', 'title' => mb_substr('Acha Fácil - Oferta da semana - ' . $comercio, 0, 250),
+        'items' => [['id' => 'oferta', 'title' => mb_substr('Localiza Fácil - Oferta da semana - ' . $comercio, 0, 250),
             'quantity' => 1, 'unit_price' => (float)$o['valor'], 'currency_id' => 'BRL']],
         'payer' => ['email' => mp_modo() === 'sandbox' ? 'test_user_123456789@testuser.com' : $email],
         'external_reference' => 'oferta:' . $o['id'],
         'back_urls' => ['success' => $volta, 'pending' => $volta, 'failure' => $volta],
         'auto_return' => 'approved',
         'notification_url' => url_publica('mp-webhook.php?source_news=webhooks'),
-        'statement_descriptor' => 'ACHAFACIL',
-    ], ['X-Idempotency-Key: achafacil-oferta-' . $o['id'] . '-' . time()]);
+        'statement_descriptor' => 'LOCALIZAFACIL',
+    ], ['X-Idempotency-Key: localizafacil-oferta-' . $o['id'] . '-' . time()]);
     $endereco = (string)(str_starts_with(mp_token(), 'TEST-') ? ($pref['sandbox_init_point'] ?? $pref['init_point'] ?? '') : ($pref['init_point'] ?? ''));
     if ($endereco === '') throw new RuntimeException('O Mercado Pago não devolveu o endereço do pagamento.');
     q("UPDATE ofertas SET mp_status = IF(mp_status IS NULL, 'pending', mp_status), atualizado_em = NOW() WHERE id = ?", [$o['id']]);
@@ -144,7 +144,7 @@ function mp_conferir_oferta(string $mp_id, array $pg, int $oferta_id): void {
         return;
     }
     if (($pg['currency_id'] ?? '') !== 'BRL' || $valor + 0.009 < (float)$o['valor']) {
-        error_log("acha-facil mp: pagamento $mp_id com valor ou moeda diferente da oferta {$o['id']}");
+        error_log("localiza-facil mp: pagamento $mp_id com valor ou moeda diferente da oferta {$o['id']}");
         return;
     }
     $marcou = q("UPDATE ofertas SET mp_pagamento = ?, mp_status = 'approved', pago_em = NOW(), atualizado_em = NOW(),

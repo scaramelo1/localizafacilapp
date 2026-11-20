@@ -1,5 +1,5 @@
 <?php
-// Visitas do robô do Google por cidade (passo 69). Lê o registro do Apache do achafacilapp.com.br e guarda em
+// Visitas do robô do Google por cidade (passo 69). Lê o registro do Apache do localizafacilapp.com.br e guarda em
 // $DADOS/google/visitas.json quais fichas o Google já visitou (pelo nº da ficha) e quantas páginas ele visitou
 // por dia em cada cidade. Só conta o Google de verdade: User-Agent "Googlebot" e IP que volta *.googlebot.com
 // ou *.google.com (conferido nos dois sentidos, guardado no próprio arquivo). Pode rodar quantas vezes quiser:
@@ -30,7 +30,7 @@ $cidades_web = [];
 foreach (TODAS_CIDADES as $slug => $_) $cidades_web[cidade_web($slug)] = $slug;
 $dias = [];   // contados agora: dia => cidade => [paginas, fichas]
 $lidas = 0;
-foreach (glob('/var/log/apache2/achafacilapp_acesso.log*') ?: [] as $f) {
+foreach (glob('/var/log/apache2/localizafacilapp_acesso.log*') ?: [] as $f) {
     $gz = str_ends_with($f, '.gz');
     $h = $gz ? @gzopen($f, 'r') : @fopen($f, 'r');
     if (!$h) { fwrite(STDERR, "Sem permissão para ler $f (rode como root).\n"); continue; }

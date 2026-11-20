@@ -1,4 +1,4 @@
-# Imagem de compartilhar (og:image, 1200x630) do Acha Fácil: a paisagem do cabeçalho do app, o símbolo e o texto.
+# Imagem de compartilhar (og:image, 1200x630) do Localiza Fácil: a paisagem do cabeçalho do app, o símbolo e o texto.
 # 19/11 (avaliação do site): cada cidade com o seu número ("4.464 comércios em São João da Boa Vista - SP") e a inicial
 # com o total. Chamado por publico/og.php (gera na 1ª vez e de novo a cada 7 dias); também dá para rodar à mão:
 #   python3 servidor/og-imagem.py saida.png "4.464" "comércios e serviços" "São João da Boa Vista - SP"
@@ -40,12 +40,12 @@ def gerar(saida, numero, linha2, linha3):
     img.paste(Image.new('RGB', (W, H), (4, 40, 24)), (0, 0), sombra)
     d = ImageDraw.Draw(img)
     m = 64
-    # símbolo + "Acha Fácil!"
+    # símbolo + "Localiza Fácil"
     s = Image.open(SIMBOLO).convert('RGBA').resize((96, 96), Image.LANCZOS)
     img.paste(s, (m - 10, 44), s)
     f = fonte(56, 900)
-    d.text((m + 92, 62), 'Acha ', font=f, fill=BRANCO)
-    d.text((m + 92 + d.textlength('Acha ', font=f), 62), 'Fácil!', font=f, fill=AMARELO)
+    d.text((m + 92, 62), 'Localiza ', font=f, fill=BRANCO)
+    d.text((m + 92 + d.textlength('Localiza ', font=f), 62), 'Fácil', font=f, fill=AMARELO)
     # número grande, o que é e onde
     larg = 700
     fn = cabe(d, numero, 150, 1000, larg)
@@ -61,7 +61,7 @@ def gerar(saida, numero, linha2, linha3):
     d.rectangle([0, H - 82, W, H - 78], fill=AMARELO)
     fb = fonte(30, 800)
     d.text((m, H - 60), 'Endereço, horário e WhatsApp, grátis', font=fb, fill=BRANCO)
-    site = 'achafacilapp.com.br'
+    site = 'localizafacilapp.com.br'
     fs = fonte(30, 900)
     d.text((W - m - d.textlength(site, font=fs), H - 60), site, font=fs, fill=AMARELO)
     tmp = saida + '.tmp.png'

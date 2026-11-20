@@ -1,11 +1,11 @@
 <?php
 // APK do app para baixar direto do site (enquanto não está nas lojas, e depois como alternativa).
-// Fica fora da pasta pública: dados_dir/apk/acha-facil.apk, publicado por servidor/publicar-apk.sh.
+// Fica fora da pasta pública: dados_dir/apk/localiza-facil.apk, publicado por servidor/publicar-apk.sh.
 // downloads.txt guarda o total (nunca é zerado ao trocar o APK); versao.txt a versão do app.
 declare(strict_types=1);
 
 function apk_dir(): string { return config()['dados_dir'] . '/apk'; }
-function apk_arquivo(): string { return apk_dir() . '/acha-facil.apk'; }
+function apk_arquivo(): string { return apk_dir() . '/localiza-facil.apk'; }
 
 function apk_info(): ?array {
     $f = apk_arquivo();

@@ -22,16 +22,16 @@ require_once __DIR__ . '/../inc/conta-web.php';
 require_once __DIR__ . '/../inc/avisos.php';
 // tirar do app também (passo 52): o admin recebe o aviso e sabe quem pediu
 $conta = exigir_login_web($acao === 'remover' ? 'Tirar do app' : ($plano ? 'Plano ' . PLANOS_NOME[$plano] : 'Assumir o perfil'),
-    $acao === 'remover' ? "Você vai pedir para tirar {$p['nome']} do Acha Fácil."
-        : ($p ? "Você vai pedir para cuidar de {$p['nome']} no Acha Fácil." : 'Você vai fazer um pedido para o seu comércio.'));
+    $acao === 'remover' ? "Você vai pedir para tirar {$p['nome']} do Localiza Fácil."
+        : ($p ? "Você vai pedir para cuidar de {$p['nome']} no Localiza Fácil." : 'Você vai fazer um pedido para o seu comércio.'));
 // comércio que já tem dono (plano pago ou painel liberado): ninguém mais assume nem tira por aqui
 require_once __DIR__ . '/../inc/moderacao.php';
 $e_o_dono = fn(): bool => (int)(dono_atual()['id'] ?? 0) === (int)$p['id']
     || (pedido_usuario_pronto() && valor("SELECT 1 FROM pedidos WHERE profissional_id = ? AND usuario_id = ? AND status = 'feito'", [$p['id'], $conta['id']]));
 if ($p && tem_dono($p) && !$e_o_dono()) {
-    pagina_inicio('Comércio com responsável | Acha Fácil!', 'Este comércio já tem um responsável no Acha Fácil.', '', ['noindex' => true]);
+    pagina_inicio('Comércio com responsável | Localiza Fácil', 'Este comércio já tem um responsável no Localiza Fácil.', '', ['noindex' => true]);
     echo '<main class="documento"><h1>Este comércio já tem responsável</h1><div class="quadro"><strong>' . h($p['nome']) . '</strong></div>'
-        . '<p>O responsável por este comércio já cuida da página no Acha Fácil. Se acha que isso está errado, fale com a gente: '
+        . '<p>O responsável por este comércio já cuida da página no Localiza Fácil. Se acha que isso está errado, fale com a gente: '
         . contatos_html() . '.</p></main>';
     pagina_fim();
     exit;
@@ -61,7 +61,7 @@ if (e_post()) {
         avisar_admins('Comércio assumido (grátis)', "$nome assumiu {$p['nome']} pelo plano Grátis.", ['pedido' => (int)valor('SELECT pedido_id FROM acessos_dono WHERE id = ?', [$acesso_id])]);
         session_regenerate_id(true);
         $_SESSION['dono_acesso'] = $acesso_id;
-        flash('Pronto! Agora você cuida de ' . $p['nome'] . ' no Acha Fácil. Confira os dados abaixo: cada mudança aparece no app depois da conferência da equipe.');
+        flash('Pronto! Agora você cuida de ' . $p['nome'] . ' no Localiza Fácil. Confira os dados abaixo: cada mudança aparece no app depois da conferência da equipe.');
         ir('painel/');
     } else {
         $dados = ['profissional_id' => $p['id'] ?? null, 'tipo' => $acao, 'plano' => $plano, 'nome' => $nome, 'telefone' => $telefone, 'mensagem' => $mensagem, 'ip' => ip()];
@@ -83,7 +83,7 @@ if (e_post()) {
 }
 
 $titulo = $acao === 'remover' ? 'Tirar do app' : ($plano ? 'Plano ' . PLANOS_NOME[$plano] : ($p ? 'Cadastrar grátis' : 'Incluir meu negócio'));
-pagina_inicio("$titulo | Acha Fácil!", 'Pedido do dono do comércio para o Acha Fácil.');
+pagina_inicio("$titulo | Localiza Fácil", 'Pedido do dono do comércio para o Localiza Fácil.');
 ?>
 <main class="documento">
   <h1><?= h($titulo) ?></h1>
@@ -101,7 +101,7 @@ pagina_inicio("$titulo | Acha Fácil!", 'Pedido do dono do comércio para o Acha
         ? 'É o responsável por este comércio? Cadastre-se de graça e corrija o nome, o telefone, o WhatsApp, o endereço, o site e o horário. '
           . 'Logo, fotos, descrição, produtos e "atende em casa / entrega" ficam no plano Básico (' . preco_plano_texto('basico') . ').'
         : ($acao === 'remover'
-        ? 'É o responsável por este comércio e não quer que ele apareça no Acha Fácil? Deixe seu contato para confirmarmos.'
+        ? 'É o responsável por este comércio e não quer que ele apareça no Localiza Fácil? Deixe seu contato para confirmarmos.'
         : ($p ? ($com_assinatura
                 ? 'Plano ' . PLANOS_NOME[$plano] . ': ' . preco_plano_texto($plano) . '. Preencha seus dados e, em seguida, '
                     . (plano_unico($plano) ? 'pague pelo Mercado Pago (cartão, Pix ou boleto, sem precisar de conta). Pagou' : 'assine com o seu cartão de crédito. Assinou')

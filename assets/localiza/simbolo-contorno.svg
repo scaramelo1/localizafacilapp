@@ -1,0 +1,19 @@
+<!-- Símbolo do Localiza Fácil com contorno branco (para fundo verde/escuro; 20/11): pino verde, círculo amarelo e loja verde com toldo. Cores da marca: #005C38 e #F7C600 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="-30 -30 1060 1060">
+  <!-- pino -->
+  <path fill="#005C38" stroke="#FFFFFF" stroke-width="44" stroke-linejoin="round" d="M500 70 C 700 70 850 220 850 410 C 850 530 790 630 705 735 L 545 920 Q 500 970 455 920 L 295 735 C 210 630 150 530 150 410 C 150 220 300 70 500 70 Z"/>
+  <!-- círculo -->
+  <circle cx="500" cy="410" r="255" fill="#F7C600"/>
+  <!-- loja: telhado -->
+  <path fill="#005C38" d="M345 270 H655 Q668 270 672 282 L690 325 H310 L328 282 Q332 270 345 270 Z"/>
+  <!-- toldo: 4 gomos verdes e brancos -->
+  <path fill="#005C38" d="M310 335 H405 V385 Q405 425 357 425 Q310 425 310 385 Z"/>
+  <path fill="#FFFFFF" d="M405 335 H500 V385 Q500 425 452 425 Q405 425 405 385 Z"/>
+  <path fill="#005C38" d="M500 335 H595 V385 Q595 425 547 425 Q500 425 500 385 Z"/>
+  <path fill="#FFFFFF" d="M595 335 H690 V385 Q690 425 642 425 Q595 425 595 385 Z"/>
+  <path fill="none" stroke="#005C38" stroke-width="10" d="M310 335 H690 V385 Q690 425 642 425 Q595 425 595 385 Q595 425 547 425 Q500 425 500 385 Q500 425 452 425 Q405 425 405 385 Q405 425 357 425 Q310 425 310 385 Z"/>
+  <!-- fachada -->
+  <rect x="330" y="435" width="340" height="135" rx="14" fill="#005C38"/>
+  <rect x="360" y="465" width="75" height="105" rx="8" fill="#F7C600"/>
+  <rect x="470" y="465" width="170" height="70" rx="10" fill="#FFFFFF"/>
+</svg>

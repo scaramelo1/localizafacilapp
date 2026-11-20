@@ -49,7 +49,7 @@ function origem_do_referer(?string $ref = null): ?string {
     $host = strtolower((string)parse_url($ref, PHP_URL_HOST));
     if ($host === '') return null;
     $proprio = strtolower((string)preg_replace('/:\d+$/', '', (string)($_SERVER['HTTP_HOST'] ?? '')));
-    if ($host === $proprio || preg_match('/(^|\.)(achafacilapp\.com\.br|fsadesigners\.com\.br)$/', $host)) return null;
+    if ($host === $proprio || preg_match('/(^|\.)(localizafacilapp\.com\.br|fsadesigners\.com\.br)$/', $host)) return null;
     // o app do Google no Android manda android-app://com.google.android.googlequicksearchbox
     if (preg_match('/(^|\.)google\.|googlequicksearchbox|^com\.google\./', $host)) return 'google';
     if (preg_match('/(^|\.)(bing|yahoo|duckduckgo|yandex|ecosia|baidu|qwant)\.|search\.brave\.com$|(^|\.)msn\.com$/', $host)) return 'buscadores';
@@ -122,7 +122,7 @@ function entradas_prontas(): bool {
 /** Sal do embaralhamento: 'sal_visitas' no config ou, se não houver, derivado da senha do banco (nunca sai do servidor). */
 function sal_visitas(): string {
     $c = config();
-    return (string)($c['sal_visitas'] ?? hash('sha256', 'acha-facil-visitas|' . ($c['db_senha'] ?? '')));
+    return (string)($c['sal_visitas'] ?? hash('sha256', 'localiza-facil-visitas|' . ($c['db_senha'] ?? '')));
 }
 
 /**
@@ -179,12 +179,12 @@ function contar_hora(int $profissional_id, string $tipo, string $origem, int $pe
     if (!contatos_hora_prontos()) return;
     try {
         q('INSERT INTO contatos_hora (profissional_id, tipo, origem, pessoa) VALUES (?, ?, ?, ?)', [$profissional_id, $tipo, $origem, $pessoa]);
-    } catch (PDOException $e) { error_log('Acha Fácil contatos_hora: ' . $e->getMessage()); }
+    } catch (PDOException $e) { error_log('Localiza Fácil contatos_hora: ' . $e->getMessage()); }
 }
 
 /** Banco ainda sem a mudança 017 (ou falha qualquer): conta do jeito antigo, sem origem nem pessoas, e anota no log. */
 function contar_sem_017(int $profissional_id, string $tipo, Throwable $e): void {
-    error_log('Acha Fácil números: ' . $e->getMessage());
+    error_log('Localiza Fácil números: ' . $e->getMessage());
     try {
         q('INSERT INTO contatos (profissional_id, tipo, dia, total) VALUES (?,?,CURDATE(),1) ON DUPLICATE KEY UPDATE total = total + 1', [$profissional_id, $tipo]);
     } catch (PDOException) {}
@@ -200,7 +200,7 @@ function contar_aparicoes(array $lista, string $onde): void {
     try {
         q('INSERT INTO aparicoes (profissional_id, dia, onde, total) VALUES ' . implode(',', array_fill(0, count($ids), '(?, CURDATE(), ?, 1)'))
             . ' ON DUPLICATE KEY UPDATE total = total + 1', $params);
-    } catch (PDOException $e) { error_log('Acha Fácil aparições: ' . $e->getMessage()); }
+    } catch (PDOException $e) { error_log('Localiza Fácil aparições: ' . $e->getMessage()); }
 }
 
 // ---------- leitura (admin, relatório e painel do dono) ----------
@@ -312,7 +312,7 @@ function pedir_info(int $profissional_id, string $tipo, string $origem, ?int $us
         if (random_int(1, 300) === 1) q('DELETE FROM pedidos_info_vistos WHERE dia < CURDATE() - INTERVAL 1 DAY');
         return true;
     } catch (PDOException $e) {
-        error_log('Acha Fácil pedidos de info: ' . $e->getMessage());
+        error_log('Localiza Fácil pedidos de info: ' . $e->getMessage());
         return false;
     }
 }
@@ -387,7 +387,7 @@ function numeros_publicos_html(): string {
     $n = numeros_publicos();
     if ($n['vistas'] < 100) return '';
     $f = fn(int $v) => number_format($v, 0, ',', '.');
-    return '<div class="numeros-blocos" aria-label="Números do Acha Fácil nos últimos 30 dias">'
+    return '<div class="numeros-blocos" aria-label="Números do Localiza Fácil nos últimos 30 dias">'
         . ($n['pessoas'] ? '<div><strong>' . $f($n['pessoas']) . '</strong><span>visitas de pessoas ao site</span></div>' : '')
         . '<div><strong>' . $f($n['vistas']) . '</strong><span>páginas de comércio abertas</span></div>'
         . '<div><strong>' . $f($n['contatos']) . '</strong><span>toques em WhatsApp, ligar e "como chegar"</span></div>'

@@ -13,7 +13,7 @@ header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') { http_response_code(204); exit; }
 
 set_exception_handler(function (Throwable $e) {
-    error_log('Acha Fácil API: ' . $e->getMessage() . ' em ' . $e->getFile() . ':' . $e->getLine());
+    error_log('Localiza Fácil API: ' . $e->getMessage() . ' em ' . $e->getFile() . ':' . $e->getLine());
     responder(['erro' => 'Algo deu errado no servidor. Tente de novo em instantes.'], 500);
 });
 

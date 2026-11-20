@@ -1,5 +1,5 @@
 <?php
-// Acha Fácil — funções comuns: configuração, banco, formatação, segurança
+// Localiza Fácil — funções comuns: configuração, banco, formatação, segurança
 declare(strict_types=1);
 date_default_timezone_set('America/Sao_Paulo');
 mb_internal_encoding('UTF-8');
@@ -10,15 +10,15 @@ function config(): array {
     if ($c !== null) return $c;
     $local = dirname(__DIR__) . '/config.local.php';
     $c = require (is_file($local) ? $local : '/etc/guia-novo/config.php');
-    $c['url'] = rtrim($c['url'] ?? '/acha-facil', '/');
-    // Domínio próprio (achafacilapp.com.br): o site fica na raiz, sem /acha-facil
-    if (preg_match('/^(www\.)?achafacilapp\.com\.br$/i', (string)($_SERVER['HTTP_HOST'] ?? ''))) $c['url'] = '';
+    $c['url'] = rtrim($c['url'] ?? '/guia-novo', '/');
+    // Domínio próprio (localizafacilapp.com.br): o site fica na raiz, sem /localiza-facil
+    if (preg_match('/^(www\.)?localizafacilapp\.com\.br$/i', (string)($_SERVER['HTTP_HOST'] ?? ''))) $c['url'] = '';
     $c['dados_dir'] = rtrim($c['dados_dir'] ?? '/var/lib/guia-novo', '/');
     return $c;
 }
 function url(string $caminho = ''): string { return config()['url'] . '/' . ltrim($caminho, '/'); }
 function url_publica(string $caminho = ''): string {
-    return rtrim((string)(config()['endereco_publico'] ?? 'https://achafacilapp.com.br/'), '/') . '/' . ltrim($caminho, '/');
+    return rtrim((string)(config()['endereco_publico'] ?? 'https://localizafacilapp.com.br/'), '/') . '/' . ltrim($caminho, '/');
 }
 
 function db(): PDO {
@@ -109,7 +109,7 @@ function login_falhou(): void { q('INSERT INTO tentativas_login (ip, quando) VAL
 function iniciar_sessao(): void {
     if (session_status() === PHP_SESSION_ACTIVE) return;
     $c = config();
-    session_name('ACHAFACIL');
+    session_name('LOCALIZAFACIL');
     session_set_cookie_params(['lifetime' => 0, 'path' => $c['url'] . '/', 'secure' => !empty($c['https']), 'httponly' => true, 'samesite' => 'Lax']);
     ini_set('session.use_strict_mode', '1');
     session_start();

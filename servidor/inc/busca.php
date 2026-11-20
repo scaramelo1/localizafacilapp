@@ -324,7 +324,7 @@ function registrar_busca(string $termo, ?string $cidade, int $resultados, ?strin
         inserir('buscas', ['cidade' => $cid, 'termo' => $termo, 'resultados' => min($resultados, 65535), 'corrigido' => $corrigido,
             'origem' => $origem === 'site' ? 'site' : 'app', 'quem' => $quem]);
     } catch (PDOException $e) {
-        error_log('acha-facil registrar_busca: ' . $e->getMessage());   // guardar nunca derruba a busca
+        error_log('localiza-facil registrar_busca: ' . $e->getMessage());   // guardar nunca derruba a busca
     }
 }
 

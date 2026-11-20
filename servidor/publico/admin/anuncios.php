@@ -37,7 +37,7 @@ admin_inicio('Anúncios', $admin);
   <p><strong>Sem anúncio:</strong> fichas de quem paga Básico, Destaque ou Destaque + Site; planos, pagamento, incluir, entrar,
     minha conta, painel, admin, termos e privacidade.</p>
   <p class="discreto">Os lugares e formatos (barra, no meio do texto etc.) se escolhem no próprio AdSense, em "Anúncios" →
-    "Por site" → achafacilapp.com.br. Recomendado: anúncios automáticos ligados, com a "vinheta" (tela cheia) desligada.
+    "Por site" → localizafacilapp.com.br. Recomendado: anúncios automáticos ligados, com a "vinheta" (tela cheia) desligada.
     Nunca clique nos seus próprios anúncios.</p>
   <p class="discreto">Arquivo de autorização: <a href="/ads.txt" target="_blank" rel="noopener">/ads.txt</a>.</p>
 </div>

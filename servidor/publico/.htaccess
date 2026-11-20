@@ -1,5 +1,5 @@
 # Guia novo (Plano D, nome provisório), em https://fsadesigners.com.br/guia-novo/ enquanto não tem domínio.
-# NADA daqui vai para o Google (mesmas fichas do Acha Fácil): noindex em toda resposta.
+# NADA daqui vai para o Google (mesmas fichas do Localiza Fácil): noindex em toda resposta.
 <IfModule mod_headers.c>
   Header always set X-Robots-Tag "noindex, nofollow"
 </IfModule>

@@ -1,6 +1,6 @@
 <?php
 // Versão web com SEO (passo 21): páginas públicas de cidade, área, tipo e ficha, para quem procura no Google
-// ("dentista em São João da Boa Vista") cair no Acha Fácil. Só mostra o que já aparece no app (visivel()).
+// ("dentista em São João da Boa Vista") cair no Localiza Fácil. Só mostra o que já aparece no app (visivel()).
 // Endereços (helpers em inc/guia.php):
 //   /<cidade>/                    cidade (nome completo: sao-joao-da-boa-vista)
 //   /<cidade>/<area>/             área (slug da categoria)       ?pagina=2  ?bairro=Centro (filtro não indexado)
@@ -113,7 +113,7 @@ function web_botao_aberto(string $base, bool $ligado, array $manter = []): strin
 function web_aviso_aberto(int $achados): string {
     return '<p class="aviso-aberto">' . ($achados ? '<b>' . web_qtd($achados, 'lugar aberto', 'lugares abertos') . ' agora</b> entre os que informaram o horário.'
             : '<b>Nenhum lugar com horário informado está aberto agora.</b>')
-        . ' Muitos comércios ainda não informaram o horário no Acha Fácil.'
+        . ' Muitos comércios ainda não informaram o horário no Localiza Fácil.'
         . ' É dono? <a href="' . h(url('busca.php')) . '" rel="nofollow">Informe o seu horário de graça</a> e apareça aqui.</p>';
 }
 /** Bairros da lista (sem o filtro de bairro), para o filtro. */
@@ -153,7 +153,7 @@ function web_qtd(int $n, string $um, string $varios): string { return web_num($n
 /** Trilha "Início › Cidade › Área" (HTML + dados estruturados BreadcrumbList). $itens: [[nome, url relativa ou null]]. */
 function web_trilha(array $itens): array {
     $html = '<nav class="trilha" aria-label="Você está em"><a href="' . h(url()) . '">Início</a>';
-    $ld = [['@type' => 'ListItem', 'position' => 1, 'name' => 'Acha Fácil', 'item' => url_publica()]];
+    $ld = [['@type' => 'ListItem', 'position' => 1, 'name' => 'Localiza Fácil', 'item' => url_publica()]];
     foreach ($itens as $i => [$nome, $link]) {
         $html .= ' <span aria-hidden="true">›</span> ' . ($link ? '<a href="' . h($link) . '">' . h($nome) . '</a>' : '<span aria-current="page">' . h($nome) . '</span>');
         $item = ['@type' => 'ListItem', 'position' => $i + 2, 'name' => $nome];
@@ -265,7 +265,7 @@ function web_form_busca(string $cidade, string $termo = ''): string {
 }
 /** Chamada para baixar o app, no fim das páginas. */
 function web_baixe_app(string $cidade): string {
-    return '<section class="verde baixe"><div class="conteudo"><h2>Leve o Acha Fácil no bolso</h2><p class="intro">O comércio de '
+    return '<section class="verde baixe"><div class="conteudo"><h2>Leve o Localiza Fácil no bolso</h2><p class="intro">O comércio de '
         . h(nome_cidade($cidade)) . ' no seu celular: procure, veja quem está aberto e chame no WhatsApp com um toque.</p><div class="lojas">'
         . botoes_lojas() . '</div></div></section>';
 }
@@ -283,7 +283,7 @@ function web_pagina_cidade(string $cidade): void {
         WHERE ' . visivel($cidade) . ' AND NOT ' . SQL_DESTAQUE . ' ORDER BY p.popularidade + p.total_avaliacoes * 5 DESC LIMIT 60) t
         ORDER BY RAND(?) LIMIT 12', [semente_dia()]);
     [$trilha, $ld] = web_trilha([["$nome - $uf", null]]);
-    pagina_inicio("Comércios e serviços em $nome - $uf | Acha Fácil!",
+    pagina_inicio("Comércios e serviços em $nome - $uf | Localiza Fácil",
         web_num($total) . " comércios e serviços de $nome ($uf): restaurantes, mercados, oficinas, clínicas, lojas e muito mais. Endereço, horário e WhatsApp.",
         'web', ['canonica' => web_absoluta(url_cidade($cidade)), 'head' => web_json_ld($ld), 'anuncios' => true,
             'noindex' => !cidade_no_google($cidade)]);   // Plano D, passo 7
@@ -355,7 +355,7 @@ function web_pagina_lista(string $cidade, array $area, ?string $tipo, ?string $b
     $tipos = $tipo === null ? web_tipos($cidade, (int)$area['id']) : [];
     $bairros = web_bairros($cidade, (int)$area['id'], $tipo);
     $qtd = web_qtd($total, 'lugar', 'lugares');
-    $titulo = ($tipo !== null ? "$tipo em $nome_cidade - $uf" : "{$area['nome']} em $nome_cidade - $uf") . ($pagina > 1 ? " (página $pagina)" : '') . ' | Acha Fácil!';
+    $titulo = ($tipo !== null ? "$tipo em $nome_cidade - $uf" : "{$area['nome']} em $nome_cidade - $uf") . ($pagina > 1 ? " (página $pagina)" : '') . ' | Localiza Fácil';
     $descricao = "$qtd de " . mb_strtolower($titulo_lista) . " em $nome_cidade ($uf): endereço, horário, WhatsApp e avaliações. Veja quem está aberto e chame direto.";
     // não vai para o Google: filtro de bairro e tipo com poucos comércios
     $noindex = $aberto || $bairro !== null || ($tipo !== null && $total < WEB_TIPO_MINIMO)
@@ -456,7 +456,7 @@ function web_pagina_ficha(array $p): void {
     $tem_rua = $p['endereco'] && !preg_match('/domic[ií]lio|em casa|delivery|online|sem endere/iu', $p['endereco']);
     $descricao = $nome . ' em ' . $nome_cidade . ' (' . $uf . ')' . ($tipo ? ", $tipo" : '') . '. '
         . ($tem_rua ? 'Endereço: ' . $p['endereco'] . '. ' : ($p['atende_em_casa'] || $p['endereco'] ? 'Atende a domicílio. ' : ''))
-        . 'Veja horário, telefone e WhatsApp no Acha Fácil.';
+        . 'Veja horário, telefone e WhatsApp no Localiza Fácil.';
     pagina_inicio(web_titulo_ficha((string)$nome, (string)$tipo, (string)$nome_cidade), mb_substr($descricao, 0, 300), 'web',
         ['canonica' => $url, 'imagem' => $imagem, 'head' => web_json_ld($ld, $ld_trilha), 'noindex' => !ficha_no_google($p),
             'anuncios' => $p['importado'] && !$p['destaque_pago']]);   // 17/11 (pedido do usuário): anúncio também no Básico; só o Destaque fica sem
@@ -478,7 +478,7 @@ function web_pagina_ficha(array $p): void {
           <p class="ficha-sub"><?= h(implode(' · ', $sub)) ?></p>
           <p class="ficha-selos">
             <?php if ($p['destaque_pago']): ?><span class="selo-destaque">Destaque</span><?php endif ?>
-            <?php if ($c['verificado']): ?><span class="selo-verificado">✔ Verificado pelo Acha Fácil</span>
+            <?php if ($c['verificado']): ?><span class="selo-verificado">✔ Verificado pelo Localiza Fácil</span>
             <?php elseif (!$p['destaque_pago'] && !$sem_dono && $p['importado']): // passo 78: assumiu (grátis ou Básico) ?><span class="selo-verificado">✓ Dados confirmados pelo dono</span>
             <?php elseif (!empty($p['confirmado_em'])): // Plano D, passo 8: a equipe conferiu por telefone/WhatsApp ?><span class="selo-verificado">✓ Dados conferidos pela equipe em <?= h(date('m/Y', strtotime($p['confirmado_em']))) ?></span><?php endif ?>
             <?php if ($aberto !== null): ?><span class="selo-<?= $aberto ? 'aberto' : 'fechado' ?>"><?= $aberto ? 'Aberto agora' : 'Fechado agora' ?></span><?php endif ?>
@@ -551,7 +551,7 @@ function web_pagina_ficha(array $p): void {
 
       <?php // 19/11: o convite ao dono fica só na caixa "Este comércio é seu?" (antes repetia aqui) ?>
 
-      <h2>Avaliações de quem usa o Acha Fácil</h2>
+      <h2>Avaliações de quem usa o Localiza Fácil</h2>
       <?php if (!$c['comentarios']): ?><p class="discreto">Ainda sem avaliações. Seja o primeiro a avaliar!</p><?php endif ?>
       <?php if ($c['comentarios']): ?>
         <ul class="avaliacoes">
@@ -597,11 +597,11 @@ function web_pagina_ficha(array $p): void {
           <?php if (!web_tem_horario($p)): ?><br>🕒 Informando o horário, sua ficha aparece no filtro <strong>"Aberto agora"</strong> e antes das outras nas listas.<?php endif ?>
           <a class="botao amarelo" href="<?= h(url('perfil.php?acao=assumir&id=' . (int)$p['id'])) ?>" rel="nofollow">Cadastrar grátis</a>
           <a class="botao contorno" href="<?= h($c['linkAssumir']) ?>" rel="nofollow">Ver os planos</a></p>
-        <p class="discreto">Os dados vieram de informações públicas do comércio na internet. Não quer aparecer? <a href="<?= h($c['linkRemover']) ?>" rel="nofollow">Tirar meu comércio do Acha Fácil</a>.</p>
+        <p class="discreto">Os dados vieram de informações públicas do comércio na internet. Não quer aparecer? <a href="<?= h($c['linkRemover']) ?>" rel="nofollow">Tirar meu comércio do Localiza Fácil</a>.</p>
         <p class="discreto">Informação errada? <a href="<?= h(url('suporte.php?id=' . (int)$p['id'])) ?>" rel="nofollow">Envie uma mensagem para a equipe</a> (precisa entrar com a conta Google).</p>
       <?php else: ?>
         <h2 class="h-pequeno">Informação errada ou algum problema?</h2>
-        <p>Mande uma mensagem para a equipe do Acha Fácil. É preciso <strong>entrar com a conta Google</strong>: assim a
+        <p>Mande uma mensagem para a equipe do Localiza Fácil. É preciso <strong>entrar com a conta Google</strong>: assim a
           gente responde e você recebe o aviso no celular.</p>
         <p><a class="botao contorno" href="<?= h(url('suporte.php?id=' . (int)$p['id'])) ?>" rel="nofollow">Enviar mensagem para a equipe</a></p>
       <?php endif ?>
@@ -677,7 +677,7 @@ document.querySelectorAll('[data-quero]').forEach(function (b) {
     : 'Entre com o Google e receba o aviso no celular e em Minha conta. É 1 toque, sem senha.';
   q.querySelector('[data-avisar]').textContent = logado ? '🔔 Sim, me avise' : 'Entrar com o Google e me avisar';
   var ok = document.createElement('p'); ok.className = 'avisar-ok'; ok.hidden = true;
-  ok.innerHTML = '🔔 Combinado! Você recebe um aviso no celular (app Acha Fácil) e em <a href="' + <?= json_encode(url('minha-conta.php')) ?> + '">Minha conta</a> quando a informação entrar.';
+  ok.innerHTML = '🔔 Combinado! Você recebe um aviso no celular (app Localiza Fácil) e em <a href="' + <?= json_encode(url('minha-conta.php')) ?> + '">Minha conta</a> quando a informação entrar.';
   cx.appendChild(q); cx.appendChild(ok);
 });
 function avisoFeito(caixa) { var q = caixa.querySelector('.quero-avisar'), ok = caixa.querySelector('.avisar-ok'); if (q) q.hidden = true; if (ok) ok.hidden = false; }
@@ -775,7 +775,7 @@ document.querySelectorAll('[data-contato]').forEach(function (a) {
 /**
  * Título da ficha para o Google (19/11, passo 117, avaliação item 4): até ~65 letras, que é o que o Google mostra sem cortar.
  * Tira a cidade do fim do nome ("Spani Atacadista São João da Boa Vista" -> "Spani Atacadista") e vai encurtando:
- *   "Nome - Tipo em Cidade | Acha Fácil!" -> "Nome - Tipo em Cidade" -> "Nome em Cidade" -> "Nome - Tipo" -> "Nome" (cortado).
+ *   "Nome - Tipo em Cidade | Localiza Fácil" -> "Nome - Tipo em Cidade" -> "Nome em Cidade" -> "Nome - Tipo" -> "Nome" (cortado).
  */
 function web_titulo_ficha(string $nome, string $tipo, string $cidade, int $max = 65): string {
     $nome = trim($nome);
@@ -784,10 +784,10 @@ function web_titulo_ficha(string $nome, string $tipo, string $cidade, int $max =
     $tipo = trim($tipo);
     $opcoes = [];
     if ($tipo !== '' && mb_stripos($nome, $tipo) === false) {
-        $opcoes[] = "$nome - $tipo em $cidade | Acha Fácil!";
+        $opcoes[] = "$nome - $tipo em $cidade | Localiza Fácil";
         $opcoes[] = "$nome - $tipo em $cidade";
     }
-    $opcoes[] = "$nome em $cidade | Acha Fácil!";
+    $opcoes[] = "$nome em $cidade | Localiza Fácil";
     $opcoes[] = "$nome em $cidade";
     if ($tipo !== '' && mb_stripos($nome, $tipo) === false) $opcoes[] = "$nome - $tipo";
     foreach ($opcoes as $o) if (mb_strlen($o) <= $max) return $o;
@@ -809,7 +809,7 @@ function web_pagina_busca(string $cidade, string $termo, bool $aberto = false): 
     }
     $url_busca = url(cidade_web($cidade) . '/buscar');
     [$trilha] = web_trilha([["$nome_cidade - $uf", url_cidade($cidade)], ['Busca', null]]);
-    pagina_inicio("Procurar em $nome_cidade | Acha Fácil!", "Procure comércios e serviços em $nome_cidade ($uf).", 'web',
+    pagina_inicio("Procurar em $nome_cidade | Localiza Fácil", "Procure comércios e serviços em $nome_cidade ($uf).", 'web',
         ['canonica' => web_absoluta(url_cidade($cidade)), 'noindex' => true, 'anuncios' => true]);
     ?>
 <main>
@@ -879,7 +879,7 @@ function web_busca_sem_resultado(string $cidade, string $termo): string {
   </div>
 
   <div class="convite-incluir">
-    <p><b>Conhece um lugar assim em <?= h($nome_cidade) ?>?</b> Inclua o negócio no Acha Fácil de graça. Pode ser o seu ou de alguém que você indica.</p>
+    <p><b>Conhece um lugar assim em <?= h($nome_cidade) ?>?</b> Inclua o negócio no Localiza Fácil de graça. Pode ser o seu ou de alguém que você indica.</p>
     <a class="botao" href="<?= h(url('incluir.php') . '?' . http_build_query(['cidade' => $cidade])) ?>" rel="nofollow">Incluir um negócio de graça</a>
   </div>
 </div>
@@ -890,11 +890,11 @@ function web_busca_sem_resultado(string $cidade, string $termo): string {
 /** Página não encontrada (404 de verdade, sem ir para o Google). */
 function web_pagina_404(): void {
     http_response_code(404);
-    pagina_inicio('Página não encontrada | Acha Fácil!', 'Esta página não existe ou o comércio saiu do Acha Fácil.', 'web', ['noindex' => true, 'canonica' => url_publica()]);
+    pagina_inicio('Página não encontrada | Localiza Fácil', 'Esta página não existe ou o comércio saiu do Localiza Fácil.', 'web', ['noindex' => true, 'canonica' => url_publica()]);
     ?>
 <main class="documento">
   <h1>Página não encontrada</h1>
-  <p>Esta página não existe, ou o comércio saiu do Acha Fácil.</p>
+  <p>Esta página não existe, ou o comércio saiu do Localiza Fácil.</p>
   <p class="chips"><?php foreach (CIDADES as $s => [$n, , $u]): ?><a href="<?= h(url_cidade($s)) ?>"><?= h("$n - $u") ?></a><?php endforeach ?></p>
   <p><a class="botao" href="<?= h(url()) ?>">Ir para o início</a></p>
 </main>

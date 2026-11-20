@@ -48,7 +48,7 @@ $avaliacoes = linhas('SELECT a.estrelas, a.comentario, a.resposta, a.status, a.c
 $avisos = $_SESSION['flash'] ?? [];
 unset($_SESSION['flash']);
 
-pagina_inicio('Minha conta | Acha Fácil!', 'Seus comércios salvos e suas avaliações no Acha Fácil.', 'web', ['noindex' => true, 'canonica' => url_publica('minha-conta.php')]);
+pagina_inicio('Minha conta | Localiza Fácil', 'Seus comércios salvos e suas avaliações no Localiza Fácil.', 'web', ['noindex' => true, 'canonica' => url_publica('minha-conta.php')]);
 ?>
 <main class="documento minha-conta">
   <?php foreach ($avisos as [$tipo, $msg]): ?><p class="aviso <?= h($tipo) ?>"><?= h($msg) ?></p><?php endforeach ?>
@@ -58,7 +58,7 @@ pagina_inicio('Minha conta | Acha Fácil!', 'Seus comércios salvos e suas avali
     <?php endif ?>
     <div>
       <h1>Olá, <?= h(primeiro_nome($u['nome'])) ?>!</h1>
-      <p class="discreto"><?= h($u['email']) ?> · a mesma conta do app Acha Fácil</p>
+      <p class="discreto"><?= h($u['email']) ?> · a mesma conta do app Localiza Fácil</p>
       <?php require_once __DIR__ . '/../inc/avisos.php'; if (admin_do_usuario($u)): ?><p><a class="botao amarelo" href="<?= h(url('admin/')) ?>">Painel da administração</a></p><?php endif ?>
     </div>
   </div>

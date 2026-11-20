@@ -46,7 +46,7 @@ function avisar_infos_completas(?array $ids = null): int {
         if (!ficha_tem_info($a, $a['tipo'])) continue;
         $nome = nome_curto($a['nome'], 40);
         avisar_usuario((int)$a['usuario_id'], "🔔 $nome colocou " . AVISO_INFO_TEXTO[$a['tipo']],
-            'Você pediu para ser avisado no Acha Fácil. Toque para ver.', ['tela' => 'profissional', 'id' => (int)$a['pid']]);
+            'Você pediu para ser avisado no Localiza Fácil. Toque para ver.', ['tela' => 'profissional', 'id' => (int)$a['pid']]);
         q('UPDATE avisos_info SET avisado_em = NOW() WHERE id = ?', [$a['id']]);   // mesmo sem celular: aparece em "Minha conta"
         $avisados++;
     }

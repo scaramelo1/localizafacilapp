@@ -43,7 +43,7 @@ for ($i = 0; $i < 4; $i++) { $t = strtotime(date('Y-m-01') . " -$i month"); $mes
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title><?= h($p['nome']) ?> no Acha Fácil · <?= h($periodo) ?></title>
+<title><?= h($p['nome']) ?> no Localiza Fácil · <?= h($periodo) ?></title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap">
 <style>
   :root { --verde: #005C38; --amarelo: #F7C600; --texto: #1d2a24; --texto2: #5b6b63; --borda: #e3e8e5; }
@@ -120,7 +120,7 @@ for ($i = 0; $i < 4; $i++) { $t = strtotime(date('Y-m-01') . " -$i month"); $mes
 <div class="folha">
   <div class="topo">
     <img src="<?= $base ?>/assets/logo.png" alt="">
-    <div><div class="marca">Acha <b>Fácil!</b></div><div class="lema">O comércio da sua cidade, pertinho de você.</div></div>
+    <div><div class="marca">Localiza <b>Fácil</b></div><div class="lema">O comércio da sua cidade, pertinho de você.</div></div>
   </div>
   <div class="corpo">
     <h1><?= h($p['nome']) ?></h1>
@@ -179,14 +179,14 @@ for ($i = 0; $i < 4; $i++) { $t = strtotime(date('Y-m-01') . " -$i month"); $mes
       <ul>
         <?php if ($sem_basico): ?><li>Tudo do Básico e até 10 fotos</li><?php endif ?>
         <li>Seu comércio no topo da tela inicial e da sua categoria</li>
-        <li>Selo "Verificado pelo Acha Fácil"</li>
+        <li>Selo "Verificado pelo Localiza Fácil"</li>
         <?php if (!$sem_basico): ?><li>Logo, fotos e dados corrigidos por você</li><?php endif ?>
         <li>Responder às avaliações e acompanhar estes números todo mês</li>
       </ul>
     </div>
     </div>
     <div class="chamada-site">
-      <?php if (plano_site_pronto()): ?><p style="margin:.4em 0 0">Quer também um site próprio com domínio? <strong>Destaque + Site (<?= h(preco_plano_texto('site')) ?>)</strong>: tudo do Destaque e uma página do seu negócio feita pela equipe do Acha Fácil.</p><?php endif ?>
+      <?php if (plano_site_pronto()): ?><p style="margin:.4em 0 0">Quer também um site próprio com domínio? <strong>Destaque + Site (<?= h(preco_plano_texto('site')) ?>)</strong>: tudo do Destaque e uma página do seu negócio feita pela equipe do Localiza Fácil.</p><?php endif ?>
     </div>
     <?php endif ?>
 
@@ -195,7 +195,7 @@ for ($i = 0; $i < 4; $i++) { $t = strtotime(date('Y-m-01') . " -$i month"); $mes
       (<?= h(oferta_preco_texto()) ?> por oferta, até <?= OFERTA_MAX_DIAS ?> dias no ar) na sua ficha e na página da cidade, pelo painel do comércio.</div>
     <?php endif ?>
     <p class="rodape">Veja os planos em <strong><?= h(preg_replace('#^https?://#', '', url_publica('planos.php'))) ?></strong>
-      · App Acha Fácil para Android</p>
+      · App Localiza Fácil para Android</p>
   </div>
 </div>
 </body>

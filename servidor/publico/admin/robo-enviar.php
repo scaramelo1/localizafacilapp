@@ -2,7 +2,7 @@
 // Recebe a lista do robô direto do PC (scripts/robo/robo-rodar.ps1), sem login: vale a chave do robô
 // (gerada em /admin/novidades.php) no cabeçalho X-Chave-Robo. Confere em modo TESTE e guarda em Novidades;
 // com o modo automático ligado, já importa. Avisa os admins no celular. Responde em texto simples.
-//   curl.exe -H "X-Chave-Robo: af_..." -F "arquivos[]=@leads_sao_joao.html" [-F cidade=sao-joao] [-F importar=1] https://achafacilapp.com.br/admin/robo-enviar.php
+//   curl.exe -H "X-Chave-Robo: af_..." -F "arquivos[]=@leads_sao_joao.html" [-F cidade=sao-joao] [-F importar=1] https://localizafacilapp.com.br/admin/robo-enviar.php
 declare(strict_types=1);
 require __DIR__ . '/../../inc/base.php';
 require_once __DIR__ . '/../../inc/novidades.php';
@@ -18,7 +18,7 @@ function sair(string $msg, int $status): never { http_response_code($status); ec
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') sair('Use POST.', 405);
 if (!robo_chave_confere((string)($_SERVER['HTTP_X_CHAVE_ROBO'] ?? ''))) {
     sleep(2);
-    error_log('acha-facil robo-enviar: chave errada de ' . ip());
+    error_log('localiza-facil robo-enviar: chave errada de ' . ip());
     sair('ERRO: chave do robô errada ou não gerada. Gere em /admin/novidades.php e coloque no robo-config.json do PC.', 403);
 }
 

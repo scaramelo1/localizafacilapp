@@ -90,13 +90,13 @@ function mp_assinar(array $pedido): string {
 
     $comercio = $pedido['profissional_id'] ? (string)valor('SELECT nome FROM profissionais WHERE id = ?', [$pedido['profissional_id']]) : '';
     $a = mp_api('POST', '/preapproval', [
-        'reason' => mb_substr('Acha Fácil - Plano ' . PLANOS_NOME[$plano] . ($comercio !== '' ? ' - ' . $comercio : ''), 0, 250),
+        'reason' => mb_substr('Localiza Fácil - Plano ' . PLANOS_NOME[$plano] . ($comercio !== '' ? ' - ' . $comercio : ''), 0, 250),
         'external_reference' => 'pedido:' . $pedido['id'],
         'payer_email' => $pedido['email'],
         'auto_recurring' => ['frequency' => 1, 'frequency_type' => 'months', 'transaction_amount' => $valor, 'currency_id' => 'BRL'],
         'back_url' => url_publica('assinatura.php?c=' . $pedido['codigo']),
         'status' => 'pending',
-    ], ['X-Idempotency-Key: achafacil-assinatura-' . $pedido['id'] . '-' . time()]);
+    ], ['X-Idempotency-Key: localizafacil-assinatura-' . $pedido['id'] . '-' . time()]);
     if (empty($a['id']) || empty($a['init_point'])) throw new RuntimeException('O Mercado Pago não devolveu o endereço da assinatura.');
     q('UPDATE pedidos SET mp_assinatura = ?, mp_status = ?, valor = ?, atualizado_em = NOW() WHERE id = ?', [$a['id'], $a['status'] ?? 'pending', $valor, $pedido['id']]);
     mp_evento((int)$pedido['id'], 'assinatura', (string)$a['id'], (string)($a['status'] ?? 'pending'), $valor);
@@ -123,14 +123,14 @@ function mp_assinar_cartao(array $pedido, array $form): array {
 
     $comercio = $pedido['profissional_id'] ? (string)valor('SELECT nome FROM profissionais WHERE id = ?', [$pedido['profissional_id']]) : '';
     $a = mp_api('POST', '/preapproval', [
-        'reason' => mb_substr('Acha Fácil - Plano ' . PLANOS_NOME[$plano] . ($comercio !== '' ? ' - ' . $comercio : ''), 0, 250),
+        'reason' => mb_substr('Localiza Fácil - Plano ' . PLANOS_NOME[$plano] . ($comercio !== '' ? ' - ' . $comercio : ''), 0, 250),
         'external_reference' => 'pedido:' . $pedido['id'],
         'payer_email' => $email,
         'card_token_id' => $token,
         'auto_recurring' => ['frequency' => 1, 'frequency_type' => 'months', 'transaction_amount' => $valor, 'currency_id' => 'BRL'],
         'back_url' => url_publica('assinatura.php?c=' . $pedido['codigo']),
         'status' => 'authorized',
-    ], ['X-Idempotency-Key: achafacil-cartao-' . $pedido['id'] . '-' . hash('sha256', $token)]);
+    ], ['X-Idempotency-Key: localizafacil-cartao-' . $pedido['id'] . '-' . hash('sha256', $token)]);
     if (empty($a['id'])) throw new RuntimeException('O Mercado Pago não devolveu a assinatura.');
     // esta passa a ser a assinatura do pedido (uma tentativa antiga pelo Mercado Pago fica de lado)
     q('UPDATE pedidos SET mp_assinatura = ?, mp_status = ?, valor = ?, atualizado_em = NOW() WHERE id = ?',
@@ -156,7 +156,7 @@ function mp_pagar_unico(array $pedido): string {
     $pref = mp_api('POST', '/checkout/preferences', [
         'items' => [[
             'id' => 'plano-' . $plano,
-            'title' => mb_substr('Acha Fácil - Plano ' . PLANOS_NOME[$plano] . ($comercio !== '' ? ' - ' . $comercio : ''), 0, 250),
+            'title' => mb_substr('Localiza Fácil - Plano ' . PLANOS_NOME[$plano] . ($comercio !== '' ? ' - ' . $comercio : ''), 0, 250),
             'quantity' => 1, 'unit_price' => $valor, 'currency_id' => 'BRL',
         ]],
         // no teste, o Mercado Pago exige comprador de teste (mesmo e-mail usado na assinatura do Destaque)
@@ -165,8 +165,8 @@ function mp_pagar_unico(array $pedido): string {
         'back_urls' => ['success' => $volta, 'pending' => $volta, 'failure' => $volta],
         'auto_return' => 'approved',
         'notification_url' => url_publica('mp-webhook.php?source_news=webhooks'),
-        'statement_descriptor' => 'ACHAFACIL',
-    ], ['X-Idempotency-Key: achafacil-unico-' . $pedido['id'] . '-' . time()]);
+        'statement_descriptor' => 'LOCALIZAFACIL',
+    ], ['X-Idempotency-Key: localizafacil-unico-' . $pedido['id'] . '-' . time()]);
     // sandbox_init_point só serve para token TEST-; com o token de um vendedor de teste (APP_USR-) é o init_point normal
     $endereco = (string)(str_starts_with(mp_token(), 'TEST-') ? ($pref['sandbox_init_point'] ?? $pref['init_point'] ?? '') : ($pref['init_point'] ?? ''));
     if ($endereco === '') throw new RuntimeException('O Mercado Pago não devolveu o endereço do pagamento.');
@@ -200,7 +200,7 @@ function mp_conferir_pagamento(string $mp_id): ?array {
     if ($status !== 'approved') {
         q('UPDATE pedidos SET mp_pagamento = ?, mp_status = ?, atualizado_em = NOW() WHERE id = ?', [$mp_id, $status, $pedido['id']]);
     } elseif (!$certo) {
-        error_log("acha-facil mp: pagamento $mp_id com valor ou moeda diferente do plano (pedido {$pedido['id']})");
+        error_log("localiza-facil mp: pagamento $mp_id com valor ou moeda diferente do plano (pedido {$pedido['id']})");
     } else {
         // só quem conseguir marcar o pedido como pago liga o plano (webhook e volta da página podem chegar juntos)
         $marcou = q("UPDATE pedidos SET mp_pagamento = ?, mp_status = 'approved', atualizado_em = NOW()
@@ -253,7 +253,7 @@ function mp_conferir_assinatura(string $mp_id): ?array {
         // não renova mais; continua valendo até o fim do mês já pago
         q("UPDATE profissionais SET assinatura = 'cancelada' WHERE id = ? AND mp_assinatura = ? AND assinatura = 'ativa'", [$pid, $mp_id]);
     } elseif ($status === 'authorized' && !$certo) {
-        error_log("acha-facil mp: assinatura $mp_id com valor ou moeda diferente do plano (pedido {$pedido['id']})");
+        error_log("localiza-facil mp: assinatura $mp_id com valor ou moeda diferente do plano (pedido {$pedido['id']})");
     }
     return linha('SELECT * FROM pedidos WHERE id = ?', [$pedido['id']]);
 }
@@ -276,7 +276,7 @@ function mp_conferir_mensalidade(string $mp_id): void {
     mp_evento((int)$pedido['id'], 'mensalidade', $mp_id, $status, $valor);
     if (!$pago) return;
     if ($valor + 0.009 < preco_pedido($pedido)) {
-        error_log("acha-facil mp: mensalidade $mp_id paga com valor menor que o plano (pedido {$pedido['id']})");
+        error_log("localiza-facil mp: mensalidade $mp_id paga com valor menor que o plano (pedido {$pedido['id']})");
         return;
     }
     // marca como aplicada; só quem conseguir marcar estende (o aviso pode chegar repetido)
@@ -298,13 +298,13 @@ function mp_aviso_valido(string $data_id): bool {
         $partes[$k] = $v;
     }
     if (empty($partes['ts']) || empty($partes['v1'])) {
-        error_log('acha-facil mp-webhook: aviso sem cabeçalho x-signature (ts/v1)');
+        error_log('localiza-facil mp-webhook: aviso sem cabeçalho x-signature (ts/v1)');
         return false;
     }
     $manifesto = 'id:' . strtolower($data_id) . ';request-id:' . ($_SERVER['HTTP_X_REQUEST_ID'] ?? '') . ';ts:' . $partes['ts'] . ';';
     if (hash_equals(hash_hmac('sha256', $manifesto, $segredo), $partes['v1'])) return true;
     // diagnóstico sem expor o segredo: tamanho e as 4 primeiras letras do hash dele
-    error_log('acha-facil mp-webhook: assinatura não bate (request-id ' . (($_SERVER['HTTP_X_REQUEST_ID'] ?? '') !== '' ? 'presente' : 'AUSENTE')
+    error_log('localiza-facil mp-webhook: assinatura não bate (request-id ' . (($_SERVER['HTTP_X_REQUEST_ID'] ?? '') !== '' ? 'presente' : 'AUSENTE')
         . ', data.id ' . $data_id . ', segredo com ' . strlen($segredo) . ' caracteres, hash ' . substr(hash('sha256', $segredo), 0, 4) . ')');
     return false;
 }

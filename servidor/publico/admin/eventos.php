@@ -111,7 +111,7 @@ admin_inicio('Eventos', $admin);
     <?php if ($l = evento_link_oficial($e)): ?><br>Página oficial: <a href="<?= h($l) ?>" target="_blank" rel="noopener nofollow"><?= h($l) ?></a><?php endif ?></p>
   <?php if ($e['imagem']): ?><p><a href="<?= h(foto_url($e['imagem'])) ?>" target="_blank"><img src="<?= h(foto_url($e['imagem'])) ?>" alt="Cartaz" style="max-width:260px;border-radius:12px;display:block"></a></p><?php endif ?>
   <?php if ($e['descricao']): ?><p style="white-space:pre-line"><?= h($e['descricao']) ?></p><?php endif ?>
-  <p class="discreto">Enviado por <strong><?= h($e['enviado_nome'] ?? '?') ?></strong> · <a href="<?= h(link_whatsapp((string)$e['enviado_contato'], 'Olá! Aqui é do Acha Fácil, sobre o evento ' . $e['titulo'] . ' que você enviou.')) ?>" target="_blank"><?= h(telefone_formatado($e['enviado_contato'])) ?></a>
+  <p class="discreto">Enviado por <strong><?= h($e['enviado_nome'] ?? '?') ?></strong> · <a href="<?= h(link_whatsapp((string)$e['enviado_contato'], 'Olá! Aqui é do Localiza Fácil, sobre o evento ' . $e['titulo'] . ' que você enviou.')) ?>" target="_blank"><?= h(telefone_formatado($e['enviado_contato'])) ?></a>
     · <?= h(datahora_br($e['criado_em'])) ?><?= $e['enviado_recado'] ? '<br>Recado: ' . h($e['enviado_recado']) : '' ?></p>
   <form method="post" style="display:inline"><?= campo_csrf() ?><input type="hidden" name="acao" value="autorizar"><input type="hidden" name="id" value="<?= (int)$e['id'] ?>">
     <button class="botao">Autorizar e publicar</button></form>

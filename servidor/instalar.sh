@@ -40,7 +40,7 @@ return [
     // Página de divulgação, termos e privacidade (vazio = não aparece / "em breve")
     'contato_email' => '',
     'contato_whatsapp' => '',          // ex.: '19999999999'
-    'instagram' => '',                 // ex.: 'achafacil'
+    'instagram' => '',                 // ex.: 'localizafacil'
     'link_play' => '',                 // link da Play Store quando publicar
     'link_app_store' => '',            // link da App Store quando publicar
     // Entrar com o Google (console.cloud.google.com > Credenciais > ID do cliente OAuth, tipo Aplicativo da Web;
@@ -84,7 +84,7 @@ ln -sfn "$RAIZ/publico" /var/www/fsa-designer/$NOME
 echo "✔ /var/www/fsa-designer/$NOME -> $RAIZ/publico"
 
 # 4. Apache: sem marca d'água de protótipo (a API devolve JSON)
-# (acrescenta "|acha-facil/" no fim da lista de exceções da LocationMatch "^/(?!assets/|...)[^/]+/")
+# (acrescenta "|localiza-facil/" no fim da lista de exceções da LocationMatch "^/(?!assets/|...)[^/]+/")
 if grep -q 'LocationMatch "^/(?!assets/' "$APACHE_SSL" && ! grep -q "|$NOME/" "$APACHE_SSL"; then
   cp "$APACHE_SSL" "/root/fsadesigners-le-ssl.conf.antes-$NOME.$(date +%Y%m%d%H%M%S)"
   sed -i "/LocationMatch \"^\/(?!assets\//s#/)\[^/\]+/\">#/|$NOME/)[^/]+/\">#" "$APACHE_SSL"
