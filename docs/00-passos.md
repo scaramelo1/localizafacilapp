@@ -1,6 +1,6 @@
-# Guia novo (Plano D) — lista de passos
+# Localiza Fácil (Plano D) — lista de passos
 
-Projeto em /var/www/guia-novo, nome provisório "guia-novo" até o usuário escolher o nome. Por enquanto em
+Projeto em /var/www/guia-novo (pasta e banco com o nome provisório "guia-novo"; marca escolhida: Localiza Fácil). Por enquanto em
 https://fsadesigners.com.br/guia-novo/ (pedido do usuário, 20/11), TUDO com noindex (config 'sem_google' + X-Robots-Tag).
 Banco guia_novo, config /etc/guia-novo/config.php, dados /var/lib/guia-novo. Histórico do Acha Fácil: docs/historico-acha-facil.md.
 Plano criado em 20/11/2026.
@@ -19,12 +19,15 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    registrados por outros, mas parados. Cuidado avisado: "Localiza" (aluguel de carros) é marca forte; pesquisar no INPI.
 2. 🟡 Domínio escolhido: **localizafacilapp.com.br** (20/11 ainda livre no registro.br). Falta registrar e apontar o DNS (A) para 177.153.68.212.
 3. ⬜ Criar o Instagram e o e-mail com o nome novo.
+3b. ⬜ Trocar a marca no site novo para Localiza Fácil (textos, logo, e-mails, termos).
+3c. ⬜ Login com Google: o usuário cadastra https://fsadesigners.com.br/guia-novo/google/retorno.php no Google Cloud
+    (20/11 o Google não devolvia: redirect_uri não cadastrado). Depois, o do domínio novo.
 
 ## Fase 1 — Preparar o sistema (Claude)
 4. ✅ Cópia do projeto em pasta nova e banco novo (20/11): /var/www/guia-novo (git novo), banco guia_novo, instalar.sh
    adaptado (sem cron), base.php lendo /etc/guia-novo/config.php (antes apontava para o do Acha Fácil: corrigido),
    servidor/dominio/ removido, .htaccess com RewriteBase /guia-novo/ e noindex em tudo.
-5. ✅ Só as 4 cidades ligadas (20/11): cidades, categorias (42) e fichas ativas copiadas do acha_facil:
+5. ✅ Cidades ligadas (20/11; Santa Rita entrou depois, ver passo 6): cidades, categorias (42) e fichas ativas copiadas do acha_facil:
    São João 4.468, Poços 8.372, Vargem Grande 2.118, Aguaí 1.442 (16.400). Donos, pedidos e pagamentos NÃO copiados (passo 13).
 6. ✅ Fichas "a confirmar" x "confirmadas" (20/11): mudança 035 (profissionais.confirmado_em e confirmado_por).
    SQL_CONFIRMADA em inc/guia.php = conferida pela equipe OU com dono (SQL_TEM_DONO, automático); ficha_confirmada(),
@@ -62,30 +65,30 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    20/11: o teste grátis da API do Google Maps acabou; a importação de Santa Rita (avaliações) ficou para depois (usuário).
 10. ⬜ Botão de confirmação rápida: link por WhatsApp para o dono conferir os dados, informar horário e foto, de graça.
 11. ⬜ Tela no admin "Confirmar por telefone" (a equipe liga, confere e marca como confirmada).
-12. ⬜ App com nome, ícone e servidor novos, MANTENDO o pacote br.com.fsadesigner.achafacil (20/11: app em teste na
-    Play Console, 10º dia; trocar o pacote vira outro app e recomeça o teste). Depois do nome escolhido.
+12. ⬜ App com nome (Localiza Fácil), ícone e servidor novos, MANTENDO o pacote br.com.fsadesigner.achafacil (20/11: app em
+    teste na Play Console, 10º dia; trocar o pacote vira outro app e recomeça o teste).
 13. ⬜ Levar o cliente pagante, as cortesias, os acessos de dono e as ofertas (ex.: oferta da Agnes) para o site novo, avisando cada um.
 
-## Fase 2 — Confirmar fichas antes de abrir (usuário + equipe; 4 a 8 semanas)
-14. ⬜ Meta: 50 a 100 fichas confirmadas por cidade, começando pelos mais procurados ("Quem chamar").
+## Fase 2 — Confirmar fichas (usuário + equipe; contínuo, não trava o lançamento: as ondas já levam fichas ao Google)
+14. ⬜ Meta: 50 a 100 fichas confirmadas por cidade, começando pelos mais procurados ("Quem chamar"). Confirmadas entram no Google fora da fila.
 15. ⬜ Prioridade: comércios com mais visitas no Acha Fácil, mais avaliações no Google, e os que já pediram informação.
 16. ⬜ Cada ficha confirmada com algo próprio: horário, foto, descrição, WhatsApp conferido ou oferta.
 
 ## Fase 3 — Lançamento
-17. ⬜ Site antigo: noindex em tudo, aviso no topo "O Acha Fácil agora é [nome novo] → conheça", link comum.
+17. ⬜ Site antigo: noindex em tudo, aviso no topo "O Acha Fácil agora é Localiza Fácil → conheça", link comum.
     SEM redirecionamento (o Google levaria a nota ruim junto).
-18. ⬜ Domínio novo no Search Console; enviar um sitemap pequeno (só o que é confirmado).
+18. ⬜ Domínio novo no Search Console; enviar só o sitemap.xml principal (ele cresce sozinho com as ondas).
 19. ⬜ Publicar o app nas lojas.
 20. ⬜ Instagram por cidade desde o 1º dia; cada comerciante confirmado recebe o link da ficha para divulgar.
 
 ## Fase 4 — Crescer sem cair de novo
 21. ⬜ Conferência semanal: Search Console + registros do servidor.
-22. ⬜ Ficha a confirmar só vai para o Google quando for confirmada (automático).
-23. ⬜ Cidade nova: no máximo 1 ou 2 por mês, e só quando as anteriores tiverem 50+ fichas confirmadas.
+22. ⬜ Ondas semanais rodando sozinhas (passo 7); pausar em /admin/google.php se o Search Console mostrar queda; aumentar GOOGLE_ONDA se for bem.
+23. ⬜ Cidade nova: no máximo 1 ou 2 por mês, e só com as anteriores indo bem no Google.
 24. ⬜ Depois de uns 3 meses no ar, decidir se o achafacilapp.com.br sai do ar de vez.
 
 ## Nunca fazer
-- Subir milhares de fichas de uma vez para o Google.
+- Subir milhares de fichas de uma vez para o Google (usar as ondas).
 - Redirecionar o domínio antigo para o novo.
 - Ter as mesmas páginas abertas para o Google nos dois domínios ao mesmo tempo.
 - Publicar dados do Google Maps como se fossem nossos.
