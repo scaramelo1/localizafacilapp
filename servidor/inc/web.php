@@ -191,7 +191,8 @@ function web_cartao(array $p): string {
         . '<span class="cc-texto"><b>' . h($p['nome']) . '</b><small>' . h(implode(' · ', $sub)) . '</small>'
         . ($p['destaque_pago'] ? '<span class="selo-destaque">Destaque</span>'
             : (ficha_paga($p) ? '<span class="selo-completa">✓ Ficha completa</span>'
-            : (!empty($p['tem_dono']) ? '<span class="selo-completa">✓ Confirmado pelo dono</span>' : '')))   // passo 78
+            : (!empty($p['tem_dono']) ? '<span class="selo-completa">✓ Confirmado pelo dono</span>'
+            : (!empty($p['confirmado_em']) ? '<span class="selo-completa">✓ Dados conferidos</span>' : ''))))   // passo 78; Plano D passo 8: conferida pela equipe
         . (!$p['destaque_pago'] && web_tem_horario($p) ? '<span class="selo-horario">🕒 Horário informado</span>' : '')   // passo 116
         . web_nota($p) . '</span></a></li>';
 }
@@ -478,10 +479,12 @@ function web_pagina_ficha(array $p): void {
           <p class="ficha-selos">
             <?php if ($p['destaque_pago']): ?><span class="selo-destaque">Destaque</span><?php endif ?>
             <?php if ($c['verificado']): ?><span class="selo-verificado">✔ Verificado pelo Acha Fácil</span>
-            <?php elseif (!$p['destaque_pago'] && !$sem_dono && $p['importado']): // passo 78: assumiu (grátis ou Básico) ?><span class="selo-verificado">✓ Dados confirmados pelo dono</span><?php endif ?>
+            <?php elseif (!$p['destaque_pago'] && !$sem_dono && $p['importado']): // passo 78: assumiu (grátis ou Básico) ?><span class="selo-verificado">✓ Dados confirmados pelo dono</span>
+            <?php elseif (!empty($p['confirmado_em'])): // Plano D, passo 8: a equipe conferiu por telefone/WhatsApp ?><span class="selo-verificado">✓ Dados conferidos pela equipe em <?= h(date('m/Y', strtotime($p['confirmado_em']))) ?></span><?php endif ?>
             <?php if ($aberto !== null): ?><span class="selo-<?= $aberto ? 'aberto' : 'fechado' ?>"><?= $aberto ? 'Aberto agora' : 'Fechado agora' ?></span><?php endif ?>
             <?= web_nota($p) ?>
           </p>
+          <?php if (!ficha_confirmada($p)): // Plano D, passo 8 ?><p class="ficha-a-confirmar">ℹ️ Informações públicas, ainda não conferidas com o comércio.<?php if ($link_dono): ?> É o dono? <a href="<?= h($link_dono) ?>" rel="nofollow">Confirme os dados de graça</a>.<?php endif ?></p><?php endif ?>
         </div>
       </header>
 

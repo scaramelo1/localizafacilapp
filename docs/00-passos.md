@@ -48,7 +48,12 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    Testado em cópia: onda 1 = 100 por cidade (+ as com dono), onda 3 = 300, pausa congela; sitemaps e noindex conferidos.
    Login: volta_web() tirava a pasta /guia-novo em dobro (corrigido) e o Google login foi ligado com as chaves do Acha Fácil;
    falta o usuário cadastrar https://fsadesigners.com.br/guia-novo/google/retorno.php no Google Cloud.
-8. ⬜ Ficha a confirmar mostra pouco (nome, tipo, bairro, "dados ainda não confirmados") e não copia tudo do Google Maps.
+8. ✅ Selo na ficha (20/11, sugestão aprovada; troca o "mostrar pouco", porque com as ondas fichas a confirmar também vão ao Google):
+   conferida pela equipe = "✓ Dados conferidos pela equipe em mm/aaaa" na ficha e "✓ Dados conferidos" no cartão; com dono
+   continua "✓ Dados confirmados pelo dono"; a confirmar = linha discreta "ℹ️ Informações públicas, ainda não conferidas com
+   o comércio. É o dono? Confirme os dados de graça" (link do assumir). confirmado_em entrou no CAMPOS_RESUMO. CSS v=51.
+   Santa Rita sem avaliações: o usuário vai rodar o robô no PC (leads_places_api.py) e subir o HTML em /guia-novo/admin/importar.php
+   (o importador atualiza a popularidade das fichas que já existem).
 9. ⬜ Robô do Google Maps não publica mais nada sozinho: só alimenta a lista interna de quem procurar.
 10. ⬜ Botão de confirmação rápida: link por WhatsApp para o dono conferir os dados, informar horário e foto, de graça.
 11. ⬜ Tela no admin "Confirmar por telefone" (a equipe liga, confere e marca como confirmada).

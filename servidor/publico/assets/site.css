@@ -690,3 +690,7 @@ section.secao-ofertas + section { padding-top: 32px; }
 .perguntas h4 { font-size: 1rem; margin: 18px 0 4px; }
 .perguntas p { margin: 0; color: var(--texto2); line-height: 1.55; max-width: 75ch; }
 .perguntas a { color: var(--verde); font-weight: 700; }
+
+/* Plano D, passo 8 (20/11): aviso da ficha ainda não conferida */
+.ficha-a-confirmar { font-size: .88rem; color: var(--texto2); margin: 8px 0 0; }
+.ficha-a-confirmar a { color: var(--verde); font-weight: 700; }

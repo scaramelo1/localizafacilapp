@@ -252,7 +252,7 @@ function tem_dono(array $p): bool {
 
 const CAMPOS_RESUMO = 'p.id, p.nome, p.tipo, p.cidade, p.importado, p.servicos, p.bairro, p.atende_em_casa, p.foto, p.fotos, p.verificado, p.plano,
     ' . SQL_DESTAQUE . ' AS destaque_pago, ' . SQL_TEM_DONO . ' AS tem_dono, ' . SQL_FICHA_PAGA . ' AS ficha_paga,
-    p.nota_media, p.total_avaliacoes, p.whatsapp, p.telefone, p.horarios, c.id AS categoria_id, c.nome AS categoria, c.icone, c.cor';
+    p.nota_media, p.total_avaliacoes, p.whatsapp, p.telefone, p.horarios, p.confirmado_em, c.id AS categoria_id, c.nome AS categoria, c.icone, c.cor';
 
 require_once __DIR__ . '/horarios.php';
 
