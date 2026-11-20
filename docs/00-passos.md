@@ -130,12 +130,13 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     link comum, SEM redirecionar; inicial 200, resto 410). Só admins usam o admin; api/, google/, painel/, planos,
     termos e privacidade continuam (o app em teste ainda usa). Passo 120 do docs do acha-facil. O ativar.sh troca o link
     do aviso para https://localizafacilapp.com.br/.
-18. 🟡 LANÇADO em 20/11/2026 ~21h (lancar.sh, pedido do usuário): sem_google false, bloco SEM_GOOGLE tirado do .htaccess,
+18. ✅ LANÇADO em 20/11/2026 ~21h (lancar.sh, pedido do usuário): sem_google false, bloco SEM_GOOGLE tirado do .htaccess,
     robots.txt com Disallow /confirmar.php. 1ª onda começou 20/11 ($DADOS/google-ondas.json): no sitemap São João 102 fichas
     + 13 categorias, Poços 101 + 15, Vargem 101 + 13, Aguaí 100 + 13, Santa Rita 16 + 3, + 5 páginas de cidade (~490 URLs).
     Conferido: inicial, cidade e fichas da onda sem noindex; ficha fora da onda com noindex; admin e confirmar.php fora.
-    Falta (usuário): Search Console, propriedade "Prefixo do URL" https://localizafacilapp.com.br/ com Tag HTML (o usuário
-    manda a meta google-site-verification; pôr em inc/pagina.php) e enviar sitemap.xml.
+    Search Console (20/11): propriedade "Prefixo do URL" https://localizafacilapp.com.br/ (conta localizafacilapp@gmail.com),
+    verificada pelo ARQUIVO publico/google1e88fb9a9da291bf.html (NÃO remover); sitemap.xml enviado e "Processado"
+    (Googlebot leu às 20:48; os das cidades vêm depois).
 19. ⬜ Publicar o app nas lojas.
 20. ⬜ Instagram por cidade desde o 1º dia; cada comerciante confirmado recebe o link da ficha para divulgar.
 
