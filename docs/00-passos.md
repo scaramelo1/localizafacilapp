@@ -54,7 +54,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    o comércio. É o dono? Confirme os dados de graça" (link do assumir). confirmado_em entrou no CAMPOS_RESUMO. CSS v=51.
    Santa Rita sem avaliações: o usuário vai rodar o robô no PC (leads_places_api.py) e subir o HTML em /guia-novo/admin/importar.php
    (o importador atualiza a popularidade das fichas que já existem).
-9. ⬜ Robô do Google Maps não publica mais nada sozinho: só alimenta a lista interna de quem procurar.
+9. ✅ Robô não publica sozinho (20/11): robo-enviar.php nunca importa nem liga cidade (nem com importar=1/ligar=1 nem com o
+   modo automático); a lista sempre espera "Importar para o app" em /admin/novidades.php, onde o modo automático ficou
+   desligado de propósito (o botão só desliga). Novos entram "a confirmar" e só vão ao Google pelas ondas.
+   20/11: o teste grátis da API do Google Maps acabou; a importação de Santa Rita (avaliações) ficou para depois (usuário).
 10. ⬜ Botão de confirmação rápida: link por WhatsApp para o dono conferir os dados, informar horário e foto, de graça.
 11. ⬜ Tela no admin "Confirmar por telefone" (a equipe liga, confere e marca como confirmada).
 12. ⬜ App com nome, ícone e servidor novos, MANTENDO o pacote br.com.fsadesigner.achafacil (20/11: app em teste na

@@ -24,8 +24,8 @@ if (e_post()) {
         }
         ir('admin/novidades.php?id=' . $id);
     }
-    if ($acao === 'automatico') {
-        $c = nov_config(); $c['automatico'] = ($_POST['ligar'] ?? '') === '1'; nov_config_salvar($c);
+    if ($acao === 'automatico') {   // Plano D, passo 9: só desliga, nunca liga
+        $c = nov_config(); $c['automatico'] = false; nov_config_salvar($c);
         registrar((int)$admin['id'], 'robo_automatico', null, $c['automatico'] ? 'ligado' : 'desligado');
         flash($c['automatico'] ? 'Modo automático ligado: as listas do robô entram sozinhas no app.' : 'Modo automático desligado: as listas esperam você aprovar.');
         ir('admin/novidades.php');
@@ -144,11 +144,8 @@ admin_inicio('Novidades', $admin);
 
 <h2>Modo automático</h2>
 <div class="quadro">
-  <p><?= $cfg['automatico']
-      ? '🟢 <strong>Ligado:</strong> a lista do robô entra sozinha no app e você só recebe o aviso do que mudou.'
-      : '⚪ <strong>Desligado:</strong> a lista do robô espera aqui até você clicar em “Importar para o app”.' ?></p>
-  <form method="post"><?= campo_csrf() ?><input type="hidden" name="acao" value="automatico"><input type="hidden" name="ligar" value="<?= $cfg['automatico'] ? '0' : '1' ?>">
-    <button class="botao contorno"><?= $cfg['automatico'] ? 'Desligar (eu aprovo cada lista)' : 'Ligar (entra sozinho)' ?></button></form>
+  <p>⚪ <strong>Desligado de propósito</strong> (Plano D, passo 9): toda lista do robô espera aqui até você clicar em “Importar para o app”,
+    e nenhuma cidade é ligada sozinha. Comércios novos entram “a confirmar” e só vão ao Google pelas ondas (veja <a href="google.php">Google</a>).</p>
 </div>
 
 <h2 id="chave">Chave do robô</h2>

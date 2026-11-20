@@ -41,7 +41,8 @@ $base = url_publica('admin/novidades.php?id=' . $m['id']);
 $tem_novidade = $m['novos'] + $m['mudaram'] + $m['fecharam'] > 0;
 
 // 20/11: importar=1 (scripts/robo/enviar-listas.ps1) importa na hora, mesmo com o modo automático desligado
-if (nov_config()['automatico'] || ($_POST['importar'] ?? '') === '1') {
+// Plano D, passo 9 (20/11): o robô NUNCA importa nem liga cidade sozinho; a lista sempre espera aprovação em Novidades.
+if (false && (nov_config()['automatico'] || ($_POST['importar'] ?? '') === '1')) {
     try {
         $m = nov_importar($m, null);
         nov_descartar_antigas($m['cidade'], $m['id']);
