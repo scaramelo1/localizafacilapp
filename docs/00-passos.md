@@ -98,8 +98,11 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 16. ⬜ Cada ficha confirmada com algo próprio: horário, foto, descrição, WhatsApp conferido ou oferta.
 
 ## Fase 3 — Lançamento
-17. ⬜ Site antigo: noindex em tudo, aviso no topo "O Acha Fácil agora é Localiza Fácil → conheça", link comum.
-    SEM redirecionamento (o Google levaria a nota ruim junto).
+17. ✅ Acha Fácil fechado (20/11, pedido do usuário): noindex em tudo; guia público (inicial, cidades, fichas, sitemaps,
+    incluir, APK) virou a página "O Acha Fácil agora é Localiza Fácil → conheça" (acha-facil/servidor/publico/fechado.php,
+    link comum, SEM redirecionar; inicial 200, resto 410). Só admins usam o admin; api/, google/, painel/, planos,
+    termos e privacidade continuam (o app em teste ainda usa). Passo 120 do docs do acha-facil. O ativar.sh troca o link
+    do aviso para https://localizafacilapp.com.br/.
 18. ⬜ Domínio novo no Search Console; enviar só o sitemap.xml principal (ele cresce sozinho com as ondas).
 19. ⬜ Publicar o app nas lojas.
 20. ⬜ Instagram por cidade desde o 1º dia; cada comerciante confirmado recebe o link da ficha para divulgar.

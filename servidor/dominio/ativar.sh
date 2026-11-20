@@ -21,5 +21,7 @@ php -r '$f="/etc/guia-novo/config.php"; $s=file_get_contents($f);
   $s=preg_replace("~\x27google_retorno\x27 => \x27[^\x27]*\x27,~", "\x27google_retorno\x27 => \x27https://localizafacilapp.com.br/google/retorno.php\x27,", $s);
   file_put_contents($f, $s);'
 cp htaccess-dominio ../publico/.htaccess
+# o aviso do Acha Fácil fechado (passo 17) passa a apontar direto para o domínio novo
+sed -i "s#\$novo = 'https://fsadesigners.com.br/guia-novo/';#\$novo = 'https://localizafacilapp.com.br/';#" /var/www/acha-facil/servidor/publico/fechado.php
 find /var/lib/guia-novo/cache/web /var/lib/guia-novo/og -type f -delete 2>/dev/null || true
 echo "Pronto: https://localizafacilapp.com.br no ar (ainda fora do Google) e fsadesigners.com.br/guia-novo redirecionando."
