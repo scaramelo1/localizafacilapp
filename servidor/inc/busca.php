@@ -303,9 +303,31 @@ function buscas_prontas(): bool {
  * (ou continuação) do termo novo ("piz" -> "pizza"), a linha anterior é trocada em vez de criar outra.
  * A mesma busca repetida pela mesma pessoa em 30 min não conta de novo. Robôs não contam.
  */
+/**
+ * 21/11 (pedido do usuário): busca de quem é da equipe não conta em /admin/buscas.php. No app: conta Google com e-mail de
+ * admin. No site: logado no admin (sessão) ou na conta Google de um admin.
+ */
+function busca_da_equipe(): bool {
+    try {
+        require_once __DIR__ . '/avisos.php';
+        if (function_exists('usuario_app') && admin_do_usuario(usuario_app())) return true;
+        if (!empty($_COOKIE['LOCALIZAFACIL']) && !headers_sent()) {
+            iniciar_sessao();
+            if (!empty($_SESSION['admin_id'])) return true;
+        }
+        if (!empty($_COOKIE['af_logado'])) {
+            require_once __DIR__ . '/conta-web.php';
+            if (admin_do_usuario(usuario_web())) return true;
+        }
+    } catch (Throwable $e) {
+        error_log('localiza-facil busca_da_equipe: ' . $e->getMessage());
+    }
+    return false;
+}
+
 function registrar_busca(string $termo, ?string $cidade, int $resultados, ?string $corrigido, string $origem): void {
     $termo = trim(mb_substr($termo, 0, 60));
-    if (mb_strlen($termo) < 2 || e_robo() || !buscas_prontas()) return;
+    if (mb_strlen($termo) < 2 || e_robo() || !buscas_prontas() || busca_da_equipe()) return;
     try {
         $quem = visitante();
         $cid = $cidade !== null && isset(CIDADES[$cidade]) ? $cidade : '';

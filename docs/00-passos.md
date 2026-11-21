@@ -187,6 +187,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 28. ✅ Origem "Site: veio do Acha Fácil" (21/11, pedido do usuário): origem_do_referer() devolve 'acha_facil' para
     achafacilapp.com.br (antes caía em outros_sites); aparece no filtro de /admin/entradas.php e nos números. As 6
     entradas de 21/11 (todas pelo aviso do Acha Fácil, conferidas no registro do Apache) foram passadas para acha_facil.
+29. ✅ Buscas só de gente de fora (21/11, pedido do usuário): as 4 buscas de 21/11 eram 3 do teste automático da Google
+    Play (108.177.24.188, okhttp) e 1 de um admin pelo site; apagadas. e_robo() agora pega app (okhttp) vindo de IPs do
+    Google (vale para buscas, visitas e toques); busca_da_equipe() (inc/busca.php) não grava busca de admin (conta Google
+    de admin no app ou no site, ou sessão do admin aberta).
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

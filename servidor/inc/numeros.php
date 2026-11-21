@@ -36,6 +36,9 @@ function e_robo(): bool {
     $ua = (string)($_SERVER['HTTP_USER_AGENT'] ?? '');
     if ($ua === '' || preg_match('/bot|crawl|spider|slurp|preview|facebookexternalhit|whatsapp\/|curl|wget|python|httpclient|headless|lighthouse|'
         . 'mediapartners|adsbot|googleother|google-|playstore-google|privacy preserving prefetch/i', $ua)) return true;
+    // 21/11: teste automático da Google Play (pre-launch report): o app de verdade (okhttp) rodando em celulares dos
+    // servidores do Google; pesquisava, abria fichas e ligava avisos como se fosse gente
+    if (stripos($ua, 'okhttp') !== false && preg_match('/^(108\.177\.|66\.249\.|74\.125\.|64\.233\.|209\.85\.|172\.217\.|142\.25[01]\.|216\.58\.|173\.194\.)/', ip())) return true;
     // 16/11: robô do AdSense que se passa por Chrome no Windows, vindo dos servidores do Google
     // (rate-limited-proxy-74-125-*.google.com), sem Referer. Contava como "entrou direto" e inflou o dia 15/11.
     return empty($_SERVER['HTTP_REFERER']) && preg_match('/^(74\.125\.(20[89]|21\d)|66\.249\.(6[4-9]|[7-9]\d))\./', ip()) === 1;
