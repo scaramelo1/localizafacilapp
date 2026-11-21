@@ -10,12 +10,13 @@ const ORIGENS = [
     'inicio' => 'Recomendados da tela inicial', 'favoritos' => 'Favoritos', 'link' => 'Link ou aviso',
     // site (passo 38, 14/11): de onde a pessoa chegou ao site; antes de 14/11 tudo do site era 'web'
     'google' => 'Site: veio do Google', 'buscadores' => 'Site: outro buscador (Bing...)', 'redes' => 'Site: redes sociais e WhatsApp',
+    'acha_facil' => 'Site: veio do Acha Fácil',   // 21/11: aviso "agora é Localiza Fácil" do site antigo (achafacilapp.com.br)
     'outros_sites' => 'Site: link de outro site', 'direto' => 'Site: endereço digitado ou favorito',
     'web' => 'Site (sem origem, antes de 14/11)',
     'app' => 'App (versão antiga, sem origem)',
 ];
 /** Origens que são do site (para somar "Site" e separar do app). */
-const ORIGENS_SITE = ['google', 'buscadores', 'redes', 'outros_sites', 'direto', 'web'];
+const ORIGENS_SITE = ['google', 'acha_facil', 'buscadores', 'redes', 'outros_sites', 'direto', 'web'];
 /** Tipos de página por onde se entra no site. */
 const PAGINAS_ENTRADA = ['inicio' => 'Página inicial', 'cidade' => 'Cidade', 'lista' => 'Área ou tipo', 'ficha' => 'Ficha de comércio',
     'eventos' => 'Agenda de eventos', 'evento' => 'Evento', 'busca' => 'Busca', 'outra' => 'Outra página'];
@@ -50,6 +51,7 @@ function origem_do_referer(?string $ref = null): ?string {
     if ($host === '') return null;
     $proprio = strtolower((string)preg_replace('/:\d+$/', '', (string)($_SERVER['HTTP_HOST'] ?? '')));
     if ($host === $proprio || preg_match('/(^|\.)(localizafacilapp\.com\.br|fsadesigners\.com\.br)$/', $host)) return null;
+    if (preg_match('/(^|\.)achafacilapp\.com\.br$/', $host)) return 'acha_facil';   // 21/11 (antes contava em outros_sites)
     // o app do Google no Android manda android-app://com.google.android.googlequicksearchbox
     if (preg_match('/(^|\.)google\.|googlequicksearchbox|^com\.google\./', $host)) return 'google';
     if (preg_match('/(^|\.)(bing|yahoo|duckduckgo|yandex|ecosia|baidu|qwant)\.|search\.brave\.com$|(^|\.)msn\.com$/', $host)) return 'buscadores';

@@ -184,6 +184,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 27. ✅ Páginas visitadas pelo Google, uma por uma (21/11, pedido do usuário): google-visitas.php (cron de hora em hora)
     guarda em visitas.json 'paginas' => caminho => primeira/última visita, vezes e código HTTP (só conta visita depois da
     última guardada, porque relê o registro); fim do /admin/google.php com abas Fichas / Cidades e páginas / Mapas / Arquivos.
+28. ✅ Origem "Site: veio do Acha Fácil" (21/11, pedido do usuário): origem_do_referer() devolve 'acha_facil' para
+    achafacilapp.com.br (antes caía em outros_sites); aparece no filtro de /admin/entradas.php e nos números. As 6
+    entradas de 21/11 (todas pelo aviso do Acha Fácil, conferidas no registro do Apache) foram passadas para acha_facil.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
