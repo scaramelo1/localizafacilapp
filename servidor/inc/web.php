@@ -792,6 +792,8 @@ document.querySelectorAll('[data-contato]').forEach(function (a) {
 function web_titulo_ficha(string $nome, string $tipo, string $cidade, int $max = 65): string {
     $nome = trim($nome);
     $sem = trim((string)preg_replace('/[\s\-–|,]*' . preg_quote($cidade, '/') . '(\s*[-–]?\s*(SP|MG))?\s*$/iu', '', $nome));
+    // 21/11: "Auto Visão Vistoria Veicular de Aguaí" sem a cidade sobrava "... de" e o título saía "de em Aguaí"
+    $sem = trim((string)preg_replace('/\s+(de|do|da|dos|das|em|na|no|nas|nos)$/iu', '', $sem));
     if (mb_strlen($sem) >= 3) $nome = $sem;
     $tipo = trim($tipo);
     $opcoes = [];
