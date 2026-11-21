@@ -308,21 +308,8 @@ function buscas_prontas(): bool {
  * admin. No site: logado no admin (sessão) ou na conta Google de um admin.
  */
 function busca_da_equipe(): bool {
-    try {
-        require_once __DIR__ . '/avisos.php';
-        if (function_exists('usuario_app') && admin_do_usuario(usuario_app())) return true;
-        if (!empty($_COOKIE['LOCALIZAFACIL']) && !headers_sent()) {
-            iniciar_sessao();
-            if (!empty($_SESSION['admin_id'])) return true;
-        }
-        if (!empty($_COOKIE['af_logado'])) {
-            require_once __DIR__ . '/conta-web.php';
-            if (admin_do_usuario(usuario_web())) return true;
-        }
-    } catch (Throwable $e) {
-        error_log('localiza-facil busca_da_equipe: ' . $e->getMessage());
-    }
-    return false;
+    require_once __DIR__ . '/numeros.php';
+    return da_equipe();   // 21/11 (passo 31): mesma regra dos números (sessão, conta de admin, cookie lf_equipe ou IP do /admin)
 }
 
 function registrar_busca(string $termo, ?string $cidade, int $resultados, ?string $corrigido, string $origem): void {

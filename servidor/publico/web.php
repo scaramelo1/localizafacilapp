@@ -69,8 +69,8 @@ if ($n === 3 && $partes[1] === 'c') {
     $certo = url_ficha($p);
     if ($certo !== url(implode('/', $partes))) redirecionar($certo);   // nome ou cidade mudou: endereço certo
     // 16/11: pré-carregamento do Chrome não conta agora; a página conta sozinha se a pessoa abrir (visita_adiada_js)
-    if (e_pre_carregamento()) $GLOBALS['visita_adiada'] = $origem_site;
-    else contar_visita((int)$p['id'], $origem_site);
+    // 21/11 (passo 31): vale para toda visita do site: só conta quando a ficha abre num navegador de verdade (robôs fora)
+    $GLOBALS['visita_adiada'] = $origem_site;
     web_pagina_ficha($p);
     exit;
 }

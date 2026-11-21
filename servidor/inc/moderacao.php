@@ -62,6 +62,8 @@ function admin_atual(): ?array {
 function exigir_admin(): array {
     $a = admin_atual();
     if (!$a) ir('admin/entrar.php');
+    require_once __DIR__ . '/numeros.php';
+    marcar_equipe();   // 21/11 (passo 31): este navegador e este IP não entram mais nos números
     header('Cache-Control: no-store');
     return $a;
 }

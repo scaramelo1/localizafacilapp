@@ -197,6 +197,21 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     do Acha Fácil); enviar-listas.ps1 e robo-config.exemplo.json usam localizafacilapp.com.br. Lista sobe por
     /admin/importar.php (cai em Novidades, nunca publica sozinha); chave do robô (robo-enviar.php) ainda não gerada.
     Objetivo: melhorar as fichas que já existem, sem cidade nova.
+31. ✅ Números sem robôs e sem a equipe (21/11, pedido do usuário: "retirando todas as entradas dos admins"). No registro do
+    Apache, das 82 entradas de 21/11, 70 eram robôs (varreduras atrás de .env/wp-includes, servidores Amazon/Hetzner,
+    rastreador do Facebook) ou admins. As 17 fichas abertas, os 3 contatos e quase todas as aparições até 9h29 eram do
+    teste da Google Play (108.177.24.188), e as visitas "pelo Google" das 10h21 e 18h35 eram de admin.
+    - Entrada no site só conta quando a página abre num navegador de verdade: registrar_entrada_site() põe um <script>
+      antes de </body> (ob_start) que chama api/entrada.php com os dados assinados (entrada_sinal, vale 2 h). Ficha aberta
+      no site também só conta pelo script (visita_adiada_js para toda visita, não só pré-carregamento). Pré-carregamento
+      do Chrome só conta quando a pessoa abre a página (pre = 2); pre = 1 não aparece mais.
+    - nao_contar() = e_robo() || da_equipe(), usado em entradas, visualizações, toques, aparições e buscas
+      (busca_da_equipe() agora chama da_equipe()). Admin = sessão do /admin, conta de admin no app ou no site, cookie
+      lf_equipe (posto em toda página do /admin por exigir_admin -> marcar_equipe(), vale 1 ano) ou IP que abriu o /admin
+      nas últimas 3 h (dados_dir/equipe-ips.json; o IP do app não é guardado porque a rede do celular é dividida).
+    - Limpeza de 21/11 (cópia antes em scratchpad/backup-numeros-21-11.sql): ficaram 10 entradas (4 Acha Fácil, 2 direto,
+      4 pré-carregamentos do Google), 1 visualização (Agnes Veterinária, início do app) e aparições do início estimadas
+      (4 de 15 aberturas eram de gente). 20/11 não foi mexido.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

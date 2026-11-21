@@ -44,6 +44,54 @@ function e_robo(): bool {
     return empty($_SERVER['HTTP_REFERER']) && preg_match('/^(74\.125\.(20[89]|21\d)|66\.249\.(6[4-9]|[7-9]\d))\./', ip()) === 1;
 }
 
+// ---------- a equipe não entra nos números (21/11, passo 31, pedido do usuário) ----------
+// Admin reconhecido por: sessão do /admin aberta, conta de admin no app ou no site, cookie lf_equipe (posto no navegador
+// em toda página do /admin, vale 1 ano, mesmo depois de sair) ou IP que abriu o /admin nas últimas 3 horas
+// (pega o celular no mesmo Wi-Fi e a aba anônima; o IP do app não é guardado porque a rede do celular é dividida).
+
+const EQUIPE_IP_HORAS = 3;
+function equipe_sinal(): string { return substr(hash_hmac('sha256', 'equipe-localiza', sal_visitas()), 0, 32); }
+function equipe_ips(): array {
+    $arq = config()['dados_dir'] . '/equipe-ips.json';
+    $ips = is_file($arq) ? json_decode((string)@file_get_contents($arq), true) : [];
+    return is_array($ips) ? $ips : [];
+}
+/** Chamada nas páginas do /admin (exigir_admin): marca este navegador e este IP como da equipe. */
+function marcar_equipe(): void {
+    if (!headers_sent() && !hash_equals(equipe_sinal(), (string)($_COOKIE['lf_equipe'] ?? '')))
+        setcookie('lf_equipe', equipe_sinal(), ['expires' => time() + 365 * 86400, 'path' => '/', 'samesite' => 'Lax',
+            'secure' => !empty(config()['https']), 'httponly' => true]);
+    $agora = time();
+    $ips = equipe_ips();
+    if (($ips[ip()] ?? 0) > $agora - 300) return;   // grava no máximo a cada 5 min
+    $ips[ip()] = $agora;
+    $ips = array_filter($ips, fn($t) => $t > $agora - EQUIPE_IP_HORAS * 3600);
+    @file_put_contents(config()['dados_dir'] . '/equipe-ips.json', json_encode($ips), LOCK_EX);
+}
+function da_equipe(): bool {
+    static $r = null;
+    if ($r !== null) return $r;
+    if (hash_equals(equipe_sinal(), (string)($_COOKIE['lf_equipe'] ?? ''))) return $r = true;
+    if ((equipe_ips()[ip()] ?? 0) > time() - EQUIPE_IP_HORAS * 3600) return $r = true;
+    try {
+        require_once __DIR__ . '/avisos.php';
+        if (function_exists('usuario_app') && admin_do_usuario(usuario_app())) return $r = true;
+        if (!empty($_COOKIE['LOCALIZAFACIL']) && !headers_sent()) {
+            iniciar_sessao();
+            if (!empty($_SESSION['admin_id'])) return $r = true;
+        }
+        if (!empty($_COOKIE['af_logado'])) {
+            require_once __DIR__ . '/conta-web.php';
+            if (admin_do_usuario(usuario_web())) return $r = true;
+        }
+    } catch (Throwable $e) {
+        error_log('localiza-facil da_equipe: ' . $e->getMessage());
+    }
+    return $r = false;
+}
+/** Robô ou alguém da equipe: não conta em entradas, visualizações, toques, aparições nem buscas. */
+function nao_contar(): bool { return e_robo() || da_equipe(); }
+
 // ---------- de onde a pessoa chegou ao site (passo 38) ----------
 
 /** Origem pelo endereço de onde veio (Referer). null = veio do próprio site ou sem Referer. */
@@ -94,28 +142,49 @@ function registrar_entrada_site(string $pagina, ?string $cidade = null): string 
     $cookie = (string)($_COOKIE['af_origem'] ?? '');
     $cookie = isset(ORIGENS[$cookie]) && in_array($cookie, ORIGENS_SITE, true) ? $cookie : '';
     $origem = $de_fora ?? ($cookie ?: 'direto');
-    if (e_robo()) return $origem;
+    if (nao_contar()) return $origem;
     // entrada nova = veio de fora (e não é recarga da mesma entrada) ou chegou sem Referer e sem cookie
     $entrada = $de_fora !== null ? $de_fora !== $cookie : $cookie === '';
     if (!headers_sent()) setcookie('af_origem', $origem, ['expires' => time() + 1800, 'path' => '/', 'samesite' => 'Lax',
         'secure' => !empty($_SERVER['HTTPS']), 'httponly' => true]);
     if ($entrada) {
-        $caminho = mb_substr((string)parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH), 0, 190);
-        register_shutdown_function(function () use ($origem, $caminho, $pagina, $cidade) {
-            if (http_response_code() !== 200) return;   // 404 e redirecionamento não contam
-            try {
-                q('INSERT INTO entradas (dia, origem, caminho, pagina, cidade, total) VALUES (CURDATE(), ?, ?, ?, ?, 1)
-                    ON DUPLICATE KEY UPDATE total = total + 1', [$origem, rawurldecode($caminho), $pagina, $cidade]);
-            } catch (PDOException) {}   // mudança 022 ainda não aplicada: só não conta
-            try {   // data e hora de cada entrada (mudança 023, passo 42) e se foi pré-carregamento (027, passo 55)
-                if (pre_carregamento_pronto()) q('INSERT INTO entradas_hora (quando, origem, caminho, pagina, cidade, pre) VALUES (NOW(), ?, ?, ?, ?, ?)',
-                    [$origem, rawurldecode($caminho), $pagina, $cidade, e_pre_carregamento() ? 1 : 0]);
-                else q('INSERT INTO entradas_hora (quando, origem, caminho, pagina, cidade) VALUES (NOW(), ?, ?, ?, ?)',
-                    [$origem, rawurldecode($caminho), $pagina, $cidade]);
-            } catch (PDOException) {}
+        // 21/11 (passo 31): a entrada só conta quando a página abre num navegador de verdade. A página leva um <script>
+        // (posto antes de </body>) que chama api/entrada.php; robôs que só baixam o HTML (a maioria dos "direto") não contam.
+        // Pré-carregamento do Chrome: o script só roda quando a pessoa abre a página (fica gravado com pre = 2).
+        $d = ['origem' => $origem, 'caminho' => mb_substr(rawurldecode((string)parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH)), 0, 190),
+            'pagina' => $pagina, 'cidade' => $cidade, 'pre' => e_pre_carregamento() ? 1 : 0, 't' => time()];
+        $d['sinal'] = entrada_sinal($d);
+        ob_start(function (string $html) use ($d): string {
+            if (http_response_code() !== 200 || ($p = strripos($html, '</body>')) === false) return $html;   // 404 e redirecionamento não contam
+            $js = '<script>(function(){var d=' . json_encode($d, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG)
+                . ';function contar(){try{fetch(' . json_encode(url('api/entrada.php')) . ',{method:"POST",keepalive:true,'
+                . 'headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});}catch(e){}}'
+                . 'if(document.prerendering){document.addEventListener("prerenderingchange",contar,{once:true});}else{contar();}})();</script>';
+            return substr_replace($html, $js, $p, 0);
         });
     }
     return $origem;
+}
+
+/** Assinatura dos dados da entrada (só o servidor sabe fazer): impede contar entrada inventada. */
+function entrada_sinal(array $d): string {
+    return substr(hash_hmac('sha256', implode('|', [$d['origem'], $d['caminho'], $d['pagina'], (string)$d['cidade'], (int)$d['pre'], (int)$d['t']]),
+        sal_visitas()), 0, 24);
+}
+/** api/entrada.php: a página abriu no navegador; grava a entrada (sinal conferido antes, vale por 2 horas). */
+function gravar_entrada(array $d): void {
+    if (nao_contar()) return;
+    $cid = $d['cidade'] !== null && $d['cidade'] !== '' ? (string)$d['cidade'] : null;
+    try {
+        q('INSERT INTO entradas (dia, origem, caminho, pagina, cidade, total) VALUES (CURDATE(), ?, ?, ?, ?, 1)
+            ON DUPLICATE KEY UPDATE total = total + 1', [$d['origem'], $d['caminho'], $d['pagina'], $cid]);
+    } catch (PDOException) {}   // mudança 022 ainda não aplicada: só não conta
+    try {   // data e hora (mudança 023); pre = 2: pré-carregada pelo Chrome e aberta de verdade (027)
+        if (pre_carregamento_pronto()) q('INSERT INTO entradas_hora (quando, origem, caminho, pagina, cidade, pre) VALUES (NOW(), ?, ?, ?, ?, ?)',
+            [$d['origem'], $d['caminho'], $d['pagina'], $cid, $d['pre'] ? 2 : 0]);
+        else q('INSERT INTO entradas_hora (quando, origem, caminho, pagina, cidade) VALUES (NOW(), ?, ?, ?, ?)',
+            [$d['origem'], $d['caminho'], $d['pagina'], $cid]);
+    } catch (PDOException) {}
 }
 
 /** A mudança 022 (entradas no site) já foi aplicada? */
@@ -144,7 +213,7 @@ function visitante(): string {
  * Ficha aberta. Conta 1 visualização, e 1 pessoa se for a 1ª vez dela no dia; quem reabre em menos de 30 min não conta de novo.
  */
 function contar_visita(int $profissional_id, string $origem): void {
-    if (e_robo()) return;
+    if (nao_contar()) return;
     try { contar_visita_017($profissional_id, $origem); }
     catch (PDOException $e) { contar_sem_017($profissional_id, 'perfil', $e); }   // contar nunca derruba a resposta
 }
@@ -163,7 +232,7 @@ function contar_visita_017(int $profissional_id, string $origem): void {
 
 /** Toque em WhatsApp, ligar, Instagram, mapa ou site. */
 function contar_contato(int $profissional_id, string $tipo, string $origem = 'app'): void {
-    if (!isset(TIPOS_CONTATO[$tipo]) || e_robo()) return;
+    if (!isset(TIPOS_CONTATO[$tipo]) || nao_contar()) return;
     try {
         q('INSERT INTO contatos (profissional_id, tipo, dia, origem, total) VALUES (?, ?, CURDATE(), ?, 1) ON DUPLICATE KEY UPDATE total = total + 1',
             [$profissional_id, $tipo, in_array($origem, ORIGENS_SITE, true) ? $origem : 'app']);
@@ -197,7 +266,7 @@ function contar_sem_017(int $profissional_id, string $tipo, Throwable $e): void 
 
 /** Fichas mostradas numa lista (resumos com 'id'): uma gravação só para a lista toda. */
 function contar_aparicoes(array $lista, string $onde): void {
-    if (!isset(ONDE_APARICAO[$onde]) || e_robo()) return;
+    if (!isset(ONDE_APARICAO[$onde]) || nao_contar()) return;
     $ids = array_values(array_unique(array_map(fn($p) => (int)$p['id'], array_slice($lista, 0, APARICAO_MAX))));
     if (!$ids) return;
     $params = [];
