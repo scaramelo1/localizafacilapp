@@ -212,9 +212,29 @@ function mp_conferir_pagamento(string $mp_id): ?array {
             require_once __DIR__ . '/avisos.php';
             avisar_admins('Novo plano pago', $pedido['nome'] . ' pagou o plano ' . (PLANOS_NOME[$pedido['plano']] ?? '') . ' de '
                 . (string)valor('SELECT nome FROM profissionais WHERE id = ?', [$pid]) . '.', ['pedido' => (int)$pedido['id']]);
+            email_plano_confirmado($pedido, $pid);
         }
     }
     return linha('SELECT * FROM pedidos WHERE id = ?', [$pedido['id']]);
+}
+
+/** E-mail ao dono quando o plano é confirmado (21/11, inc/email.php), com o link da página da assinatura (entra no painel). */
+function email_plano_confirmado(array $pedido, int $pid): void {
+    try {
+        email_plano_confirmado_mandar($pedido, $pid);
+    } catch (Throwable $e) {
+        error_log('localiza-facil email plano: ' . $e->getMessage());   // nunca atrapalha a confirmação do pagamento
+    }
+}
+function email_plano_confirmado_mandar(array $pedido, int $pid): void {
+    require_once __DIR__ . '/email.php';
+    $comercio = (string)valor('SELECT nome FROM profissionais WHERE id = ?', [$pid]);
+    $plano = PLANOS_NOME[$pedido['plano']] ?? 'escolhido';
+    email_avisar_pedido((int)$pedido['id'], "Pagamento confirmado: plano $plano de $comercio",
+        "Olá {nome},\n\nRecebemos o pagamento do plano $plano de $comercio no Localiza Fácil. Obrigado!\n\n"
+        . "Para colocar fotos, horário, descrição e o que você vende, entre no painel do seu comércio por este link:\n"
+        . url_publica('assinatura.php?c=' . rawurlencode((string)$pedido['codigo'])) . "\n\n"
+        . "Guarde este e-mail: o link é o seu acesso ao painel.\n\nQualquer dúvida, é só responder este e-mail.\n\nEquipe Localiza Fácil");
 }
 
 /** Registra um aviso do Mercado Pago (cada tipo + id + status uma vez só). */
@@ -248,6 +268,7 @@ function mp_conferir_assinatura(string $mp_id): ?array {
             avisar_admins('Novo plano pago', $pedido['nome'] . ' assinou o plano ' . (PLANOS_NOME[$pedido['plano']] ?? '') . ' de '
                 . (string)valor('SELECT nome FROM profissionais WHERE id = ?', [$pid]) . '.'
                 . ($pedido['plano'] === 'site' ? ' Fazer o site e registrar o domínio.' : ''), ['pedido' => (int)$pedido['id']]);
+            email_plano_confirmado($pedido, $pid);
         }
     } elseif ($pid && in_array($status, ['paused', 'cancelled'], true)) {
         // não renova mais; continua valendo até o fim do mês já pago

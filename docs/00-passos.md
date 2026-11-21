@@ -164,6 +164,15 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 22. ⬜ Ondas semanais rodando sozinhas (passo 7); pausar em /admin/google.php se o Search Console mostrar queda; aumentar GOOGLE_ONDA se for bem.
 23. ⬜ Cidade nova: no máximo 1 ou 2 por mês, e só com as anteriores indo bem no Google.
 24. ⬜ Depois de uns 3 meses no ar, decidir se o achafacilapp.com.br sai do ar de vez.
+25. 🟡 E-mails pelo site (21/11, pedido do usuário; escolheu Gmail): inc/email.php manda pelo localizafacilapp@gmail.com
+    (SMTP smtp.gmail.com:465 com senha de app; config smtp_usuario/smtp_senha, opcional email_limite_dia = 450). Tudo
+    entra na fila (mudança 037: emails, emails_lotes, emails_descadastro) e enviar-emails.php (cron de minuto em minuto,
+    www-data, log /var/log/guia-novo-emails.log) manda 20 por minuto até 450 em 24 h. /admin/emails.php (Pessoas > E-mails):
+    escrever para donos (pedidos com e-mail, por cidade), contas do app ou um e-mail; {nome}; teste para si; histórico.
+    Automáticos: plano pago (Básico e 1ª confirmação da assinatura, com o link da assinatura.php?c= = acesso ao painel),
+    alteração aprovada/recusada (com motivo), resposta do suporte. /contato.php (Fale conosco no rodapé, sem login, 3 por
+    IP por hora, Responder vai para quem escreveu). /descadastrar.php (link e List-Unsubscribe one-click; só para os da
+    equipe). Falta: o usuário criar a senha de app no Google e pôr no /etc/guia-novo/config.php, e mandar o 1º teste.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

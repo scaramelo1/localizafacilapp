@@ -66,7 +66,7 @@ function admin_inicio(string $titulo, ?array $admin): void {
           ['numeros.php', 'Números', 0], ['entradas.php', 'De onde vêm (entradas)', 0], ['buscas.php', 'O que procuram', 0],
           ['pedidos-info.php', 'Pedidos de informação', 0], ['google.php', 'Google por cidade', 0]]],
       ['👥', 'Pessoas', $sup, [
-          ['pessoas.php', 'Pessoas', 0], ['suporte.php', 'Suporte', $sup], ['notificacoes.php', 'Notificações', 0]]],
+          ['pessoas.php', 'Pessoas', 0], ['suporte.php', 'Suporte', $sup], ['emails.php', 'E-mails', 0], ['notificacoes.php', 'Notificações', 0]]],
       ['⚙️', 'Mais', $ev, [
           ['eventos.php', 'Eventos', $ev], ['app.php', 'App e downloads', 0], ['anuncios.php', 'Anúncios', 0],
           ['registro.php', 'Registro', 0], ['senha.php', 'Trocar senha', 0], ['sair.php', 'Sair', 0]]],

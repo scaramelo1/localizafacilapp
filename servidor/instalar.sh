@@ -97,6 +97,8 @@ fi
 # no cron do acha-facil, que usa o mesmo cadastro de donos; ligar aqui só quando o Acha Fácil sair do ar.
 cat > /etc/cron.d/$NOME <<CRON
 23 * * * * root php $RAIZ/google-visitas.php >/dev/null 2>&1
+# 21/11: fila de e-mails (inc/email.php), de minuto em minuto, como www-data (mesmo dono dos arquivos do admin)
+* * * * * www-data php $RAIZ/enviar-emails.php >> /var/log/guia-novo-emails.log 2>&1
 CRON
 chmod 644 /etc/cron.d/$NOME
 echo; echo "Pronto: https://fsadesigners.com.br/guia-novo/"

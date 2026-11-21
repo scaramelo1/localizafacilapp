@@ -344,6 +344,7 @@ function aprovar_alteracao(int $id, int $admin_id): void {
     $agora = linha('SELECT foto, fotos FROM profissionais WHERE id = ?', [$a['profissional_id']]);
     apagar_fotos_sobrando(arquivos_dos_campos($prof), arquivos_dos_campos($agora));
     web_cache_limpar();   // as páginas públicas mostram o dado novo na hora
+    email_alteracao_decidida($a, true, null);
     // passo 65: avisa quem pediu "me avise quando colocar o WhatsApp/horário/fotos"
     try { require_once __DIR__ . '/avisos-info.php'; avisar_infos_completas([(int)$a['profissional_id']]); }
     catch (Throwable $e) { error_log('localiza-facil avisos info: ' . $e->getMessage()); }
@@ -356,6 +357,29 @@ function recusar_alteracao(int $id, int $admin_id, string $motivo): void {
     $prof = linha('SELECT foto, fotos FROM profissionais WHERE id = ?', [$a['profissional_id']]);
     apagar_fotos_sobrando(arquivos_dos_campos(json_decode($a['novos'], true) ?: []), arquivos_dos_campos($prof ?: []));
     registrar($admin_id, 'recusou_alteracao', (int)$a['profissional_id'], $motivo);
+    email_alteracao_decidida($a, false, $motivo);
+}
+
+/** E-mail ao dono quando a equipe aprova ou recusa a alteração que ele pediu no painel (21/11, inc/email.php). */
+function email_alteracao_decidida(array $a, bool $aprovada, ?string $motivo): void {
+    try {
+        require_once __DIR__ . '/email.php';
+        $p = linha('SELECT id, nome, cidade FROM profissionais WHERE id = ?', [$a['profissional_id']]);
+        $pedido = $a['acesso_id'] ? (int)valor('SELECT pedido_id FROM acessos_dono WHERE id = ?', [$a['acesso_id']]) : 0;
+        if (!$p || !$pedido) return;
+        if ($aprovada) {
+            email_avisar_pedido($pedido, "Alteração aprovada: {$p['nome']}",
+                "Olá {nome},\n\nA equipe do Localiza Fácil aprovou a alteração que você pediu em {$p['nome']}. Ela já aparece no app e no site:\n"
+                . url_publica(caminho_ficha((int)$p['id'], (string)$p['nome'], (string)$p['cidade'])) . "\n\nEquipe Localiza Fácil");
+        } else {
+            email_avisar_pedido($pedido, "Alteração não aprovada: {$p['nome']}",
+                "Olá {nome},\n\nA equipe do Localiza Fácil não pôde aprovar a alteração que você pediu em {$p['nome']}."
+                . ($motivo ? "\n\nMotivo: $motivo" : '') . "\n\nVocê pode corrigir e mandar de novo pelo painel do seu comércio. "
+                . "Qualquer dúvida, é só responder este e-mail.\n\nEquipe Localiza Fácil");
+        }
+    } catch (Throwable $e) {
+        error_log('localiza-facil email alteração: ' . $e->getMessage());
+    }
 }
 
 /** Valor para mostrar ao admin/dono (foto vira miniatura). */

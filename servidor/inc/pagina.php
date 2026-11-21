@@ -120,7 +120,7 @@ function pagina_fim(): void {
   <p class="rodape-marca"><img src="<?= $base ?>/assets/logo.png?v=2" alt="" width="36" height="36"> <strong>Localiza <b>Fácil</b></strong></p>
   <p class="lema">O comércio da sua cidade, pertinho de você.</p>
   <p>Atendemos <?= h(resumo_cidades(true)) ?> · <a href="<?= $base ?>/#cidades">Ver as cidades</a></p>
-  <p><a href="<?= $base ?>/busca.php">Procurar meu negócio</a> · <a href="<?= $base ?>/termos.php">Termos de uso</a> · <a href="<?= $base ?>/privacidade.php">Privacidade</a> · <a href="<?= $base ?>/privacidade.php#excluir-conta">Excluir minha conta</a></p>
+  <p><a href="<?= $base ?>/contato.php">Fale conosco</a> · <a href="<?= $base ?>/busca.php">Procurar meu negócio</a> · <a href="<?= $base ?>/termos.php">Termos de uso</a> · <a href="<?= $base ?>/privacidade.php">Privacidade</a> · <a href="<?= $base ?>/privacidade.php#excluir-conta">Excluir minha conta</a></p>
   <p class="discreto">Localiza Fácil · <?= date('Y') ?></p>
 </footer>
 <div class="convite-avaliar" id="convite-avaliar" hidden>

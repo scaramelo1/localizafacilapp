@@ -44,6 +44,13 @@ function suporte_responder(array $ch, string $texto, ?int $admin_id): void {
     q('UPDATE chamados SET status = ?, atualizado_em = NOW() WHERE id = ?', [$admin_id ? 'respondido' : 'aberto', $ch['id']]);
     if ($admin_id) {
         avisar_usuario((int)$ch['usuario_id'], 'A equipe do Localiza Fácil respondeu', mb_substr($texto, 0, 150), ['chamado' => (int)$ch['id']]);
+        // 21/11: também por e-mail (inc/email.php), para quem não tem o app com avisos ligados
+        require_once __DIR__ . '/email.php';
+        $u = linha('SELECT nome, email FROM usuarios WHERE id = ?', [$ch['usuario_id']]);
+        if ($u && $u['email']) email_enfileirar((string)$u['email'], (string)$u['nome'], 'A equipe do Localiza Fácil respondeu',
+            "Olá {nome},\n\nA equipe do Localiza Fácil respondeu a sua mensagem (" . (SUPORTE_ASSUNTOS[$ch['assunto']] ?? 'suporte') . "):\n\n"
+            . mb_substr($texto, 0, 3000) . "\n\nPara continuar a conversa, abra:\n" . url_publica('suporte.php?c=' . (int)$ch['id'])
+            . "\n\nEquipe Localiza Fácil", 'aviso');
     } else {
         $nome = (string)valor('SELECT nome FROM usuarios WHERE id = ?', [$ch['usuario_id']]);
         avisar_admins('Suporte: nova mensagem', primeiro_nome($nome) . ': ' . mb_substr($texto, 0, 120), ['chamado' => (int)$ch['id']]);
