@@ -694,3 +694,14 @@ section.secao-ofertas + section { padding-top: 32px; }
 /* Plano D, passo 8 (20/11): aviso da ficha ainda não conferida */
 .ficha-a-confirmar { font-size: .88rem; color: var(--texto2); margin: 8px 0 0; }
 .ficha-a-confirmar a { color: var(--verde); font-weight: 700; }
+
+/* 21/11 (pedido do usuário): tags que recolhem ("+ Ver todos" / "− Mostrar menos"), web_chips() em inc/web.php */
+.chips-caixa .chips { margin-bottom: 10px; }
+.chips-mais { margin: 0 0 20px; }
+.chips-mais > summary { display: inline-block; cursor: pointer; list-style: none; font-weight: 800; font-size: .95rem; color: var(--verde);
+  border: 2px solid var(--verde); border-radius: 999px; padding: 5px 14px; margin-bottom: 10px; user-select: none; }
+.chips-mais > summary::-webkit-details-marker { display: none; }
+.chips-mais > summary:hover { background: var(--verde); color: #fff; }
+.chips-mais .menos { display: none; }
+.chips-mais[open] .mais { display: none; }
+.chips-mais[open] .menos { display: inline; }

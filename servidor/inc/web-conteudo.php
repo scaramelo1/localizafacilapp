@@ -140,7 +140,7 @@ function web_conteudo_lista(string $cidade, array $area, ?string $tipo): string 
     <?php endif ?>
     <?php if ($irmaos): ?>
       <h3>Veja também em <?= h($nome_cidade) ?></h3>
-      <p class="chips"><?php foreach (array_slice($irmaos, 0, 12) as $t): ?><a href="<?= h(url_tipo($cidade, $area['slug'], $t['nome'])) ?>"><?= h($t['nome']) ?> <small><?= (int)$t['total'] ?></small></a><?php endforeach ?></p>
+      <?= web_chips(array_map(fn($t) => '<a href="' . h(url_tipo($cidade, $area['slug'], $t['nome'])) . '">' . h($t['nome']) . ' <small>' . (int)$t['total'] . '</small></a>', $irmaos)) ?>
     <?php endif ?>
     <?php if ($vizinhas): ?>
       <h3><?= h($tipo ?? $area['nome']) ?> perto de <?= h($nome_cidade) ?></h3>
@@ -183,7 +183,7 @@ function web_conteudo_cidade(string $cidade, array $areas): string {
     <p class="sobre"><?= implode(' ', $frases) ?></p>
     <?php if ($top_tipos): ?>
       <h3>Mais procurados em <?= h($nome) ?></h3>
-      <p class="chips"><?php foreach ($top_tipos as $t): ?><a href="<?= h(url_tipo($cidade, $t['area'], $t['nome'])) ?>"><?= h($t['nome']) ?> <small><?= web_num((int)$t['total']) ?></small></a><?php endforeach ?></p>
+      <?= web_chips(array_map(fn($t) => '<a href="' . h(url_tipo($cidade, $t['area'], $t['nome'])) . '">' . h($t['nome']) . ' <small>' . web_num((int)$t['total']) . '</small></a>', $top_tipos)) ?>
     <?php endif ?>
     <?php if ($perto): ?>
       <h3>Cidades perto de <?= h($nome) ?></h3>

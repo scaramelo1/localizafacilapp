@@ -108,6 +108,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     Ligar/WhatsApp/Mapa/Ver ficha/Editar tudo, roteiro da ligação, correção rápida (telefone, WhatsApp, endereço, bairro,
     horário; campo que não veio não muda) e botões Confirmado / Mandar link (volta em 3 dias) / Não atende (volta amanhã) /
     Pular (1 h) / Fechou (status pausado, sai da fila). Testado com fichas de Aguaí; dados de teste desfeitos.
+11b. ✅ Tags que recolhem (21/11, pedido do usuário: no celular a lista de tipos ficava enorme, ex. Saúde em Poços com 61):
+    web_chips() em inc/web.php mostra as 8 primeiras (as com mais comércios) e "+ Ver todos os tipos (N)" / "− Mostrar menos"
+    (details/summary, sem JavaScript; todos os links continuam no HTML). Usado nos tipos da área, no "Veja também" e no
+    "Mais procurados" da cidade. CSS v=52.
 12. 🟡 App passado para o Localiza Fácil no código (20/11, pedido do usuário): app.json name "Localiza Fácil", versão
     1.14.0, texto da localização; 14 arquivos de src/ ("Acha Fácil(!)" -> "Localiza Fácil", Abertura e Cabecalho com o
     nome novo; Marca 21 px e traço tamanho*5), todos os endereços -> https://localizafacilapp.com.br; ícones novos
