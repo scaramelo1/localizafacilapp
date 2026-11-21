@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS profissionais (
   email VARCHAR(160) NULL UNIQUE,             -- login do painel do profissional
   senha_hash VARCHAR(255) NULL,
   status ENUM('pendente','ativo','pausado','recusado') NOT NULL DEFAULT 'pendente',
-  verificado TINYINT(1) NOT NULL DEFAULT 0,   -- selo "Verificado pelo Acha Fácil"
+  verificado TINYINT(1) NOT NULL DEFAULT 0,   -- selo "Verificado pelo Localiza Fácil"
   plano ENUM('basico','destaque','site') NOT NULL DEFAULT 'basico',
   assinatura ENUM('sem','ativa','atrasada','cancelada','cortesia') NOT NULL DEFAULT 'sem',
   assinatura_ate DATE NULL,

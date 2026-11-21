@@ -10,7 +10,7 @@ export const URL_PRIVACIDADE = 'https://localizafacilapp.com.br/privacidade.php'
 export const URL_PLANOS = 'https://localizafacilapp.com.br/planos.php';
 export const URL_MEU_NEGOCIO = 'https://localizafacilapp.com.br/busca.php';
 /** Contato do Localiza Fácil (iguais aos do site, /etc/guia-novo/config.php). */
-export const EMAIL_CONTATO = 'achafacilcontato@gmail.com';
+export const EMAIL_CONTATO = 'localizafacilapp@gmail.com';
 export const URL_INSTAGRAM = 'https://instagram.com/fsa.designer';
 
 export interface Cidade {
