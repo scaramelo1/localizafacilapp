@@ -15,7 +15,11 @@ $dir = config()['dados_dir'] . '/google';
 if (!is_dir($dir)) mkdir($dir, 0750, true);
 $arq = "$dir/visitas.json";
 $d = is_file($arq) ? (json_decode((string)file_get_contents($arq), true) ?: []) : [];
-$d += ['fichas' => [], 'dias' => [], 'ips' => []];
+$d += ['fichas' => [], 'dias' => [], 'ips' => [], 'paginas' => []];
+// 21/11 (pedido do usuário): todas as páginas que o robô abriu, uma por endereço (/admin/google.php, no fim).
+// 'p' = primeira visita, 'u' = última, 'n' = vezes, 's' = último código HTTP. Só conta visita depois da última já guardada,
+// porque o mesmo registro do Apache é lido de novo a cada hora.
+$ultima_antes = array_map(fn($x) => $x['u'] ?? '', $d['paginas']);
 
 /** IP do Google? Reverso termina em googlebot.com/google.com e o nome volta para o mesmo IP. */
 $e_google = function (string $ip) use (&$d): bool {
@@ -36,6 +40,17 @@ foreach (glob('/var/log/apache2/localizafacilapp_acesso.log*') ?: [] as $f) {
     if (!$h) { fwrite(STDERR, "Sem permissão para ler $f (rode como root).\n"); continue; }
     while (($l = $gz ? gzgets($h) : fgets($h)) !== false) {
         if (stripos($l, 'googlebot') === false) continue;
+        if (preg_match('#^(\S+) \S+ \S+ \[([^\]]+)\] "GET (/\S*) [^"]*" (\d{3}) #', $l, $t) && $e_google($t[1])) {
+            $quando = date('Y-m-d H:i:s', strtotime(str_replace('/', ' ', preg_replace('#:#', ' ', $t[2], 1))));
+            $cam = mb_substr(rawurldecode($t[3]), 0, 300);
+            if ($quando > ($ultima_antes[$cam] ?? '')) {
+                $pg = $d['paginas'][$cam] ?? ['p' => $quando, 'u' => $quando, 'n' => 0, 's' => $t[4]];
+                $pg['n']++;
+                if ($quando < $pg['p']) $pg['p'] = $quando;
+                if ($quando >= $pg['u']) { $pg['u'] = $quando; $pg['s'] = $t[4]; }
+                $d['paginas'][$cam] = $pg;
+            }
+        }
         if (!preg_match('#^(\S+) \S+ \S+ \[(\d\d)/(\w{3})/(\d{4}):[^\]]+\] "GET (/[^ ?"]*)\S* [^"]*" 200 #', $l, $m)) continue;
         [, $ip, $dd, $mes, $ano, $caminho] = $m;
         $partes = explode('/', trim(rawurldecode($caminho), '/'));

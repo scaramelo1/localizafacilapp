@@ -147,4 +147,42 @@ admin_inicio('Google por cidade', $admin);
   <?php endforeach ?>
 </table></div>
 <?php endif ?>
+<?php
+// 21/11 (pedido do usuário): todas as páginas que o robô já abriu, a mais recente primeiro (google-visitas.php, de hora em hora)
+$paginas = $d['paginas'] ?? [];
+$tipo_pg = function (string $c): string {
+    if (preg_match('#^/[^/]+/c/#', $c)) return 'fichas';
+    if (preg_match('#^/(sitemap[^/]*\.xml|robots\.txt|google[0-9a-f]+\.html)$#', $c)) return 'tecnico';
+    if (preg_match('#^/(assets/|foto\.php|og\.php|favicon)#', $c)) return 'arquivos';
+    return 'paginas';
+};
+$tipos_pg = ['fichas' => 'Fichas de comércio', 'paginas' => 'Cidades, categorias e páginas', 'tecnico' => 'Mapas do site e robots', 'arquivos' => 'Imagens e arquivos'];
+$cont_pg = array_fill_keys(array_keys($tipos_pg), 0);
+foreach ($paginas as $c => $_) $cont_pg[$tipo_pg((string)$c)]++;
+$ver = isset($tipos_pg[$_GET['ver'] ?? '']) ? $_GET['ver'] : 'fichas';
+$lista_pg = array_filter($paginas, fn($c) => $tipo_pg((string)$c) === $ver, ARRAY_FILTER_USE_KEY);
+uasort($lista_pg, fn($a, $b) => strcmp($b['u'], $a['u']));
+?>
+<h2 id="paginas-google">Páginas que o robô do Google já visitou (<?= num(count($paginas)) ?>)</h2>
+<?php if (!$paginas): ?>
+<p class="discreto">Ainda sem dados: a lista aparece depois da próxima leitura do registro (de hora em hora).</p>
+<?php else: ?>
+<p class="discreto">Visitar é o 1º passo: depois o Google decide se a página entra na pesquisa (confira com
+  <code>site:localizafacilapp.com.br</code> + o nome). Atualizado de hora em hora<?= !empty($d['atualizado']) ? ' · última leitura ' . h(datahora_br($d['atualizado'])) : '' ?>.</p>
+<p><?php foreach ($tipos_pg as $k => $rot): ?>
+  <a class="botao pequeno<?= $k === $ver ? ' amarelo' : '' ?>" href="?ver=<?= $k ?>#paginas-google"><?= h($rot) ?> (<?= num($cont_pg[$k]) ?>)</a>
+<?php endforeach ?></p>
+<?php if (!$lista_pg): ?><p class="discreto">Nenhuma página deste tipo ainda.</p><?php else: ?>
+<div class="tabela"><table>
+  <tr><th>Última visita</th><th>Página</th><th>Vezes</th><th>1ª visita</th><th>Resposta</th></tr>
+  <?php foreach (array_slice($lista_pg, 0, 500, true) as $c => $pg): $c = (string)$c; ?>
+  <tr><td><?= h(datahora_br($pg['u'])) ?></td>
+    <td><a class="adm-link" href="<?= h(url_publica(ltrim($c, '/'))) ?>" target="_blank" rel="noopener"><?= h($c) ?></a></td>
+    <td><?= num((int)$pg['n']) ?></td><td><?= h(datahora_br($pg['p'])) ?></td>
+    <td><?= $pg['s'] === '200' ? 'OK' : '<strong style="color:#C92A2A">' . h($pg['s']) . '</strong>' ?></td></tr>
+  <?php endforeach ?>
+</table></div>
+<?php if (count($lista_pg) > 500): ?><p class="discreto">Mostrando as 500 mais recentes de <?= num(count($lista_pg)) ?>.</p><?php endif ?>
+<?php endif ?>
+<?php endif ?>
 <?php admin_fim();

@@ -181,6 +181,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     aviso não tinha dados (ex.: admin > Pessoas > avisar) e a Expo recusava o lote inteiro com 400. Agora vai {}.
     Teste para a conta 1: dos 3 aparelhos, 1 recebeu; 2 são de instalações antigas (recibo DeviceNotRegistered do FCM),
     que o código só tira quando o erro vem na hora, não no recibo. Limpeza pelos recibos (cron) ficou para o usuário decidir.
+27. ✅ Páginas visitadas pelo Google, uma por uma (21/11, pedido do usuário): google-visitas.php (cron de hora em hora)
+    guarda em visitas.json 'paginas' => caminho => primeira/última visita, vezes e código HTTP (só conta visita depois da
+    última guardada, porque relê o registro); fim do /admin/google.php com abas Fichas / Cidades e páginas / Mapas / Arquivos.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
