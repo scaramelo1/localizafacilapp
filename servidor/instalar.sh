@@ -93,5 +93,10 @@ if grep -q 'LocationMatch "^/(?!assets/' "$APACHE_SSL" && ! grep -q "|$NOME/" "$
 else
   echo "• Apache já ajustado (ou padrão diferente; confira a LocationMatch em $APACHE_SSL)"
 fi
-# (sem cron por enquanto: avisos, visitas do Google e relatório ficam para o lançamento)
+# 20/11 (lançamento): só as visitas do Google, de hora em hora (/admin/google.php). Avisos e relatório mensal continuam
+# no cron do acha-facil, que usa o mesmo cadastro de donos; ligar aqui só quando o Acha Fácil sair do ar.
+cat > /etc/cron.d/$NOME <<CRON
+23 * * * * root php $RAIZ/google-visitas.php >/dev/null 2>&1
+CRON
+chmod 644 /etc/cron.d/$NOME
 echo; echo "Pronto: https://fsadesigners.com.br/guia-novo/"

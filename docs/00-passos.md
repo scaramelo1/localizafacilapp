@@ -137,6 +137,8 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     Search Console (20/11): propriedade "Prefixo do URL" https://localizafacilapp.com.br/ (conta localizafacilapp@gmail.com),
     verificada pelo ARQUIVO publico/google1e88fb9a9da291bf.html (NÃO remover); sitemap.xml enviado e "Processado"
     (Googlebot leu às 20:48; os das cidades vêm depois).
+    Cron (20/11): /etc/cron.d/guia-novo roda google-visitas.php de hora em hora (minuto 23) para /admin/google.php
+    (antes mostrava "nunca" porque não havia cron). Avisos e relatório mensal continuam no cron do acha-facil.
 19. ⬜ Publicar o app nas lojas.
 20. ⬜ Instagram por cidade desde o 1º dia; cada comerciante confirmado recebe o link da ficha para divulgar.
 
