@@ -148,15 +148,15 @@ function campo_de_hoje(?int $agora = null): string {
 // ---------- pedaços de HTML ----------
 /**
  * 21/11 (pedido do usuário): lista de tags (chips) que recolhe no celular: mostra as primeiras $mostrar e o resto num
- * "+ Ver todos (N)" / "− Mostrar menos" (details/summary, funciona sem JavaScript; os links continuam no HTML para o Google).
+ * "+ Mais tipos (N)" / "− Menos tipos" (details/summary, funciona sem JavaScript; os links continuam no HTML para o Google).
  * $links = HTML de cada <a> já pronto.
  */
-function web_chips(array $links, int $mostrar = 8, string $nome = 'os tipos'): string {
+function web_chips(array $links, int $mostrar = 8, string $nome = 'tipos'): string {
     if (count($links) <= $mostrar + 2) return '<p class="chips">' . implode('', $links) . '</p>';
     $resto = array_slice($links, $mostrar);
     return '<div class="chips-caixa"><p class="chips">' . implode('', array_slice($links, 0, $mostrar)) . '</p>'
-        . '<details class="chips-mais"><summary><span class="mais">+ Ver todos ' . h($nome) . ' (' . count($links) . ')</span>'
-        . '<span class="menos">− Mostrar menos</span></summary><p class="chips">' . implode('', $resto) . '</p></details></div>';
+        . '<details class="chips-mais"><summary><span class="mais">+ Mais ' . h($nome) . ' (' . count($resto) . ')</span>'
+        . '<span class="menos">− Menos ' . h($nome) . '</span></summary><p class="chips">' . implode('', $resto) . '</p></details></div>';
 }
 function web_num(int $n): string { return number_format($n, 0, ',', '.'); }
 /** "1 dentista" / "97 comércios": plural simples para os textos. */
