@@ -1,13 +1,17 @@
-﻿# Acha Facil - roda o robo do Google Places nas cidades desligadas, na ordem de prioridade (docs/cronograma-cidades.md).
+﻿# Localiza Facil - roda o robo do Google Places (copia do robo do Acha Facil).
+# 21/11/2026: -Existentes = so as 5 cidades que ja estao no Localiza Facil (melhorar as fichas que ja existem).
+# Pasta padrao D:\robo-listas-localiza, separada da do Acha Facil (o feitas.txt de la nao pula nada aqui).
+# Cidades desligadas na ordem de prioridade (docs/cronograma-cidades.md).
 # 20/11/2026. Uma cidade depois da outra; as que ja geraram lista ficam em feitas.txt e sao puladas na proxima vez.
 # Chave do Google: pedida na 1a vez e guardada em <Pasta>\chave-google.txt (fora do git). Trocar a chave = apagar o arquivo.
 # Para tudo (sem salvar lista pela metade) se o Google recusar: chave invalida, credito acabou ou limite do dia.
 #
+#   .\scripts\robo\rodar-cidades.ps1 -Existentes      -> so as 5 cidades do Localiza Facil
 #   .\scripts\robo\rodar-cidades.ps1                  -> todas, na ordem
 #   .\scripts\robo\rodar-cidades.ps1 -Quantas 5       -> so as 5 proximas
 #   .\scripts\robo\rodar-cidades.ps1 -Grupo 1         -> so as cidades vizinhas do grupo 1 (grupos 1 a 19, docs/cronograma-cidades.md)
-#   .\scripts\robo\rodar-cidades.ps1 -Pasta E:\listas -> outra pasta para os arquivos (padrao D:\robo-listas)
-param([int]$Quantas = 0, [int]$Grupo = 0, [string]$Pasta = 'D:\robo-listas')
+#   .\scripts\robo\rodar-cidades.ps1 -Pasta E:\listas -> outra pasta para os arquivos (padrao D:\robo-listas-localiza)
+param([int]$Quantas = 0, [int]$Grupo = 0, [switch]$Existentes, [string]$Pasta = 'D:\robo-listas-localiza')
 $robo = Join-Path $PSScriptRoot 'leads_places_api.py'
 $cidades = @(
   "Olímpia;SP",
@@ -97,14 +101,16 @@ $grupos = @{
   18 = @("São Sebastião da Grama;SP", "Tapiratiba;SP", "Itobi;SP")
   19 = @("Olímpia;SP", "Brumadinho;MG", "Araxá;MG", "Diamantina;MG", "Bananal;SP")
 }
-if ($Grupo -gt 0) {
+if ($Existentes) {
+  $cidades = @("Vargem Grande do Sul;SP", "Aguaí;SP", "Santa Rita do Sapucaí;MG", "São João da Boa Vista;SP", "Poços de Caldas;MG")
+} elseif ($Grupo -gt 0) {
   if (-not $grupos.ContainsKey($Grupo)) { Write-Host "Grupo $Grupo nao existe (1 a 19)." -ForegroundColor Red; return }
   $cidades = $grupos[$Grupo]
 }
 New-Item -ItemType Directory -Force $Pasta | Out-Null
 Set-Location $Pasta
 $env:PYTHONUTF8 = '1'
-# a chave fica guardada so neste PC, fora do projeto e do git (D:\robo-listas\chave-google.txt): pede uma vez so
+# a chave fica guardada so neste PC, fora do projeto e do git (<Pasta>\chave-google.txt): pede uma vez so
 $chaveArq = Join-Path $Pasta 'chave-google.txt'
 if (-not $env:GOOGLE_MAPS_API_KEY -and (Test-Path $chaveArq)) { $env:GOOGLE_MAPS_API_KEY = (Get-Content $chaveArq -Raw).Trim() }
 if (-not $env:GOOGLE_MAPS_API_KEY) {

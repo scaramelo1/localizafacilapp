@@ -1,5 +1,5 @@
-{
-  "site": "https://achafacilapp.com.br",
+﻿{
+  "site": "https://localizafacilapp.com.br",
   "chave": "COLE_AQUI_A_CHAVE_GERADA_EM_ADMIN_NOVIDADES",
   "pasta_robo": "D:\\leads-sem-site",
   "comando": "python robo.py \"{cidade}\"",

@@ -192,6 +192,12 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     Google (vale para buscas, visitas e toques); busca_da_equipe() (inc/busca.php) não grava busca de admin (conta Google
     de admin no app ou no site, ou sessão do admin aberta).
 
+30. ✅ Robô no Localiza Fácil (21/11, pedido do usuário): a cópia em scripts/robo apontava para achafacilapp.com.br.
+    Agora rodar-cidades.ps1 -Existentes roda só as 5 cidades do Localiza (pasta D:\robo-listas-localiza, separada da
+    do Acha Fácil); enviar-listas.ps1 e robo-config.exemplo.json usam localizafacilapp.com.br. Lista sobe por
+    /admin/importar.php (cai em Novidades, nunca publica sozinha); chave do robô (robo-enviar.php) ainda não gerada.
+    Objetivo: melhorar as fichas que já existem, sem cidade nova.
+
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
 - Redirecionar o domínio antigo para o novo.
