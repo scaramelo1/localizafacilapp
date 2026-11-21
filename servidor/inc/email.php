@@ -290,3 +290,34 @@ function email_destinatarios(string $publico, ?string $cidade, ?string $um = nul
     }
     return $lista;
 }
+
+/**
+ * Todos os e-mails cadastrados (21/11, lista do /admin/emails.php): donos (pedidos) e contas do app, um por e-mail,
+ * com de onde veio. [email => ['nome', 'comercios' => [[id, nome, cidade]], 'conta' => bool, 'desde', 'fora' => bool]]
+ */
+function email_cadastrados(): array {
+    $lista = [];
+    $junta = function (?string $email, ?string $nome, ?string $quando) use (&$lista): ?string {
+        $e = email_valido($email);
+        if (!$e) return null;
+        $lista[$e] ??= ['nome' => null, 'comercios' => [], 'conta' => false, 'desde' => $quando, 'fora' => false];
+        $lista[$e]['nome'] ??= $nome ?: null;
+        if ($quando && (!$lista[$e]['desde'] || $quando < $lista[$e]['desde'])) $lista[$e]['desde'] = $quando;
+        return $e;
+    };
+    foreach (linhas("SELECT COALESCE(NULLIF(pe.email, ''), u.email) AS email, pe.nome, pe.criado_em, p.id AS pid, p.nome AS comercio, p.cidade
+        FROM pedidos pe LEFT JOIN usuarios u ON u.id = pe.usuario_id LEFT JOIN profissionais p ON p.id = pe.profissional_id
+        WHERE pe.status <> 'recusado' AND pe.tipo IN ('assumir', 'incluir') ORDER BY pe.id") as $l) {
+        $e = $junta($l['email'], $l['nome'], $l['criado_em']);
+        if ($e && $l['pid'] && !in_array((int)$l['pid'], array_column($lista[$e]['comercios'], 0), true)) {
+            $lista[$e]['comercios'][] = [(int)$l['pid'], (string)$l['comercio'], (string)$l['cidade']];
+        }
+    }
+    foreach (linhas('SELECT email, nome, criado_em FROM usuarios WHERE ativo = 1 ORDER BY id') as $l) {
+        if ($e = $junta($l['email'], $l['nome'], $l['criado_em'])) $lista[$e]['conta'] = true;
+    }
+    foreach (array_column(linhas('SELECT email FROM emails_descadastro'), 'email') as $f) if (isset($lista[$f])) $lista[$f]['fora'] = true;
+    uasort($lista, fn($a, $b) => strcmp((string)$b['desde'], (string)$a['desde']));
+    return $lista;
+}
+

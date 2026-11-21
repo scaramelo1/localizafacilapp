@@ -15,6 +15,7 @@ if (!email_pronto()) {
 const EMAIL_MODELO = "Olá {nome},\n\n\n\nQualquer dúvida, é só responder este e-mail.\n\nEquipe Localiza Fácil";
 $f = ['publico' => 'donos', 'cidade' => '', 'um' => '', 'assunto' => '', 'texto' => EMAIL_MODELO];
 $contagem = null;
+if (!e_post() && ($pre = email_valido((string)($_GET['para'] ?? '')))) $f = ['publico' => 'um', 'um' => $pre] + $f;
 
 if (e_post()) {
     exigir_post();
@@ -64,6 +65,19 @@ if (e_post()) {
     }
 }
 
+$cadastrados = email_cadastrados();
+if (($_GET['baixar'] ?? '') === 'csv') {
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="emails-localiza-facil-' . date('Y-m-d') . '.csv"');
+    $out = fopen('php://output', 'w');
+    fwrite($out, "\xEF\xBB\xBF");   // BOM: o Excel abre os acentos certo
+    fputcsv($out, ['E-mail', 'Nome', 'Tipo', 'Comércios', 'Desde', 'Recebe e-mails da equipe'], ';');
+    foreach ($cadastrados as $e => $c) {
+        fputcsv($out, [$e, $c['nome'], implode(' + ', array_filter([$c['comercios'] ? 'Dono' : null, $c['conta'] ? 'Conta do app' : null])),
+            implode(', ', array_map(fn($x) => $x[1] . ' (' . nome_cidade($x[2], true) . ')', $c['comercios'])), data_br($c['desde']), $c['fora'] ? 'Não' : 'Sim'], ';');
+    }
+    exit;
+}
 $problema = email_problema();
 $na_fila = (int)valor("SELECT COUNT(*) FROM emails WHERE status = 'fila'");
 $hoje = email_enviados_24h();
@@ -133,6 +147,22 @@ admin_inicio('E-mails', $admin);
   p.addEventListener('change', mostrar); mostrar();
 })();
 </script>
+
+<h2 id="cadastrados">E-mails cadastrados (<?= count($cadastrados) ?>)</h2>
+<p class="discreto">Donos (quem pediu, assumiu ou pagou um comércio) e contas do app (entraram com o Google).
+  <a href="?baixar=csv">Baixar a lista (planilha)</a></p>
+<?php if (!$cadastrados): ?><p class="discreto">Nenhum e-mail cadastrado ainda.</p><?php else: ?>
+<div class="tabela"><table>
+  <tr><th>E-mail</th><th>Nome</th><th>Tipo</th><th>Comércio</th><th>Desde</th><th></th></tr>
+  <?php foreach ($cadastrados as $e => $c): ?>
+  <tr><td><?= h($e) ?><?= $c['fora'] ? '<br><small class="discreto">pediu para não receber</small>' : '' ?></td><td><?= h($c['nome'] ?? '') ?></td>
+    <td><?= h(implode(' + ', array_filter([$c['comercios'] ? 'Dono' : null, $c['conta'] ? 'Conta do app' : null]))) ?></td>
+    <td><?= implode('<br>', array_map(fn($x) => adm_comercio($x[0], $x[1], $x[2]), $c['comercios'])) ?></td>
+    <td><?= data_br($c['desde']) ?></td>
+    <td><?php if (!$c['fora']): ?><a class="botao pequeno" href="?para=<?= rawurlencode($e) ?>#form-email">Escrever</a><?php endif ?></td></tr>
+  <?php endforeach ?>
+</table></div>
+<?php endif ?>
 
 <?php if ($lotes): ?>
 <h2>Enviados pela equipe</h2>

@@ -173,6 +173,8 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     alteração aprovada/recusada (com motivo), resposta do suporte. /contato.php (Fale conosco no rodapé, sem login, 3 por
     IP por hora, Responder vai para quem escreveu). /descadastrar.php (link e List-Unsubscribe one-click; só para os da
     equipe). Senha de app posta pelo usuário em 21/11 (precisou ligar a verificação em duas etapas antes); 1º teste enviado 21/11 10:08.
+    21/11: lista "E-mails cadastrados" no /admin/emails.php (donos + contas do app, um por e-mail, com comércio, desde
+    quando e botão Escrever que preenche "Um e-mail só") e ?baixar=csv (planilha com ; e BOM para o Excel).
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
