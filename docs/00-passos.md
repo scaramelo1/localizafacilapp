@@ -137,6 +137,8 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     Search Console (20/11): propriedade "Prefixo do URL" https://localizafacilapp.com.br/ (conta localizafacilapp@gmail.com),
     verificada pelo ARQUIVO publico/google1e88fb9a9da291bf.html (NÃO remover); sitemap.xml enviado e "Processado"
     (Googlebot leu às 20:48; os das cidades vêm depois).
+    Favicon (21/11): o publico/favicon.ico da RAIZ ainda era o do Acha Fácil (o Googlebot-Image pegou em 20/11 21:04);
+    trocado pelo novo (16/32/48) e favicon.png 192x192 com sizes (o Google pede múltiplo de 48). Backup do antigo em backups/.
     Cron (20/11): /etc/cron.d/guia-novo roda google-visitas.php de hora em hora (minuto 23) para /admin/google.php
     (antes mostrava "nunca" porque não havia cron). Avisos e relatório mensal continuam no cron do acha-facil.
 19. ⬜ Publicar o app nas lojas.

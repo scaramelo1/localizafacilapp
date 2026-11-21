@@ -70,7 +70,7 @@ function pagina_inicio(string $titulo, string $descricao, string $classe = '', a
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <link rel="icon" href="<?= $base ?>/assets/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" href="<?= $base ?>/assets/favicon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="<?= $base ?>/assets/favicon.png">
 <link rel="apple-touch-icon" href="<?= $base ?>/assets/apple-touch-icon.png">
 <meta name="theme-color" content="#005c38">
 <link rel="preconnect" href="https://fonts.googleapis.com">
