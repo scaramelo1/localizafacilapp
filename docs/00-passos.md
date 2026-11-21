@@ -25,7 +25,12 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
    Backup do Apache: /root/apache-sites-available.antes-localiza.*. Lançamento: servidor/dominio/lancar.sh.
 3. ✅ E-mail localizafacilapp@gmail.com (contato_email no config e reserva do pagador no Mercado Pago em inc/ofertas.php) e
    Instagram @localizafacilapp ('instagram' no config) (20/11).
-3b. ✅ Marca trocada no site novo (20/11): "Acha Fácil(!)" -> "Localiza Fácil" em 69 arquivos de servidor/ (textos, termos,
+3b. ✅ 21/11 (pedido do usuário): o símbolo oficial passou a ser o COM LUPA (assets/localiza/simbolo-lupa.svg, como o
+    ícone antigo de que ele gostava, nas cores novas). Usado em tudo: site (logo, favicon.ico da raiz e de assets 16/32/48,
+    favicon.png 192, apple-touch-icon 180 com fundo verde, logo-google-120, imagem de compartilhar) e app (icon, ícone
+    adaptável, splash, favicon, logo); foto do Instagram em publico/assets/instagram-perfil.png (1080). Endereços dos
+    ícones com ?v=2 (cache de 7 dias). Os sem lupa em /var/lib/guia-novo/backups/icones-sem-lupa-*.
+    Marca trocada no site novo (20/11): "Acha Fácil(!)" -> "Localiza Fácil" em 69 arquivos de servidor/ (textos, termos,
     privacidade, e-mails do sistema, títulos, CSVs, logs "localiza-facil ...", sessão LOCALIZAFACIL, MP "LOCALIZAFACIL",
     achafacilapp.com.br -> localizafacilapp.com.br). Ficaram DE PROPÓSITO: pacote br.com.fsadesigner.achafacil e o esquema
     achafacil:// do app (mudam só com o app novo, passo 12). Logo nova: assets/localiza/simbolo.svg (pino verde, círculo

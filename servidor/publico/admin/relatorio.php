@@ -119,7 +119,7 @@ for ($i = 0; $i < 4; $i++) { $t = strtotime(date('Y-m-01') . " -$i month"); $mes
 </div>
 <div class="folha">
   <div class="topo">
-    <img src="<?= $base ?>/assets/logo.png" alt="">
+    <img src="<?= $base ?>/assets/logo.png?v=2" alt="">
     <div><div class="marca">Localiza <b>Fácil</b></div><div class="lema">O comércio da sua cidade, pertinho de você.</div></div>
   </div>
   <div class="corpo">

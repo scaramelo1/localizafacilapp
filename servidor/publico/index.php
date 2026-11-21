@@ -53,7 +53,7 @@ unset($cidades_do_uf);
 $ld_site = ['@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => 'Localiza Fácil', 'alternateName' => 'Localiza Fácil',
     'url' => url_publica(), 'inLanguage' => 'pt-BR'];
 $ld_org = ['@context' => 'https://schema.org', '@type' => 'Organization', 'name' => 'Localiza Fácil', 'url' => url_publica(),
-    'logo' => url_publica('assets/logo.png'), 'slogan' => 'O comércio da sua cidade, pertinho de você.'];
+    'logo' => url_publica('assets/logo.png?v=2'), 'slogan' => 'O comércio da sua cidade, pertinho de você.'];
 // descrição até ~155 caracteres (o Google corta perto de 160)
 $mil = $total >= 1000 ? number_format(intdiv($total, 1000), 0, ',', '.') . ' mil' : (string)$total;
 pagina_inicio('Localiza Fácil: o comércio da sua cidade no seu celular',

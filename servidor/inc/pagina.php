@@ -69,9 +69,9 @@ function pagina_inicio(string $titulo, string $descricao, string $classe = '', a
 <?php endif ?>
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
-<link rel="icon" href="<?= $base ?>/assets/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="192x192" href="<?= $base ?>/assets/favicon.png">
-<link rel="apple-touch-icon" href="<?= $base ?>/assets/apple-touch-icon.png">
+<link rel="icon" href="<?= $base ?>/assets/favicon.ico?v=2" sizes="any">
+<link rel="icon" type="image/png" sizes="192x192" href="<?= $base ?>/assets/favicon.png?v=2">
+<link rel="apple-touch-icon" href="<?= $base ?>/assets/apple-touch-icon.png?v=2">
 <meta name="theme-color" content="#005c38">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -82,7 +82,7 @@ function pagina_inicio(string $titulo, string $descricao, string $classe = '', a
 </head>
 <body class="<?= h($classe) ?>">
 <header class="topo">
-  <a class="marca" href="<?= $base ?>/"><img src="<?= $base ?>/assets/logo.png" alt="" width="40" height="40"><span>Localiza <b>Fácil</b></span></a>
+  <a class="marca" href="<?= $base ?>/"><img src="<?= $base ?>/assets/logo.png?v=2" alt="" width="40" height="40"><span>Localiza <b>Fácil</b></span></a>
   <nav><a href="<?= $base ?>/#cidades">Cidades</a><a href="<?= $base ?>/#seu-negocio">Seu negócio</a><a href="<?= $base ?>/#baixar" class="nav-botao">Baixar o app</a>
     <a href="<?= $base ?>/entrar.php" class="nav-conta" id="conta-topo" rel="nofollow">Entrar</a></nav>
 </header>
@@ -117,7 +117,7 @@ function pagina_fim(): void {
     $base = config()['url'];
     ?>
 <footer class="rodape">
-  <p class="rodape-marca"><img src="<?= $base ?>/assets/logo.png" alt="" width="36" height="36"> <strong>Localiza <b>Fácil</b></strong></p>
+  <p class="rodape-marca"><img src="<?= $base ?>/assets/logo.png?v=2" alt="" width="36" height="36"> <strong>Localiza <b>Fácil</b></strong></p>
   <p class="lema">O comércio da sua cidade, pertinho de você.</p>
   <p>Atendemos <?= h(resumo_cidades(true)) ?> · <a href="<?= $base ?>/#cidades">Ver as cidades</a></p>
   <p><a href="<?= $base ?>/busca.php">Procurar meu negócio</a> · <a href="<?= $base ?>/termos.php">Termos de uso</a> · <a href="<?= $base ?>/privacidade.php">Privacidade</a> · <a href="<?= $base ?>/privacidade.php#excluir-conta">Excluir minha conta</a></p>

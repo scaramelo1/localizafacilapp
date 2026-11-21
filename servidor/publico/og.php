@@ -32,7 +32,7 @@ if (!is_file($arq) || filemtime($arq) < time() - 7 * 86400) {
         flock($trava, LOCK_UN);
     }
 }
-if (!is_file($arq)) { header('Location: ' . url_publica('assets/logo.png'), true, 302); exit; }
+if (!is_file($arq)) { header('Location: ' . url_publica('assets/logo.png?v=2'), true, 302); exit; }
 header('Content-Type: image/png');
 header('Cache-Control: public, max-age=86400');
 header('Content-Length: ' . filesize($arq));

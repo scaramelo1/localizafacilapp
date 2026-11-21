@@ -46,13 +46,13 @@ function admin_inicio(string $titulo, ?array $admin): void {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title><?= h($titulo) ?> · Admin Localiza Fácil</title>
-<link rel="icon" type="image/png" href="<?= $base ?>/assets/favicon.png">
+<link rel="icon" type="image/png" href="<?= $base ?>/assets/favicon.png?v=2">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap">
 <link rel="stylesheet" href="<?= $base ?>/assets/site.css?v=45">
 </head>
 <body class="admin">
 <header class="topo">
-  <a class="marca" href="<?= $base ?>/admin/"><img src="<?= $base ?>/assets/logo.png" alt="" width="40" height="40"><span>Localiza <b>Fácil</b> admin</span></a>
+  <a class="marca" href="<?= $base ?>/admin/"><img src="<?= $base ?>/assets/logo.png?v=2" alt="" width="40" height="40"><span>Localiza <b>Fácil</b> admin</span></a>
   <?php if ($admin): ?>
   <?php
   // 19/11 (pedido do usuário): menu compacto em 4 grupos + Pendências; o número de cada grupo soma o que espera ali dentro
