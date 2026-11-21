@@ -1,4 +1,4 @@
-# Capturas de tela da Play Store do Acha Fácil, desenhadas a partir do código das telas (src/app, src/componentes,
+# Capturas de tela da Play Store do Localiza Fácil (até 09/11 era o Acha Fácil), desenhadas a partir do código das telas (src/app, src/componentes,
 # src/tema.ts) com os dados reais da API (São João da Boa Vista). Não há emulador nem navegador na VPS, então as
 # medidas (dp) e cores são as mesmas do app e o desenho é feito com o Pillow.
 #
@@ -173,12 +173,13 @@ def cabecalho(t, titulo=None, busca=None, voltar=False):
         t.icone('arrow-left', x, y + 10, 28, '#FFFFFF')
         x += 50
     # marca
-    t.texto('Acha Fácil!', x, y + 6, 24, 'i', '#FFFFFF', lh=30)
-    traco(t, x, y + 33, 24 * 3.9)
+    # marca como no Cabecalho.tsx: "Localiza Fácil" 21 dp e traço de 21 * 5
+    t.texto('Localiza Fácil', x, y + 8, 21, 'i', '#FFFFFF', lh=27)
+    traco(t, x, y + 33, 21 * 5)
     # pílula da cidade
     nome = 'São João da Boa Vista'
     # a pílula encolhe (flexShrink) até caber ao lado da marca, e no máximo 58% da linha
-    livre = t.W - 16 - (x + t.largura('Acha Fácil!', 24, 'i') + 10)
+    livre = t.W - 16 - (x + t.largura('Localiza Fácil', 21, 'i') + 10)
     pw = min(57 + t.largura(nome, 14, 700), (t.W - 32) * 0.58, livre)
     tw = pw - 57
     px = t.W - 16 - pw
@@ -548,7 +549,7 @@ def montar(tela_img, legenda, larg, alt, nome, larg_tela, topo, raio=44, borda=1
 
 TELAS = [
     (tela_inicio, 'Tudo da sua cidade\nem um só lugar', '1-inicio'),
-    (tela_categorias, 'Mais de 4.500 comércios\nem 17 categorias', '2-categorias'),
+    (tela_categorias, 'Mais de 18 mil comércios\nem 5 cidades', '2-categorias'),
     (tela_perto, 'Veja o que tem\nperto de você', '3-perto'),
     (tela_comercio, 'Chame no WhatsApp\nem um toque', '4-comercio'),
 ]

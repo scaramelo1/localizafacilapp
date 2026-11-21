@@ -123,6 +123,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     21/11 (pedido "gerar o apk e aab"): build no PC preparado — .gitignore completo (credentials.json, credentials/,
     saida/, /android, *.jks fora do git; antes só ignorava node_modules), gerar-local.ps1 gera saida\localiza-facil-*.aab/.apk,
     olha os .aab do ..\acha-facil\saida para o versionCode e publica o APK em /var/www/guia-novo/servidor/publicar-apk.sh.
+    21/11 (pedido "mude os nomes e as informações" da ficha da Play): imagens novas em assets/loja — destaque-1024x500.png
+    (destaque.py, símbolo com lupa), icone-512.png e capturas/ (telas.py com "Localiza Fácil" e "Mais de 18 mil comércios
+    em 5 cidades", dados da API de 21/11); textos e links da ficha em docs/lojas.md seções 1 e 2.
 13. 🟡 Cadastros trazidos do Acha Fácil (20/11, pedido do usuário: "admin igual ao do Acha Fácil", opção Cadastros):
     contas (16, mesmos números), sessões do app, aparelhos/avisos, cupons, pedidos/pagamentos das 5 cidades (13 de 16),
     eventos_mp, acessos de dono (7), alterações, oferta da Agnes, avaliações, favoritos, suporte e pedidos de informação

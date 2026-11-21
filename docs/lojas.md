@@ -41,14 +41,14 @@ continua).
 
 ## 1. Links que as lojas pedem
 
-- Política de privacidade: https://achafacilapp.com.br/privacidade.php
-- Excluir conta (Play Store): https://achafacilapp.com.br/privacidade.php#excluir-conta
-- Termos: https://achafacilapp.com.br/termos.php
-- Site / suporte: https://achafacilapp.com.br/ · e-mail achafacilcontato@gmail.com
+- Política de privacidade: https://localizafacilapp.com.br/privacidade.php
+- Excluir conta (Play Store): https://localizafacilapp.com.br/privacidade.php#excluir-conta
+- Termos: https://localizafacilapp.com.br/termos.php
+- Site / suporte: https://localizafacilapp.com.br/ · e-mail localizafacilapp@gmail.com
 
-## 2. Textos da ficha
+## 2. Textos da ficha (Localiza Fácil desde 21/11; antes "Acha Fácil!")
 
-**Nome:** Acha Fácil! (App Store: até 30 caracteres; se o nome estiver ocupado, usar "Acha Fácil - Comércio Local")
+**Nome:** Localiza Fácil (App Store: até 30 caracteres; se o nome estiver ocupado, usar "Localiza Fácil - Comércio Local")
 
 **Subtítulo (App Store, até 30):** O comércio da sua cidade
 
@@ -58,20 +58,20 @@ continua).
 
 > O comércio da sua cidade, pertinho de você.
 >
-> O Acha Fácil! reúne os comércios e serviços de São João da Boa Vista, Águas da Prata, Vargem Grande do Sul, Aguaí (SP) e Poços de Caldas (MG) em um só lugar. Procure por categoria ou pelo nome, veja quem está perto de você e fale direto no WhatsApp.
+> O Localiza Fácil reúne os comércios e serviços de São João da Boa Vista, Vargem Grande do Sul, Aguaí (SP), Poços de Caldas e Santa Rita do Sapucaí (MG) em um só lugar. Procure por categoria ou pelo nome, veja quem está perto de você e fale direto no WhatsApp.
 >
-> • Mais de 4.500 comércios em 17 categorias: alimentação, mercados, farmácias, beleza, pet shops, oficinas, saúde e muito mais
+> • Mais de 18 mil comércios em 18 categorias: alimentação, mercados, farmácias, beleza, pet shops, oficinas, saúde e muito mais
 > • Perto de você: lista do mais perto ao mais longe, usando a localização só quando você pede
 > • Busca com filtros por categoria e bairro
 > • Avaliações e comentários de quem já foi
 > • Favoritos para guardar os seus preferidos
 > • Não precisa de conta para procurar e chamar no WhatsApp
 >
-> Tem um comércio? Procure o seu negócio no app. Se ele ainda não estiver lá, você pode incluir de graça pelo site achafacilapp.com.br.
+> Tem um comércio? Procure o seu negócio no app. Se ele ainda não estiver lá, você pode incluir de graça pelo site localizafacilapp.com.br.
 >
-> Sua cidade ainda não está no Acha Fácil? Peça pelo site e avisamos quando chegar.
+> Sua cidade ainda não está no Localiza Fácil? Peça pelo site e avisamos quando chegar.
 
-**Palavras-chave (App Store, até 100):** comércio,guia,lojas,serviços,whatsapp,são joão da boa vista,poços de caldas,águas da prata
+**Palavras-chave (App Store, até 100):** comércio,guia,lojas,serviços,whatsapp,são joão da boa vista,poços de caldas,santa rita
 
 **Categoria:** Estilo de vida (Play: "Estilo de vida"; Apple: "Lifestyle"); secundária na Apple: "Navegação" ou "Negócios"
 
