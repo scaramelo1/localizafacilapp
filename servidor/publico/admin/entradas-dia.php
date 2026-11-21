@@ -110,7 +110,7 @@ uasort($cidades, fn($a, $b) => (($b['entradas'] ?? 0) + ($b['vis'] ?? 0)) <=> ((
 
 admin_inicio('Relatório do dia ' . date('d/m', strtotime($dia)), $admin);
 ?>
-<p><a href="entradas.php?<?= h(http_build_query(array_filter(['origem' => $origem ?: 'google', 'cidade' => $cidade, 'semana' => date('Y-m-d', strtotime('monday this week', strtotime($dia)))]))) ?>#dia-a-dia">&larr; Dia a dia</a></p>
+<p><a href="numeros.php?<?= h(http_build_query(array_filter(['origem' => $origem, 'cidade' => $cidade, 'dias' => 30]))) ?>">&larr; Números</a></p>
 <h1>Relatório de <?= date('d/m/Y', strtotime($dia)) ?> <small class="discreto"><?= $nome_dia ?><?= $dia === $hoje_d ? ' · hoje (ainda não acabou)' : '' ?></small></h1>
 
 <div class="paginacao-semana">

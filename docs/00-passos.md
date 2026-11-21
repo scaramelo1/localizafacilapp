@@ -212,6 +212,15 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     - Limpeza de 21/11 (cópia antes em scratchpad/backup-numeros-21-11.sql): ficaram 10 entradas (4 Acha Fácil, 2 direto,
       4 pré-carregamentos do Google), 1 visualização (Agnes Veterinária, início do app) e aparições do início estimadas
       (4 de 15 aberturas eram de gente). 20/11 não foi mexido.
+32. ✅ Números e "De onde vêm" numa página só, mais fácil de ler (21/11, pedido do usuário). /admin/numeros.php refeito:
+    filtros em botões (período Hoje/7/30/90, cidade, origem: Tudo/App/Site/Google/outra) que valem para a página toda;
+    4 cartões (chegaram ao site, apareceram em listas, fichas abertas, contatos) com seta e % contra o período anterior e
+    linha de tendência; "O caminho até o comércio" separado em app (apareceu -> abriu -> chamou) e site (chegou -> abriu
+    -> chamou); gráfico dia a dia (cada dia abre entradas-dia.php; "ver em tabela") ou hora a hora em "Hoje" com ontem
+    ao lado; de onde vêm as fichas abertas (app x site) e como chegaram ao site, com clique que filtra a página;
+    cidades, áreas, 10 comércios mais abertos, tipos de contato, horários de pico, páginas de entrada; no fim a tabela
+    de todas as fichas (área, tipo, plano, só abertas, CSV, páginas) e "Como ler estes números". /admin/entradas.php
+    redireciona para cá; menu Números > "Números e de onde vêm".
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
