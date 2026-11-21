@@ -6,13 +6,14 @@ instala por cima do anterior.
 
 ## Uma vez só
 
-Projeto no PC em `D:\acha-facil` (desde 12/11; antes em C:\Users\Fellipe\acha-facil) e cache do Gradle em
+Projeto no PC na pasta do Localiza Fácil (clone de github.com/scaramelo1/localizafacilapp, ao lado de `D:\acha-facil`) e cache do Gradle em
 `D:\gradle` (variável `GRADLE_USER_HOME`), para não lotar o C:.
 
 
 1. Android Studio instalado (o mesmo do emulador). O script acha sozinho o Java (`jbr`) e o SDK
    (`%LOCALAPPDATA%\Android\Sdk`).
-2. Baixar a chave do EAS (não gasta build):
+2. Chave do EAS: é a MESMA do Acha Fácil (mesmo pacote na Play). Copie `credentials.json` e a pasta `credentials\`
+   de `D:\acha-facil` para a pasta do Localiza Fácil. Se não tiver, baixe (não gasta build):
    ```
    npx eas credentials -p android
    ```
@@ -43,8 +44,8 @@ Projeto no PC em `D:\acha-facil` (desde 12/11; antes em C:\Users\Fellipe\acha-fa
 - O arquivo vai para `saida\`.
 - `.aab`: Play Console → Testar e lançar → (Produção ou o teste) → Criar nova versão → enviar o arquivo. Depois rode
   `npx eas build:version:set -p android` e digite o mesmo número, para o EAS continuar a contagem quando voltar a usar.
-- `.apk`: `scp saida\acha-facil-<versão>.apk root@achafacilapp.com.br:/root/` e, na VPS,
-  `bash /var/www/acha-facil/servidor/publicar-apk.sh /root/acha-facil-<versão>.apk`.
+- `.apk`: `scp saida\localiza-facil-<versão>.apk root@localizafacilapp.com.br:/root/` e, na VPS,
+  `bash /var/www/guia-novo/servidor/publicar-apk.sh /root/localiza-facil-<versão>.apk`.
 
 Se o PowerShell bloquear o script ("execução de scripts foi desabilitada"), rode antes, na mesma janela:
 `Set-ExecutionPolicy -Scope Process Bypass`.
@@ -63,5 +64,5 @@ O script já compila só para celulares de verdade (armeabi-v7a e arm64-v8a; sem
 para o Gradle/Kotlin e 2 tarefas por vez, e guarda tudo em `saida\build-log.txt` (no erro, mostra as primeiras linhas).
 "Internal compiler error" do Kotlin + C++ (ninja) + "Could not add entry ... executionHistory" ao mesmo tempo = quase
 sempre falta de memória/espaço ou antivírus: feche o emulador, o Android Studio e o navegador durante o build, deixe
-uns 15 GB livres no disco e, se continuar, ponha a pasta do projeto (`D:\acha-facil`) e a do cache do Gradle (`D:\gradle`, ou `C:\Users\Fellipe\.gradle`)
+uns 15 GB livres no disco e, se continuar, ponha a pasta do projeto (a do Localiza Fácil) e a do cache do Gradle (`D:\gradle`, ou `C:\Users\Fellipe\.gradle`)
 nas exclusões do Windows Defender.

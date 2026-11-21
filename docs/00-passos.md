@@ -120,6 +120,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     MANTIDOS: pacote br.com.fsadesigner.achafacil, slug acha-facil e projectId do EAS (mesmo app na Play, sem perder o
     teste) e o scheme achafacil:// (o servidor aceita). Falta: gerar o build no PC DEPOIS do domínio no ar (o app chama
     https://localizafacilapp.com.br/api) e trocar nome/ícone/descrição na Play Console.
+    21/11 (pedido "gerar o apk e aab"): build no PC preparado — .gitignore completo (credentials.json, credentials/,
+    saida/, /android, *.jks fora do git; antes só ignorava node_modules), gerar-local.ps1 gera saida\localiza-facil-*.aab/.apk,
+    olha os .aab do ..\acha-facil\saida para o versionCode e publica o APK em /var/www/guia-novo/servidor/publicar-apk.sh.
 13. 🟡 Cadastros trazidos do Acha Fácil (20/11, pedido do usuário: "admin igual ao do Acha Fácil", opção Cadastros):
     contas (16, mesmos números), sessões do app, aparelhos/avisos, cupons, pedidos/pagamentos das 5 cidades (13 de 16),
     eventos_mp, acessos de dono (7), alterações, oferta da Agnes, avaliações, favoritos, suporte e pedidos de informação

@@ -56,9 +56,10 @@ if ($VersionCode -le 0) {
   $atual = 0
   try { $atual = [int](($json | ConvertFrom-Json).versionCode) } catch { $atual = 0 }
   # o EAS so fica certo se alguem rodar eas build:version:set depois de cada envio; por isso olha tambem os .aab ja
-  # gerados aqui (saida\acha-facil-<versao>-<numero>.aab) e usa o maior (19/11: o 10 saiu repetido)
+  # gerados aqui (saida\localiza-facil-<versao>-<numero>.aab) e na pasta antiga do Acha Facil (mesmo app na Play,
+  # ..\acha-facil\saida\acha-facil-*.aab) e usa o maior (19/11: o 10 saiu repetido)
   $local = 0
-  Get-ChildItem 'saida' -Filter 'acha-facil-*.aab' -ErrorAction SilentlyContinue | ForEach-Object {
+  @('saida', '..\acha-facil\saida') | ForEach-Object { Get-ChildItem $_ -Filter '*-*.aab' -ErrorAction SilentlyContinue } | ForEach-Object {
     if ($_.BaseName -match '-(\d+)$') { $n = [int]$Matches[1]; if ($n -gt $local) { $local = $n } }
   }
   if ($local -gt $atual) { Write-Host "EAS diz $atual, mas ja existe .aab com o numero $local em saida\. Usando $local + 1." }
@@ -131,10 +132,10 @@ if ($codigo -ne 0) {
 # 8. copia para saida\
 if ($Tipo -eq 'play') {
   $origem = 'android\app\build\outputs\bundle\release\app-release.aab'
-  $destino = "saida\acha-facil-$versao-$VersionCode.aab"
+  $destino = "saida\localiza-facil-$versao-$VersionCode.aab"
 } else {
   $origem = 'android\app\build\outputs\apk\release\app-release.apk'
-  $destino = "saida\acha-facil-$versao.apk"
+  $destino = "saida\localiza-facil-$versao.apk"
 }
 if (-not (Test-Path $origem)) { Parar "Nao achei $origem." }
 Copy-Item $origem $destino -Force
@@ -147,6 +148,6 @@ if ($Tipo -eq 'play') {
   Write-Host "Depois, para o EAS continuar a contagem certa, rode: npx eas build:version:set -p android   e digite $VersionCode"
 } else {
   Write-Host 'Mande para a VPS e publique:'
-  Write-Host "  scp $destino root@achafacilapp.com.br:/root/"
-  Write-Host "  (na VPS) bash /var/www/acha-facil/servidor/publicar-apk.sh /root/acha-facil-$versao.apk"
+  Write-Host "  scp $destino root@localizafacilapp.com.br:/root/"
+  Write-Host "  (na VPS) bash /var/www/guia-novo/servidor/publicar-apk.sh /root/localiza-facil-$versao.apk"
 }
