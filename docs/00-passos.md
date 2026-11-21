@@ -175,6 +175,8 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     equipe). Senha de app posta pelo usuário em 21/11 (precisou ligar a verificação em duas etapas antes); 1º teste enviado 21/11 10:08.
     21/11: lista "E-mails cadastrados" no /admin/emails.php (donos + contas do app, um por e-mail, com comércio, desde
     quando e botão Escrever que preenche "Um e-mail só") e ?baixar=csv (planilha com ; e BOM para o Excel).
+    21/11: caixinhas na lista (e "marcar todos") ligadas ao formulário (atributo form): público "escolhidos" = só e-mails
+    que estão na lista e recebem (endereço inventado no POST é ignorado).
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

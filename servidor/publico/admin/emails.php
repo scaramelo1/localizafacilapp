@@ -13,7 +13,7 @@ if (!email_pronto()) {
 }
 
 const EMAIL_MODELO = "Olá {nome},\n\n\n\nQualquer dúvida, é só responder este e-mail.\n\nEquipe Localiza Fácil";
-$f = ['publico' => 'donos', 'cidade' => '', 'um' => '', 'assunto' => '', 'texto' => EMAIL_MODELO];
+$f = ['publico' => 'donos', 'cidade' => '', 'um' => '', 'escolhidos' => [], 'assunto' => '', 'texto' => EMAIL_MODELO];
 $contagem = null;
 if (!e_post() && ($pre = email_valido((string)($_GET['para'] ?? '')))) $f = ['publico' => 'um', 'um' => $pre] + $f;
 
@@ -24,10 +24,11 @@ if (e_post()) {
         'publico' => isset(EMAIL_PUBLICOS[$_POST['publico'] ?? '']) ? $_POST['publico'] : 'donos',
         'cidade' => isset(TODAS_CIDADES[$_POST['cidade'] ?? '']) ? $_POST['cidade'] : '',
         'um' => trim((string)($_POST['um'] ?? '')),
+        'escolhidos' => array_values(array_filter(array_map(fn($e) => email_valido((string)$e), (array)($_POST['escolhidos'] ?? [])))),
         'assunto' => (string)txt('assunto', 200),
         'texto' => trim(str_replace("\r", '', (string)($_POST['texto'] ?? ''))),
     ];
-    $lista = email_destinatarios($f['publico'], $f['publico'] === 'donos' && $f['cidade'] ? $f['cidade'] : null, $f['um']);
+    $lista = email_destinatarios($f['publico'], $f['publico'] === 'donos' && $f['cidade'] ? $f['cidade'] : null, $f['um'], $f['escolhidos']);
     $pronto_texto = $f['assunto'] !== '' && mb_strlen($f['texto']) >= 10 && $f['texto'] !== EMAIL_MODELO;
 
     if ($acao === 'processar') {
@@ -51,6 +52,7 @@ if (e_post()) {
         } else {
             $publico = EMAIL_PUBLICOS[$f['publico']] . ($f['publico'] === 'donos' && $f['cidade'] ? ' · ' . nome_cidade($f['cidade']) : '')
                 . ($f['publico'] === 'um' ? ' · ' . array_key_first($lista) : '');
+            if ($f['publico'] === 'escolhidos') $publico = count($lista) === 1 ? array_key_first($lista) : count($lista) . ' marcados na lista';
             $lote = inserir('emails_lotes', ['assunto' => $f['assunto'], 'texto' => $f['texto'], 'publico' => mb_substr($publico, 0, 120),
                 'total' => count($lista), 'admin_id' => (int)$admin['id']]);
             foreach ($lista as $para => $nome) {
@@ -120,6 +122,7 @@ admin_inicio('E-mails', $admin);
       <?php foreach (TODAS_CIDADES as $slug => $c): ?><option value="<?= h($slug) ?>"<?= $f['cidade'] === $slug ? ' selected' : '' ?>><?= h($c[0]) ?></option><?php endforeach ?>
     </select>
   </div>
+  <p id="campo-marcados" class="discreto"><b id="qtd-marcados">0</b> marcado(s) na lista de e-mails cadastrados, mais abaixo. <a href="#cadastrados">Ver a lista</a></p>
   <div id="campo-um">
     <label for="um">E-mail</label>
     <input id="um" name="um" type="email" maxlength="160" value="<?= h($f['um']) ?>" placeholder="nome@exemplo.com">
@@ -143,19 +146,34 @@ admin_inicio('E-mails', $admin);
   function mostrar() {
     document.getElementById('campo-cidade').hidden = p.value !== 'donos';
     document.getElementById('campo-um').hidden = p.value !== 'um';
+    document.getElementById('campo-marcados').hidden = p.value !== 'escolhidos';
   }
   p.addEventListener('change', mostrar); mostrar();
+  // caixinhas da lista "E-mails cadastrados" (ficam fora do formulário, ligadas a ele pelo atributo form)
+  var caixas = Array.prototype.slice.call(document.querySelectorAll('input.escolher'));
+  var todos = document.getElementById('marcar-todos');
+  function contar(mudarPublico) {
+    var n = caixas.filter(function (c) { return c.checked; }).length;
+    document.getElementById('qtd-marcados').textContent = n;
+    if (todos) { todos.checked = n > 0 && n === caixas.length; todos.indeterminate = n > 0 && n < caixas.length; }
+    if (mudarPublico && n > 0) { p.value = 'escolhidos'; mostrar(); }
+  }
+  caixas.forEach(function (c) { c.addEventListener('change', function () { contar(true); }); });
+  if (todos) todos.addEventListener('change', function () { caixas.forEach(function (c) { c.checked = todos.checked; }); contar(true); });
+  contar(false);
 })();
 </script>
 
 <h2 id="cadastrados">E-mails cadastrados (<?= count($cadastrados) ?>)</h2>
 <p class="discreto">Donos (quem pediu, assumiu ou pagou um comércio) e contas do app (entraram com o Google).
   <a href="?baixar=csv">Baixar a lista (planilha)</a></p>
+<p class="discreto">Marque as caixinhas para mandar só para essas pessoas: o "Para quem" muda sozinho para "Os marcados" e o e-mail é escrito no formulário acima.</p>
 <?php if (!$cadastrados): ?><p class="discreto">Nenhum e-mail cadastrado ainda.</p><?php else: ?>
 <div class="tabela"><table>
-  <tr><th>E-mail</th><th>Nome</th><th>Tipo</th><th>Comércio</th><th>Desde</th><th></th></tr>
+  <tr><th><input type="checkbox" id="marcar-todos" title="Marcar todos" aria-label="Marcar todos"></th><th>E-mail</th><th>Nome</th><th>Tipo</th><th>Comércio</th><th>Desde</th><th></th></tr>
   <?php foreach ($cadastrados as $e => $c): ?>
-  <tr><td><?= h($e) ?><?= $c['fora'] ? '<br><small class="discreto">pediu para não receber</small>' : '' ?></td><td><?= h($c['nome'] ?? '') ?></td>
+  <tr><td><?php if (!$c['fora']): ?><input type="checkbox" class="escolher" name="escolhidos[]" value="<?= h($e) ?>" form="form-email" aria-label="Marcar <?= h($e) ?>"<?= in_array($e, $f['escolhidos'], true) ? ' checked' : '' ?>><?php endif ?></td>
+    <td><?= h($e) ?><?= $c['fora'] ? '<br><small class="discreto">pediu para não receber</small>' : '' ?></td><td><?= h($c['nome'] ?? '') ?></td>
     <td><?= h(implode(' + ', array_filter([$c['comercios'] ? 'Dono' : null, $c['conta'] ? 'Conta do app' : null]))) ?></td>
     <td><?= implode('<br>', array_map(fn($x) => adm_comercio($x[0], $x[1], $x[2]), $c['comercios'])) ?></td>
     <td><?= data_br($c['desde']) ?></td>

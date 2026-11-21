@@ -263,11 +263,17 @@ const EMAIL_PUBLICOS = [
     'donos' => 'Donos de comércio (quem pediu ou pagou plano)',
     'contas' => 'Contas do app (entraram com o Google)',
     'um' => 'Um e-mail só',
+    'escolhidos' => 'Os marcados na lista de e-mails cadastrados',
 ];
 
 /** Lista [email => nome] do público escolhido, sem repetir e sem quem pediu para não receber. */
-function email_destinatarios(string $publico, ?string $cidade, ?string $um = null): array {
+function email_destinatarios(string $publico, ?string $cidade, ?string $um = null, array $escolhidos = []): array {
     $lista = [];
+    if ($publico === 'escolhidos') {
+        // só e-mails que estão mesmo cadastrados (não aceita endereço inventado no formulário) e que recebem
+        foreach (email_cadastrados() as $e => $c) if (!$c['fora'] && in_array($e, $escolhidos, true)) $lista[$e] = $c['nome'];
+        return $lista;
+    }
     if ($publico === 'donos') {
         $sql = "SELECT COALESCE(NULLIF(pe.email, ''), u.email) AS email, pe.nome FROM pedidos pe
             LEFT JOIN usuarios u ON u.id = pe.usuario_id LEFT JOIN profissionais p ON p.id = pe.profissional_id
