@@ -59,7 +59,8 @@ function expo_enviar(array $tokens, string $titulo, string $texto, array $dados,
     $falhas = 0;
     if (!$tokens) return [0, 0];
     $msgs = array_map(fn($t) => ['to' => $t, 'title' => mb_substr($titulo, 0, 80), 'body' => mb_substr($texto, 0, 180),
-        'data' => $dados, 'sound' => 'default', 'priority' => 'high', 'channelId' => $canal], array_values($tokens));
+        // 21/11: sem dados, o PHP manda [] (lista) e a Expo recusa o lote inteiro com 400 ("Expected record"): tem de ser {}
+        'data' => $dados ?: new stdClass(), 'sound' => 'default', 'priority' => 'high', 'channelId' => $canal], array_values($tokens));
     foreach (array_chunk($msgs, 100) as $lote) {
         try {
             $c = curl_init('https://exp.host/--/api/v2/push/send');

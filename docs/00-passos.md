@@ -177,6 +177,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     quando e botão Escrever que preenche "Um e-mail só") e ?baixar=csv (planilha com ; e BOM para o Excel).
     21/11: caixinhas na lista (e "marcar todos") ligadas ao formulário (atributo form): público "escolhidos" = só e-mails
     que estão na lista e recebem (endereço inventado no POST é ignorado).
+26. ✅ Avisos no celular voltando (21/11, "o site não está mandando notificação"): expo_enviar() mandava "data": [] quando o
+    aviso não tinha dados (ex.: admin > Pessoas > avisar) e a Expo recusava o lote inteiro com 400. Agora vai {}.
+    Teste para a conta 1: dos 3 aparelhos, 1 recebeu; 2 são de instalações antigas (recibo DeviceNotRegistered do FCM),
+    que o código só tira quando o erro vem na hora, não no recibo. Limpeza pelos recibos (cron) ficou para o usuário decidir.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
