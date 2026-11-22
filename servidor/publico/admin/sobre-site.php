@@ -8,7 +8,8 @@ require_once __DIR__ . '/../../inc/moderacao.php';
 require_once __DIR__ . '/../../inc/web.php';
 $admin = exigir_admin();
 $aba = in_array($_GET['aba'] ?? '', ['pendente', 'aprovado', 'recusado', 'erro'], true) ? $_GET['aba'] : 'pendente';
-$voltar = 'admin/sobre-site.php?aba=' . $aba;
+$pagina = max(1, (int)($_GET['pagina'] ?? $_POST['pagina'] ?? 1));
+$voltar = 'admin/sobre-site.php?aba=' . $aba . ($pagina > 1 ? '&pagina=' . $pagina : '');
 
 if (e_post()) {
     exigir_post();
@@ -44,7 +45,9 @@ if (e_post()) {
 $num = array_column(linhas('SELECT situacao, COUNT(*) AS n FROM sobre_site GROUP BY situacao'), 'n', 'situacao');
 $onde = $aba === 'erro' ? "s.situacao = 'erro' AND p.site IS NOT NULL AND p.site <> ''" : 's.situacao = ' . "'" . $aba . "'";
 $lista = linhas("SELECT s.*, p.nome, p.cidade, p.tipo, p.descricao, p.site FROM sobre_site s JOIN profissionais p ON p.id = s.profissional_id
-    WHERE $onde AND p.status = 'ativo' ORDER BY p.popularidade DESC, p.id LIMIT 100");
+    WHERE $onde AND p.status = 'ativo' ORDER BY p.popularidade DESC, p.id LIMIT 100 OFFSET " . (($pagina - 1) * 100));
+$total_aba = (int)valor("SELECT COUNT(*) FROM sobre_site s JOIN profissionais p ON p.id = s.profissional_id WHERE $onde AND p.status = 'ativo'");
+$paginas = max(1, (int)ceil($total_aba / 100));
 
 admin_inicio('Sobre pelo site do comércio', $admin);
 ?>
@@ -69,19 +72,29 @@ admin_inicio('Sobre pelo site do comércio', $admin);
       <?php if ($ficha): ?> · <a href="<?= h(url_ficha($ficha)) ?>" target="_blank">ver a ficha</a><?php endif ?></p>
     <?php if ($aba === 'erro'): ?>
       <p>⚠️ <?= h((string)$s['motivo']) ?> (lido em <?= h(date('d/m H:i', strtotime($s['lido_em']))) ?>). Se o site não existe mais, o botão “Site” da ficha leva a lugar nenhum.</p>
-      <form method="post" style="display:inline"><?= campo_csrf() ?><input type="hidden" name="id" value="<?= (int)$s['profissional_id'] ?>">
+      <form method="post" style="display:inline"><?= campo_csrf() ?><input type="hidden" name="id" value="<?= (int)$s['profissional_id'] ?>"><input type="hidden" name="pagina" value="<?= $pagina ?>">
         <button class="botao contorno pequeno" name="acao" value="tirar_site" onclick="return confirm('Tirar o site da ficha?')">Tirar o site da ficha</button></form>
     <?php elseif ($aba === 'pendente'): ?>
-      <form method="post"><?= campo_csrf() ?><input type="hidden" name="id" value="<?= (int)$s['profissional_id'] ?>">
+      <form method="post"><?= campo_csrf() ?><input type="hidden" name="id" value="<?= (int)$s['profissional_id'] ?>"><input type="hidden" name="pagina" value="<?= $pagina ?>">
         <textarea name="texto" rows="3" maxlength="600" style="width:100%"><?= h((string)$s['texto']) ?></textarea>
         <p style="margin:6px 0 0"><button class="botao pequeno" name="acao" value="aprovar">✅ Aprovar</button>
           <button class="botao contorno pequeno" name="acao" value="recusar">Recusar</button></p>
       </form>
+    <?php elseif ($aba === 'recusado'): // 22/11 (pedido do usuário): recusado também pode ser aprovado depois de conferir ?>
+      <?php if ($s['motivo']): ?><p class="discreto" style="margin:0 0 6px">Recusado porque: <?= h((string)$s['motivo']) ?></p><?php endif ?>
+      <form method="post"><?= campo_csrf() ?><input type="hidden" name="id" value="<?= (int)$s['profissional_id'] ?>"><input type="hidden" name="pagina" value="<?= $pagina ?>">
+        <textarea name="texto" rows="3" maxlength="600" style="width:100%"><?= h((string)$s['texto']) ?></textarea>
+        <p style="margin:6px 0 0"><button class="botao pequeno" name="acao" value="aprovar">✅ Aprovar</button>
+          <span class="discreto">Dá para corrigir o texto antes de aprovar.</span></p>
+      </form>
     <?php else: ?>
       <p><?= h((string)$s['texto']) ?></p>
-      <?php if ($aba === 'aprovado'): ?><form method="post"><?= campo_csrf() ?><input type="hidden" name="id" value="<?= (int)$s['profissional_id'] ?>">
+      <?php if ($aba === 'aprovado'): ?><form method="post"><?= campo_csrf() ?><input type="hidden" name="id" value="<?= (int)$s['profissional_id'] ?>"><input type="hidden" name="pagina" value="<?= $pagina ?>">
         <button class="botao contorno pequeno" name="acao" value="desfazer">Tirar da ficha</button></form><?php endif ?>
     <?php endif ?>
   </div>
 <?php endforeach ?>
+<?php if ($paginas > 1): ?><p class="filtros-linha">Páginas:
+  <?php for ($n = 1; $n <= $paginas; $n++): ?><a class="botao pequeno <?= $n === $pagina ? '' : 'contorno' ?>" href="<?= h(url('admin/sobre-site.php?aba=' . $aba . '&pagina=' . $n)) ?>"><?= $n ?></a> <?php endfor ?>
+  <span class="discreto"><?= number_format($total_aba, 0, ',', '.') ?> no total</span></p><?php endif ?>
 <?php admin_fim();

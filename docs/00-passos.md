@@ -378,3 +378,6 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     Cervejaria Gonçalves 34479, Pizza na Roça 35132: aprovado só na outra). Registro em registro_admin (admin NULL).
     Cópia antes: /var/lib/guia-novo/backups/antes-sobre-site-20261122.sql. Descrição do Google corta o Sobre em palavra
     inteira (web_corte_palavra, 150 letras).
+57. ✅ Recusados podem ser aprovados (22/11, pedido do usuário: "alguns estão certos, vou verificar todos"). Em
+    /admin/sobre-site.php, aba Recusados: mostra o motivo, o texto em caixa editável e "✅ Aprovar" (vai para a ficha na
+    hora). Todas as abas com páginas de 100 (?pagina=), e aprovar/recusar volta para a mesma página.
