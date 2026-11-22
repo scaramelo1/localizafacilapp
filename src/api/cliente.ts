@@ -62,6 +62,9 @@ export interface ProfissionalResumo {
   destaque: boolean;
   nota: number;
   avaliacoes: number;
+  /** 22/11: Destaque com catalogo (ex.: 'Cardapio') e o item que a busca achou. Servidor antigo nao manda. */
+  catalogoAba?: string | null;
+  catalogoAchou?: string | null;
   temWhatsapp: boolean;
   temTelefone: boolean;
   /** false = veio da lista pública de comércios; o dono ainda não assumiu o perfil. */
@@ -152,6 +155,10 @@ export interface Profissional extends ProfissionalResumo {
   /** Pagina do comercio no iFood e no 99Food (22/11, so areas de comida). */
   ifood?: string | null;
   food99?: string | null;
+  /** Catalogo (22/11, so Destaque com 1+ item): Cardapio, Produtos, Ofertas... */
+  catalogo?: Catalogo | null;
+  /** Sem catalogo num segmento que costuma ter: nome do espaco trancado ('Cardapio', 'Produtos'...). */
+  catalogoTrancado?: string | null;
   /** Oferta da semana no ar (so Destaque). */
   oferta?: Oferta | null;
   minhaAvaliacao: { estrelas: number; comentario: string | null } | null;
@@ -328,7 +335,39 @@ export function registrarContato(id: number, tipo: 'whatsapp' | 'ligar' | 'insta
 }
 
 /** Passo 59: "Quero saber o horário", "Quero ver fotos"... numa ficha incompleta. Conta 1 por pessoa no dia. Falha em silêncio. */
-export type TipoPedidoInfo = 'horario' | 'fotos' | 'sobre' | 'whatsapp';
+export type TipoPedidoInfo = 'horario' | 'fotos' | 'sobre' | 'whatsapp' | 'catalogo';
 export function pedirInfo(id: number, tipo: TipoPedidoInfo) {
   chamar('quero.php', 'POST', { id, tipo, origem: 'app' }).catch(() => {});
 }
+
+// ---------- catalogo da ficha (22/11, passo 45) ----------
+export interface CatalogoItem {
+  id: string;
+  nome: string;
+  desc: string | null;
+  preco: string | null;
+  precoDe: string | null;
+  aPartir: boolean;
+  unidade: string | null;
+  etiquetas: string[];
+  destaque: boolean;
+  esgotado: boolean;
+  foto: string | null;
+  mensagem: string;
+  /** Link do WhatsApp ja com o item escrito (null sem WhatsApp ou esgotado). */
+  pedir: string | null;
+}
+export interface Catalogo {
+  aba: string;
+  titulo: string;
+  aviso: string;
+  botao: string;
+  atualizado: string | null;
+  validade: string | null;
+  secoes: { nome: string; itens: CatalogoItem[] }[];
+}
+/** "Pedir" de um item do catalogo: conta o item e um toque no WhatsApp. */
+export function registrarItem(id: number, item: string) {
+  chamar('item.php', 'POST', { id, item, origem: 'app' }).catch(() => {});
+}
+

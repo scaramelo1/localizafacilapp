@@ -14,6 +14,7 @@ const TEXTO_AVISO: Record<TipoPedidoInfo, string> = {
   fotos: 'fotos',
   sobre: 'o que vende ou faz',
   whatsapp: 'o WhatsApp',
+  catalogo: 'os produtos e preços', // 22/11 (passo 45)
 };
 
 /**

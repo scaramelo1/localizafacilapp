@@ -206,6 +206,8 @@ function catalogo_api(array $p): ?array {
             'destaque' => !empty($it['destaque']), 'esgotado' => !empty($it['esgotado']),
             'foto' => !empty($it['foto']) ? foto_url((string)$it['foto']) : null,
             'mensagem' => catalogo_msg_item($it, (string)$p['nome']),
+            // link do WhatsApp já com o item escrito (null: comércio sem WhatsApp ou item esgotado)
+            'pedir' => !empty($p['whatsapp']) && empty($it['esgotado']) ? link_whatsapp((string)$p['whatsapp'], catalogo_msg_item($it, (string)$p['nome'])) : null,
         ], $s['itens'])], $secoes),
     ];
 }

@@ -285,6 +285,23 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 44. ✅ Ajustes do catálogo (22/11, pedido do usuário): só Destaque em dia tem catálogo; a aba só aparece com pelo menos
     1 item; tirada a contagem de itens da aba. Na prévia da equipe (fichas de teste, sem Destaque) a aba aparece com o
     aviso "na ficha de verdade só para Destaque". Ainda falta a tela para o dono montar o catálogo e o app.
+45. ✅ Catálogo completo (22/11, pedido do usuário: "pode executar todos os passos"; lembrete semanal por celular e e-mail).
+    inc/catalogo.php (modelos por segmento, ler/salvar/indexar, API, busca, pedidos por item); mudança 041
+    (catalogo_busca, catalogo_itens, catalogo_em; tabela catalogo_pedidos), já aplicada.
+    1) Busca acha itens do catálogo (só Destaque): BUSCA_CAMPO_CATALOGO; cartão mostra "Tem: X-Tudo" (site "Cardápio: X-Tudo").
+    2) "💬 Pedir" em cada item: WhatsApp já escrito "Vi no Localiza Fácil: X (R$ Y). Ainda tem?"; api/item.php conta o
+       item (catalogo_pedidos) e um toque no WhatsApp; "Mais pedidos pelo WhatsApp (30 dias)" no editor do dono.
+    3) Foto opcional por item (600 px, quadrada). 4) "Atualizado em dd/mm" no topo.
+    5) Editor /painel/catalogo.php (dono Destaque; admin por ?id= ou "catálogo" em Comércios > editar): + seção, + item,
+       subir/descer, apagar, campos por segmento (tamanhos/cores, serve em carros, unidade, validade). Publica na hora.
+    6) Primeira vez começa com as seções sugeridas do segmento. 7) "Esgotado" (fica riscado, sem Pedir).
+    8) "Ofertas válidas até" (catálogo) e "Oferta até" (item): vencido some da ficha na hora e da busca no
+       catalogo-diario.php (cron 3h17). 9) catalogo-semanal.php (cron segunda 10h23): Destaque com dono recebe aviso no
+       celular + e-mail ("Seu cardápio está em dia?" / convite para montar); --teste só lista.
+    10) Selo "🍔 Cardápio" no cartão (site e app) e, sem catálogo nos segmentos que costumam ter, "Cardápio 🔒 Pedir"
+       (pedidos_info tipo 'catalogo'; o dono vê "X pessoas pediram para ver seus produtos").
+    App 1.15.0: abas Informações | Catálogo (src/componentes/Catalogo.tsx), Pedir por item, selo e "Tem:" no cartão,
+    trancado do catálogo. Sintaxe conferida com esbuild; falta o typecheck e o teste no celular (PC).
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

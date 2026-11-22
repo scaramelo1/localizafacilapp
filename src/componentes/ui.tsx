@@ -239,6 +239,12 @@ export function CartaoProfissional({ p, distancia, origem }: { p: ProfissionalRe
           {p.tipo}
           {p.bairro ? ` · ${p.bairro}` : ''}
         </Text>
+        {/* 22/11 (passo 45): item do catalogo que a busca achou */}
+        {p.catalogoAchou ? (
+          <Text style={estilos.cartaoAchou} numberOfLines={1}>
+            Tem: <Text style={{ fontWeight: '800' }}>{p.catalogoAchou}</Text>
+          </Text>
+        ) : null}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginTop: 4 }}>
           {distancia !== undefined && (
             <View style={estilos.distancia} accessibilityLabel={`A cerca de ${textoDistancia(distancia)}`}>
@@ -248,6 +254,7 @@ export function CartaoProfissional({ p, distancia, origem }: { p: ProfissionalRe
           )}
           {p.abertoAgora === true && <Etiqueta texto="Aberto agora" icone="clock-outline" />}
           {p.destaque && <Etiqueta texto="Destaque" icone="star-four-points" amarela />}
+          {p.catalogoAba ? <Etiqueta texto={p.catalogoAba} /> : null}
           {!p.destaque && (p.fichaCompleta ?? p.cadastrado) && <Etiqueta texto="Ficha completa" icone="check-circle-outline" />}
           {!p.destaque && p.fichaCompleta === false && p.donoConfirmado && <Etiqueta texto="Confirmado pelo dono" icone="check-circle-outline" />}
           {p.verificado && <SeloVerificado compacto />}
@@ -402,6 +409,7 @@ export const estilos = StyleSheet.create({
   cartao: { ...cartao, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 92, marginBottom: 12, overflow: 'hidden' },
   cartaoNome: { fontSize: fonte.normal + 1, fontWeight: '900', color: cores.texto },
   cartaoSub: { fontSize: fonte.pequena, color: cores.textoSuave },
+  cartaoAchou: { fontSize: fonte.pequena, color: cores.verde },
   enfeite: { position: 'absolute', backgroundColor: 'rgba(255,255,255,0.14)' },
   pilula: {
     flexDirection: 'row',

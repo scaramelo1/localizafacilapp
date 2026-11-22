@@ -7,6 +7,7 @@ import { Alert, Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } 
 import { chamar, ORIGENS, reais, registrarContato, type Oferta, type Origem, type Profissional } from '../../api/cliente';
 import { Cabecalho } from '../../componentes/Cabecalho';
 import { CapaComercio } from '../../componentes/CapaComercio';
+import { Catalogo } from '../../componentes/Catalogo';
 import { Horarios } from '../../componentes/Horarios';
 import { Trancado } from '../../componentes/Trancado';
 import { Botao, Estrelas, Etiqueta, Falha, Carregando, SeloVerificado, estilos as ui, useCarregar } from '../../componentes/ui';
@@ -37,6 +38,7 @@ export default function TelaProfissional() {
   );
   // 19/11 (passo 107): convite "Como foi?" (veio do aviso de amanhã ou tocou em WhatsApp/Ligar há 2+ horas)
   const [convite, setConvite] = useState(() => avaliarParam === '1' || deveConvidar(Number(id)));
+  const [aba, setAba] = useState<'info' | 'catalogo'>('info');   // 22/11 (passo 45)
   // volta da tela de avaliar: atualiza as avaliações (a primeira vez já carregou acima)
   const primeira = useRef(true);
   useFocusEffect(
@@ -107,74 +109,92 @@ export default function TelaProfissional() {
             <Text style={estilos.whatsTexto}>Conversar no WhatsApp</Text>
           </Pressable>
         )}
-        {!p.whatsapp && !p.telefone && (
-          <View style={estilos.aviso}>
-            <MaterialCommunityIcons name="phone-outline" size={24} color={cores.verde} />
-            <Text style={[ui.texto, { flex: 1 }]}>Telefone ainda não informado</Text>
+        {/* 22/11 (passo 45): abas Informacoes | Catalogo (so Destaque com 1+ item) */}
+        {p.catalogo ? (
+          <View style={estilos.abas} accessibilityRole="tablist">
+            {(['info', 'catalogo'] as const).map((a) => (
+              <Pressable key={a} accessibilityRole="tab" accessibilityState={{ selected: aba === a }} onPress={() => setAba(a)} style={[estilos.aba, aba === a && estilos.abaAtiva]}>
+                <Text style={[estilos.abaTexto, aba === a && { color: '#fff' }]}>{a === 'info' ? 'Informações' : p.catalogo!.aba}</Text>
+              </Pressable>
+            ))}
           </View>
-        )}
-        {!p.whatsapp && (
-          <Trancado id={p.id} tipo="whatsapp" titulo="WhatsApp" texto="O comércio ainda não informou o WhatsApp." botao="Pedir o WhatsApp ao comércio" />
-        )}
-        {!p.fotos?.length && (
-          <Trancado id={p.id} tipo="fotos" titulo="Fotos" texto="Ainda sem fotos do lugar, dos produtos ou do cardápio." botao="Pedir fotos ao comércio" />
-        )}
-        {!p.descricao && p.servicos.length === 0 && (
-          <Trancado
-            id={p.id}
-            tipo="sobre"
-            titulo="O que faz ou vende"
-            texto="O comércio ainda não contou o que vende ou faz."
-            botao="Pedir detalhes ao comércio"
-          />
-        )}
-
-        {p.descricao ? <Text style={[ui.texto, { marginTop: 16 }]}>{p.descricao}</Text> : null}
-
-        {p.servicos.length > 0 && (
+        ) : null}
+        {aba === 'catalogo' && p.catalogo ? <Catalogo id={p.id} catalogo={p.catalogo} /> : null}
+        {(aba === 'info' || !p.catalogo) && (
           <>
-            <Text style={estilos.secao}>O que faz</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-              {p.servicos.map((s) => (
-                <View key={s} style={estilos.servico}>
-                  <Text style={{ fontSize: fonte.pequena, fontWeight: '700', color: cores.verde }}>{s}</Text>
-                </View>
-              ))}
+          {!p.whatsapp && !p.telefone && (
+            <View style={estilos.aviso}>
+              <MaterialCommunityIcons name="phone-outline" size={24} color={cores.verde} />
+              <Text style={[ui.texto, { flex: 1 }]}>Telefone ainda não informado</Text>
             </View>
-          </>
-        )}
-
-        <View style={estilos.caixa}>
-          {p.endereco || p.bairro ? (
-            <Linha
-              icone="map-marker"
-              texto={p.endereco ?? p.bairro ?? ''}
-              detalhe={[p.endereco ? p.bairro : null, p.cidade].filter(Boolean).join(' · ')}
-              onPress={p.mapa ? () => abrir('mapa', p.mapa!) : undefined}
+          )}
+          {!p.whatsapp && (
+            <Trancado id={p.id} tipo="whatsapp" titulo="WhatsApp" texto="O comércio ainda não informou o WhatsApp." botao="Pedir o WhatsApp ao comércio" />
+          )}
+          {!p.fotos?.length && (
+            <Trancado id={p.id} tipo="fotos" titulo="Fotos" texto="Ainda sem fotos do lugar, dos produtos ou do cardápio." botao="Pedir fotos ao comércio" />
+          )}
+          {!p.descricao && p.servicos.length === 0 && (
+            <Trancado
+              id={p.id}
+              tipo="sobre"
+              titulo="O que faz ou vende"
+              texto="O comércio ainda não contou o que vende ou faz."
+              botao="Pedir detalhes ao comércio"
             />
-          ) : null}
-          {p.telefoneFormatado ? <Linha icone="phone" texto={p.telefoneFormatado} detalhe={p.telefoneCentral ? 'Central de atendimento da rede' : 'Ligar'} onPress={() => abrir('ligar', `tel:${p.telefone}`)} /> : null}
-          {p.instagram ? <Linha icone="instagram" texto="Ver Instagram" onPress={() => abrir('instagram', p.instagram!)} /> : null}
-          {p.site ? <Linha icone="web" texto={siteCurto(p.site)} onPress={() => abrir('site', p.site!)} /> : null}
-          {/* 22/11 (passo 41): pedir pelo iFood / 99Food (o link abre o app deles se estiver instalado) */}
-          {p.ifood ? <Linha icone="moped" texto="Pedir no iFood" detalhe="Abre o iFood" onPress={() => abrir('ifood', p.ifood!)} /> : null}
-          {p.food99 ? <Linha icone="bike-fast" texto="Pedir no 99Food" detalhe="Abre o 99Food" onPress={() => abrir('food99', p.food99!)} /> : null}
-          {p.email ? <Linha icone="email-outline" texto={p.email} onPress={() => abrir('email', `mailto:${p.email}?subject=${encodeURIComponent('Contato pelo Localiza Fácil')}`)} /> : null}
-          {p.atendeEmCasa && <Linha icone="home-outline" texto="Vai até você" />}
-          {p.horarios?.length ? (
-            <Horarios lista={p.horarios} />
-          ) : p.horario ? (
-            <Linha icone="clock-outline" texto="Horário de funcionamento" detalhe={p.horario} ultima />
-          ) : null}
-        </View>
-        {!temHorario && (
-          <Trancado
-            id={p.id}
-            tipo="horario"
-            titulo="Horário de funcionamento"
-            texto="O comércio ainda não informou o horário."
-            botao="Pedir o horário ao comércio"
-          />
+          )}
+
+          {p.descricao ? <Text style={[ui.texto, { marginTop: 16 }]}>{p.descricao}</Text> : null}
+
+          {p.servicos.length > 0 && (
+            <>
+              <Text style={estilos.secao}>O que faz</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                {p.servicos.map((s) => (
+                  <View key={s} style={estilos.servico}>
+                    <Text style={{ fontSize: fonte.pequena, fontWeight: '700', color: cores.verde }}>{s}</Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
+
+          <View style={estilos.caixa}>
+            {p.endereco || p.bairro ? (
+              <Linha
+                icone="map-marker"
+                texto={p.endereco ?? p.bairro ?? ''}
+                detalhe={[p.endereco ? p.bairro : null, p.cidade].filter(Boolean).join(' · ')}
+                onPress={p.mapa ? () => abrir('mapa', p.mapa!) : undefined}
+              />
+            ) : null}
+            {p.telefoneFormatado ? <Linha icone="phone" texto={p.telefoneFormatado} detalhe={p.telefoneCentral ? 'Central de atendimento da rede' : 'Ligar'} onPress={() => abrir('ligar', `tel:${p.telefone}`)} /> : null}
+            {p.instagram ? <Linha icone="instagram" texto="Ver Instagram" onPress={() => abrir('instagram', p.instagram!)} /> : null}
+            {p.site ? <Linha icone="web" texto={siteCurto(p.site)} onPress={() => abrir('site', p.site!)} /> : null}
+            {/* 22/11 (passo 41): pedir pelo iFood / 99Food (o link abre o app deles se estiver instalado) */}
+            {p.ifood ? <Linha icone="moped" texto="Pedir no iFood" detalhe="Abre o iFood" onPress={() => abrir('ifood', p.ifood!)} /> : null}
+            {p.food99 ? <Linha icone="bike-fast" texto="Pedir no 99Food" detalhe="Abre o 99Food" onPress={() => abrir('food99', p.food99!)} /> : null}
+            {p.email ? <Linha icone="email-outline" texto={p.email} onPress={() => abrir('email', `mailto:${p.email}?subject=${encodeURIComponent('Contato pelo Localiza Fácil')}`)} /> : null}
+            {p.atendeEmCasa && <Linha icone="home-outline" texto="Vai até você" />}
+            {p.horarios?.length ? (
+              <Horarios lista={p.horarios} />
+            ) : p.horario ? (
+              <Linha icone="clock-outline" texto="Horário de funcionamento" detalhe={p.horario} ultima />
+            ) : null}
+          </View>
+          {!temHorario && (
+            <Trancado
+              id={p.id}
+              tipo="horario"
+              titulo="Horário de funcionamento"
+              texto="O comércio ainda não informou o horário."
+              botao="Pedir o horário ao comércio"
+            />
+          )}
+            {p.catalogoTrancado ? (
+              <Trancado id={p.id} tipo="catalogo" titulo={p.catalogoTrancado} texto="O comércio ainda não mostra os produtos e preços aqui." botao="Pedir ao comércio" />
+            ) : null}
+          </>
         )}
 
         {p.linkAssumir && (
@@ -367,6 +387,11 @@ function BotaoSalvar({ p, aoMudar }: { p: Profissional; aoMudar: (f: boolean) =>
 }
 
 const estilos = StyleSheet.create({
+  // 22/11 (passo 45): abas Informacoes | Catalogo
+  abas: { flexDirection: 'row', gap: 6, backgroundColor: cores.fundoSuave, borderRadius: 999, padding: 5, marginTop: 16 },
+  aba: { flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 999, paddingVertical: 11, minHeight: 48 },
+  abaAtiva: { backgroundColor: cores.verde },
+  abaTexto: { fontWeight: '900', fontSize: fonte.normal, color: cores.textoSuave },
   cabeca: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingTop: 10 },
   nome: { fontSize: 28, fontWeight: '900', color: cores.texto, lineHeight: 33 },
   tipo: { fontSize: fonte.normal, color: cores.textoSuave },
