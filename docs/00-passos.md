@@ -249,6 +249,8 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     era lido como Google e a mesma pessoa contava 2x ao entrar para avaliar); story.php recusa robôs e está no robots.txt
     (o ClaudeBot pedia centenas de imagens, cada uma roda o Python). Limpeza de 21/11: tiradas 2 duplicadas do login e 1
     robô da Amazon (54.70.53.60, navegador automático que roda JavaScript); apagadas as 66 imagens geradas por robô.
+38. ✅ "Não achou o seu negócio? Inclua o seu negócio de graça" no topo da página inicial, logo abaixo da busca e de
+    "Grátis. Não precisa criar conta" (21/11, pedido do usuário; antes só no fim da página e na busca). Leva a /incluir.php.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

@@ -722,4 +722,11 @@ details.chips-mais .chips { margin: 0 0 4px; }
   opacity: 0; transform: translateY(20px); pointer-events: none; transition: opacity .25s, transform .25s; }
 .dica-compartilhar.visivel { opacity: 1; transform: none; pointer-events: auto; }
 .dica-compartilhar strong { color: var(--amarelo); }
+/* 21/11 (passo 38): "Inclua o seu negócio de graça" no topo da página inicial */
+.hero-incluir { display: inline-flex; align-items: center; gap: 10px; margin: 6px 0 28px; padding: 12px 20px; background: var(--branco);
+  border: 2px dashed var(--verde2); border-radius: 999px; color: var(--texto); text-decoration: none; font-size: 1rem; line-height: 1.35; text-align: left; }
+.hero-incluir b { color: var(--verde); }
+.hero-incluir .seta { font-size: 1.6rem; font-weight: 900; color: var(--verde); line-height: 1; }
+.hero-incluir:hover, .hero-incluir:focus-visible { background: var(--verde-claro); border-style: solid; }
+@media (max-width: 520px) { .hero-incluir { border-radius: 20px; padding: 12px 16px; font-size: .95rem; } }
 
