@@ -336,6 +336,9 @@ admin_inicio('Números', $admin);
   .np-col:hover { background: var(--verde-claro); border-radius: 6px 6px 0 0; }
   .np-eixo { display: flex; gap: clamp(2px, .6vw, 8px); font-size: .7rem; color: var(--texto2); margin-top: 4px; }
   .np-eixo span { flex: 1; text-align: center; min-width: 0; overflow: hidden; white-space: nowrap; }
+  .np-eixo.horas i { font-style: normal; }
+  .np-eixo.horas span { overflow: visible; }
+  @media (max-width: 640px) { .np-eixo.horas { font-size: .55rem; letter-spacing: -.04em; } .np-eixo.horas i { display: none; } }
   .np-legenda { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .85rem; color: var(--texto2); margin: 4px 0 0; }
   .np-legenda i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
   .np-barras { display: grid; gap: 8px; margin-top: 10px; }
@@ -438,7 +441,7 @@ admin_inicio('Números', $admin);
       <?php if ($horas_antes): ?><span class="c" style="height:<?= round(100 * $o / $max_h) ?>%"></span><?php endif ?>
       <span class="a" style="height:<?= round(100 * $v / $max_h) ?>%"></span><?php if ($tem_entradas): ?><span class="b" style="height:<?= round(100 * $e / $max_h) ?>%"></span><?php endif ?></div><?php endforeach ?>
   </div>
-  <div class="np-eixo" aria-hidden="true"><?php foreach (range(0, 23) as $h): ?><span><?= $h % 3 === 0 ? $h . 'h' : '' ?></span><?php endforeach ?></div>
+  <div class="np-eixo horas" aria-hidden="true"><?php foreach (range(0, 23) as $h): ?><span><?= $h ?><i>h</i></span><?php endforeach ?></div>
   <p class="discreto">Horário de Brasília. A coluna clara é a hora de agora; hoje ainda não acabou.
     <a href="entradas-dia.php?<?= h(http_build_query(array_filter(['dia' => $hoje_d, 'origem' => in_array($origem, ORIGENS_SITE, true) ? $origem : '', 'cidade' => $cidade]))) ?>">Relatório completo de hoje ›</a></p>
 <?php else:
@@ -549,7 +552,7 @@ admin_inicio('Números', $admin);
   <div class="np-grafico" style="height:130px" role="img" aria-label="Movimento por hora do dia">
     <?php foreach ($hs as $h => $n): ?><div class="np-col" title="<?= $h ?>h: <?= $n ?>"><span class="a" style="height:<?= round(100 * $n / $max_hs) ?>%"></span></div><?php endforeach ?>
   </div>
-  <div class="np-eixo" aria-hidden="true"><?php foreach (range(0, 23) as $h): ?><span><?= $h % 3 === 0 ? $h . 'h' : '' ?></span><?php endforeach ?></div>
+  <div class="np-eixo horas" aria-hidden="true"><?php foreach (range(0, 23) as $h): ?><span><?= $h ?><i>h</i></span><?php endforeach ?></div>
 </section>
 <?php endif ?>
 
