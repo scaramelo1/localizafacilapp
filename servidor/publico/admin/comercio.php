@@ -215,6 +215,13 @@ admin_inicio('Editar ' . $p['nome'], $admin);
   <input id="site" name="site" maxlength="200" inputmode="url" value="<?= $val('site') ?>">
   <label for="email">E-mail do comércio (aparece na ficha)</label>
   <input id="email" name="email" type="email" maxlength="160" inputmode="email" value="<?= $val('email') ?>">
+  <?php if (e_area_comida((int)($f['categoria_id'] ?? $p['categoria_id']))): // 22/11 (passo 41): pedir pelo iFood e 99Food, só áreas de comida ?>
+  <label for="ifood">Link da página no iFood (opcional)</label>
+  <input id="ifood" name="ifood" maxlength="300" inputmode="url" placeholder="https://www.ifood.com.br/delivery/..." value="<?= $val('ifood') ?>">
+  <label for="food99">Link da página no 99Food (opcional)</label>
+  <input id="food99" name="food99" maxlength="300" inputmode="url" placeholder="https://99app.com/..." value="<?= $val('food99') ?>">
+  <p class="dica">No app do iFood ou do 99Food, abra a sua loja, toque em Compartilhar e copie o link. Na sua ficha aparece o botão "Pedir no iFood" / "Pedir no 99Food".</p>
+  <?php else: ?><input type="hidden" name="ifood" value="<?= $val('ifood') ?>"><input type="hidden" name="food99" value="<?= $val('food99') ?>"><?php endif ?>
   <label for="endereco">Endereço</label>
   <input id="endereco" name="endereco" maxlength="200" value="<?= $val('endereco') ?>">
   <label for="bairro">Bairro</label>

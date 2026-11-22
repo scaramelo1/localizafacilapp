@@ -259,6 +259,15 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     no Grátis, passa pela conferência como os outros) e na edição do admin (precisava, senão salvar apagava). Validado
     com email_valido(). Na ficha: botão "E-mail" no site (mailto, assunto "Contato pelo Localiza Fácil") e linha
     "E-mail" no app 1.15.0; o toque conta como contato 'email' (mudança 038 no enum de contatos, já aplicada).
+41. ✅ iFood e 99Food nas áreas de comida (22/11, pedido do usuário). Mudança 039 (profissionais.ifood e food99, contatos
+    'ifood' e 'food99'), já aplicada. Só Alimentação e Mercados e bebidas (AREAS_COMIDA, e_area_comida()). Campos em
+    "Inclua o seu negócio" (aparecem ao escolher área de comida), no painel do dono (também no Grátis, com conferência) e
+    no admin. link_delivery() aceita só ifood.com.br / 99app.com / 99food, tira o rastreio (?utm, ?share_media) e recusa
+    gestor de pedidos e página inicial. Ficha: botões "Pedir no iFood" (vermelho) e "Pedir no 99Food" (amarelo) no
+    site e linhas no app 1.15.0; o link abre o app deles se estiver instalado; o toque conta como contato.
+    Os 24 comércios que tinham iFood/99 no "site" (vindo do Google): 22 passaram para o campo novo, 2 tiveram o site
+    tirado (gestor de pedidos do iFood; só "99app.com"); 33056 "00 Marmitas" ficou como estava (link é da Mr Pincho
+    Espetaria). importar-leads.php faz o mesmo sozinho daqui para frente.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

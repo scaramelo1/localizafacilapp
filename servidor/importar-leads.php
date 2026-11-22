@@ -261,6 +261,13 @@ foreach ($linhas_html as [, $status, $tipo, $attrs, $tr]) {
         'endereco' => $endereco, 'bairro' => $bairro, 'mapa' => $mapa && preg_match('#^https://(www\.google\.com/maps|maps\.google\.com/)#', $mapa) ? mb_substr($mapa, 0, 500) : null,
         'popularidade' => $popularidade,
     ];
+    // 22/11 (passo 41): link do iFood/99Food que o Google mostra como "site" vai para o campo próprio (botão "Pedir no
+    // iFood"); fora das áreas de comida, ou link que não é a página da loja (gestor de pedidos, só 99app.com), sai do site
+    foreach (['ifood' => '/ifood\.com\.br/i', 'food99' => '/99app\.com|99food/i'] as $dl => $re) {
+        if (!$dados['site'] || !preg_match($re, $dados['site'])) continue;
+        if (($l = link_delivery($dl, $dados['site'])) && e_area_comida((int)$categoria_id)) $dados[$dl] = $l;
+        $dados['site'] = null;
+    }
     // coordenadas exatas: da lista (data-lat/lng) ou do link do Maps (!3d…!4d…, @lat,lng, query=lat,lng); só dentro do Brasil
     // (!3d…!4d… é o ponto do comércio; @lat,lng é só o centro do mapa: vem por último)
     if ($lat_lista === null) foreach (['/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/', '/query=(-?\d+\.\d+)(?:,|%2C)(-?\d+\.\d+)/', '/@(-?\d+\.\d+),(-?\d+\.\d+)/'] as $re) {

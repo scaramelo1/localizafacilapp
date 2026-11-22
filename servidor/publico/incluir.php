@@ -27,7 +27,9 @@ if (e_post() && $pronto) {
         'telefone' => telefone_normalizado(txt('telefone_comercio', 20)), 'whatsapp' => telefone_normalizado(txt('whatsapp', 20)),
         'instagram' => ltrim((string)txt('instagram', 60), '@') ?: null,
         'email' => email_valido(txt('email_comercio', 160)),   // 22/11 (passo 40): aparece na ficha (botão E-mail)
+        'ifood' => link_delivery('ifood', txt('ifood', 300)), 'food99' => link_delivery('food99', txt('food99', 300)),   // 22/11 (passo 41)
     ];
+    if (!e_area_comida($d['categoria_id'])) $d['ifood'] = $d['food99'] = null;   // só áreas de comida
     [$d['horarios'], $erro_hor] = horarios_do_post((array)($_POST['hor'] ?? []));
     $d['horario'] = horarios_texto(horarios_ler($d['horarios']));
     $nome = txt('nome', 120);
@@ -41,6 +43,8 @@ if (e_post() && $pronto) {
     elseif (!isset(CIDADES[$d['cidade']])) $erro = 'Escolha a cidade.';
     elseif (!$d['telefone'] && !$d['whatsapp']) $erro = 'Coloque o telefone ou o WhatsApp do negócio (com DDD).';
     elseif (txt('email_comercio', 160) && !$d['email']) $erro = 'E-mail do negócio: confira o endereço (ex.: contato@seunegocio.com.br).';
+    elseif (e_area_comida($d['categoria_id']) && txt('ifood', 300) && !$d['ifood']) $erro = 'iFood: cole o link da página do seu negócio no iFood (ifood.com.br/delivery/...).';
+    elseif (e_area_comida($d['categoria_id']) && txt('food99', 300) && !$d['food99']) $erro = '99Food: cole o link da página do seu negócio no 99Food (99app.com/...).';
     elseif (!$nome || !$contato) $erro = 'Preencha o seu nome e um telefone com DDD para a equipe confirmar.';
     elseif (!empty($_POST['site_web'])) $enviado = true;   // campo escondido preenchido = robô: finge que deu certo
     elseif ((int)valor('SELECT COUNT(*) FROM pedidos WHERE ip = ? AND criado_em > NOW() - INTERVAL 1 DAY', [ip()]) >= 10) $erro = 'Muitos pedidos hoje. Tente amanhã.';
@@ -102,6 +106,18 @@ pagina_inicio('Incluir meu negócio | Localiza Fácil', 'Inclua o seu negócio n
       <?= horarios_form(horarios_ler(horarios_do_post((array)($f['hor'] ?? []))[0])) ?>
       <label for="instagram">Instagram (opcional)</label>
       <input id="instagram" name="instagram" maxlength="60" placeholder="@seunegocio" value="<?= h($f['instagram'] ?? '') ?>">
+      <?php $ids_comida = array_values(array_filter(array_map('intval', array_column($areas, 'id')), 'e_area_comida')); ?>
+      <div id="campos-comida" data-areas="<?= h(implode(',', $ids_comida)) ?>"<?= in_array((int)($f['area'] ?? 0), $ids_comida, true) ? '' : ' hidden' ?>>
+        <label for="ifood">Link da página no iFood (opcional)</label>
+        <input id="ifood" name="ifood" maxlength="300" inputmode="url" placeholder="https://www.ifood.com.br/delivery/..." value="<?= h($f['ifood'] ?? '') ?>">
+        <label for="food99">Link da página no 99Food (opcional)</label>
+        <input id="food99" name="food99" maxlength="300" inputmode="url" placeholder="https://99app.com/..." value="<?= h($f['food99'] ?? '') ?>">
+        <p class="dica">No app do iFood ou do 99Food, abra a sua loja, toque em Compartilhar e copie o link.</p>
+      </div>
+      <script>(function () {   // 22/11 (passo 41): iFood e 99Food só para áreas de comida
+        var a = document.getElementById('area'), c = document.getElementById('campos-comida'), ids = c.dataset.areas.split(',');
+        a.addEventListener('change', function () { c.hidden = ids.indexOf(a.value) < 0; });
+      })();</script>
       <label for="email_comercio">E-mail do negócio (opcional, aparece na ficha)</label>
       <input id="email_comercio" name="email_comercio" type="email" inputmode="email" maxlength="160" placeholder="contato@seunegocio.com.br" value="<?= h($f['email_comercio'] ?? '') ?>">
       <div hidden><label for="site_web">Não preencha</label><input id="site_web" name="site_web" tabindex="-1" autocomplete="off"></div>

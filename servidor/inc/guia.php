@@ -473,6 +473,9 @@ function prof_completo(array $p, ?int $usuario_id): array {
         'mapa' => $p['mapa'] ?: ($p['endereco'] ? 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($p['endereco'] . ', ' . nome_cidade($p['cidade']) . ' - ' . uf_cidade($p['cidade'])) : null),
         'site' => $p['site'],
         'email' => $p['email'] ?: null,   // 22/11 (passo 40)
+        // 22/11 (passo 41): pedir pelo iFood e pelo 99Food (só áreas de comida)
+        'ifood' => !empty($p['ifood']) && e_area_comida((int)$p['categoria_id']) ? $p['ifood'] : null,
+        'food99' => !empty($p['food99']) && e_area_comida((int)$p['categoria_id']) ? $p['food99'] : null,
         'linkSite' => url_publica(caminho_ficha((int)$p['id'], (string)$p['nome'], (string)$p['cidade'])),   // 19/11: compartilhar no app
         'linkAssumir' => $p['importado'] && !tem_dono($p) ? url_publica('planos.php?id=' . $p['id']) : null,
         'linkRemover' => $p['importado'] && !tem_dono($p) ? url_publica('perfil.php?id=' . $p['id'] . '&acao=remover') : null,
@@ -500,6 +503,36 @@ function prof_completo(array $p, ?int $usuario_id): array {
 function primeiro_nome(string $nome): string {
     $p = preg_split('/\s+/', trim($nome));
     return $p[0] . (isset($p[1]) ? ' ' . mb_strtoupper(mb_substr(end($p), 0, 1)) . '.' : '');
+}
+
+// ---------- iFood e 99Food (22/11, passo 41) ----------
+/** Áreas de comida: só nelas aparecem os campos e os botões de iFood e 99Food. */
+const AREAS_COMIDA = ['alimentacao', 'mercados'];
+function e_area_comida(int $categoria_id): bool {
+    static $ids = null;
+    $ids ??= array_map('intval', array_column(linhas('SELECT id FROM categorias WHERE slug IN (' . implode(',', array_fill(0, count(AREAS_COMIDA), '?')) . ')', AREAS_COMIDA), 'id'));
+    return in_array($categoria_id, $ids, true);
+}
+/**
+ * Confere e limpa o link da página do comércio: 'ifood' só ifood.com.br; 'food99' só 99app.com/99food.
+ * Tira o rastreio (?utm..., ?share_media...). Página de gestão do lojista e a página inicial do app não valem.
+ * Devolve o link limpo ou null.
+ */
+function link_delivery(string $tipo, ?string $url): ?string {
+    $url = trim((string)$url);
+    if ($url === '') return null;
+    if (!preg_match('#^https?://#i', $url)) $url = 'https://' . $url;
+    $u = parse_url($url);
+    $host = strtolower((string)($u['host'] ?? ''));
+    $caminho = (string)($u['path'] ?? '');
+    if ($tipo === 'ifood') {
+        if (!preg_match('/(^|\.)ifood\.com\.br$/', $host) || preg_match('/^(gestordepedidos|portal|parceiros)\./', $host)) return null;
+        if (strlen(trim($caminho, '/')) < 3) return null;   // só "ifood.com.br": não é a página do comércio
+    } else {
+        if (!preg_match('/(^|\.)(99app\.com|99food\.com\.br|99food\.com)$/', $host)) return null;
+        if (strlen(trim($caminho, '/')) < 3) return null;
+    }
+    return mb_substr('https://' . $host . $caminho, 0, 300);
 }
 
 function recalcular_nota(int $profissional_id): void {

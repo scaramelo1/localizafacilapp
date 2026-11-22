@@ -54,7 +54,7 @@ export default function TelaProfissional() {
       </View>
     );
 
-  const abrir = (tipo: 'whatsapp' | 'ligar' | 'instagram' | 'mapa' | 'site' | 'email', link: string) => {
+  const abrir = (tipo: 'whatsapp' | 'ligar' | 'instagram' | 'mapa' | 'site' | 'email' | 'ifood' | 'food99', link: string) => {
     registrarContato(p.id, tipo);
     if (tipo === 'whatsapp' || tipo === 'ligar') lembrarContato({ id: p.id, nome: p.nome, jaAvaliou: !!p.minhaAvaliacao }).catch(() => {});
     Linking.openURL(link).catch(() => Alert.alert('Não foi possível abrir', 'Confira se o aplicativo está instalado.'));
@@ -156,6 +156,9 @@ export default function TelaProfissional() {
           {p.telefoneFormatado ? <Linha icone="phone" texto={p.telefoneFormatado} detalhe={p.telefoneCentral ? 'Central de atendimento da rede' : 'Ligar'} onPress={() => abrir('ligar', `tel:${p.telefone}`)} /> : null}
           {p.instagram ? <Linha icone="instagram" texto="Ver Instagram" onPress={() => abrir('instagram', p.instagram!)} /> : null}
           {p.site ? <Linha icone="web" texto={siteCurto(p.site)} onPress={() => abrir('site', p.site!)} /> : null}
+          {/* 22/11 (passo 41): pedir pelo iFood / 99Food (o link abre o app deles se estiver instalado) */}
+          {p.ifood ? <Linha icone="moped" texto="Pedir no iFood" detalhe="Abre o iFood" onPress={() => abrir('ifood', p.ifood!)} /> : null}
+          {p.food99 ? <Linha icone="bike-fast" texto="Pedir no 99Food" detalhe="Abre o 99Food" onPress={() => abrir('food99', p.food99!)} /> : null}
           {p.email ? <Linha icone="email-outline" texto={p.email} onPress={() => abrir('email', `mailto:${p.email}?subject=${encodeURIComponent('Contato pelo Localiza Fácil')}`)} /> : null}
           {p.atendeEmCasa && <Linha icone="home-outline" texto="Vai até você" />}
           {p.horarios?.length ? (

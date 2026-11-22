@@ -17,6 +17,8 @@ const CAMPOS_DONO = [
     'instagram' => ['Instagram', 60],
     'site' => ['Site', 200],
     'email' => ['E-mail do comércio', 160],   // 22/11 (passo 40): aparece na ficha (botão E-mail)
+    'ifood' => ['Página no iFood', 300],   // 22/11 (passo 41): só áreas de comida
+    'food99' => ['Página no 99Food', 300],
     'endereco' => ['Endereço', 200],
     'bairro' => ['Bairro', 80],
     'horario' => ['Horário (texto)', 400],   // pedidos antigos; hoje é gerado a partir de "horarios"
@@ -29,7 +31,7 @@ const MAX_FOTOS = 10;   // fotos na galeria de cada comércio (Destaque)
 const MAX_FOTOS_BASICO = 2;   // 17/11 (pedido do usuário): Básico até 2 fotos, Destaque até 10 (max_fotos_plano() em inc/guia.php)
 // Plano Grátis (17/11, passo 78): o dono sem Básico/Destaque só muda o que já vem do Google. O resto é do Básico.
 // 17/11: "Atende em casa / faz entrega" saiu do Grátis (pedido do usuário): fica no Básico e no Destaque
-const CAMPOS_GRATIS = ['nome', 'telefone', 'whatsapp', 'site', 'email', 'endereco', 'bairro', 'horario', 'horarios'];
+const CAMPOS_GRATIS = ['nome', 'telefone', 'whatsapp', 'site', 'email', 'ifood', 'food99', 'endereco', 'bairro', 'horario', 'horarios'];
 const CAMPOS_SO_BASICO = ['descricao', 'servicos', 'instagram', 'foto', 'fotos', 'atende_em_casa'];
 
 // ---------- registro ----------
@@ -230,6 +232,8 @@ function limpar_campos_dono(array $post): array {
         if (!filter_var($v['site'], FILTER_VALIDATE_URL)) return [$v, 'Site: endereço inválido.'];
     }
     if ($v['email'] !== null && !($v['email'] = email_valido($v['email']))) return [$v, 'E-mail: confira o endereço (ex.: contato@seucomercio.com.br).'];
+    if ($v['ifood'] !== null && !($v['ifood'] = link_delivery('ifood', $v['ifood']))) return [$v, 'iFood: cole o link da página do seu comércio no iFood (ifood.com.br/delivery/...).'];
+    if ($v['food99'] !== null && !($v['food99'] = link_delivery('food99', $v['food99']))) return [$v, '99Food: cole o link da página do seu comércio no 99Food (99app.com/...).'];
     return [$v, null];
 }
 

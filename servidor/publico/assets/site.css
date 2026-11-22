@@ -746,4 +746,7 @@ details.chips-mais .chips { margin: 0 0 4px; }
   .nav-longo { display: none; }
   .nav-curto { display: inline; }
 }
+/* 22/11 (passo 41): pedir pelo iFood / 99Food na ficha */
+.botao.botao-ifood { background: #ea1d2c; color: #fff; border-color: #ea1d2c; }
+.botao.botao-99food { background: #ffdd00; color: #1a1a1a; border-color: #ffdd00; }
 

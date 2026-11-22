@@ -149,6 +149,9 @@ export interface Profissional extends ProfissionalResumo {
   linkSite?: string | null;
   /** E-mail do comercio (22/11). Servidor antigo nao manda. */
   email?: string | null;
+  /** Pagina do comercio no iFood e no 99Food (22/11, so areas de comida). */
+  ifood?: string | null;
+  food99?: string | null;
   /** Oferta da semana no ar (so Destaque). */
   oferta?: Oferta | null;
   minhaAvaliacao: { estrelas: number; comentario: string | null } | null;
@@ -320,7 +323,7 @@ export async function chamar<T>(caminho: string, metodo: 'GET' | 'POST' | 'DELET
 }
 
 /** Conta toques em WhatsApp, ligar etc. (estatística para o profissional). Falha em silêncio. */
-export function registrarContato(id: number, tipo: 'whatsapp' | 'ligar' | 'instagram' | 'mapa' | 'site' | 'email' | 'compartilhar') {
+export function registrarContato(id: number, tipo: 'whatsapp' | 'ligar' | 'instagram' | 'mapa' | 'site' | 'email' | 'ifood' | 'food99' | 'compartilhar') {
   chamar('contato.php', 'POST', { id, tipo, origem: 'app' }).catch(() => {});
 }
 
