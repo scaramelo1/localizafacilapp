@@ -4,7 +4,7 @@ require __DIR__ . '/../inc/base.php';
 require __DIR__ . '/../inc/pagina.php';
 require_once __DIR__ . '/../inc/ofertas.php';   // 19/11: preço e regras da Oferta da semana
 $base = config()['url'];
-pagina_inicio('Termos de uso | Localiza Fácil', 'Regras de uso do app Localiza Fácil, para quem procura e para profissionais.');
+pagina_inicio('Termos de uso | Localiza Fácil App', 'Regras de uso do app Localiza Fácil, para quem procura e para profissionais.');
 ?>
 <main class="documento">
   <h1>Termos de uso</h1>

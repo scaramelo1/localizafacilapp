@@ -65,7 +65,7 @@ if (e_post() && $pronto) {
 }
 
 $sel = fn(string $campo, $valor) => (string)($f[$campo] ?? '') === (string)$valor ? ' selected' : '';
-pagina_inicio('Incluir meu negócio | Localiza Fácil', 'Inclua o seu negócio no Localiza Fácil de graça.');
+pagina_inicio('Incluir meu negócio | Localiza Fácil App', 'Inclua o seu negócio no Localiza Fácil de graça.');
 ?>
 <main class="documento">
   <h1>Incluir meu negócio</h1>

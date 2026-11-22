@@ -48,7 +48,7 @@ continua).
 
 ## 2. Textos da ficha (Localiza Fácil desde 21/11; antes "Acha Fácil!")
 
-**Nome:** Localiza Fácil (App Store: até 30 caracteres; se o nome estiver ocupado, usar "Localiza Fácil - Comércio Local")
+**Nome:** Localiza Fácil App (22/11, nome da marca; até 30 caracteres. Opção mais longa: "Localiza Fácil App: Comércio" = 28). O nome embaixo do ícone no celular continua "Localiza Fácil" (app.json), porque o Android corta nomes longos.
 
 **Subtítulo (App Store, até 30):** O comércio da sua cidade
 

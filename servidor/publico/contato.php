@@ -44,7 +44,7 @@ if (e_post() && $pronto) {
 }
 
 $sel = fn(string $campo, $valor) => (string)($f[$campo] ?? '') === (string)$valor ? ' selected' : '';
-pagina_inicio('Fale conosco | Localiza Fácil', 'Mande uma mensagem para a equipe do Localiza Fácil: dúvidas, informação errada, planos ou sugestões.');
+pagina_inicio('Fale conosco | Localiza Fácil App', 'Mande uma mensagem para a equipe do Localiza Fácil: dúvidas, informação errada, planos ou sugestões.');
 ?>
 <main class="documento">
   <h1>Fale conosco</h1>

@@ -63,7 +63,7 @@ if (e_post() && $pronto) {
 
 $sel = fn(string $campo, $valor) => (string)($f[$campo] ?? '') === (string)$valor ? ' selected' : '';
 $v = fn(string $campo) => h((string)($f[$campo] ?? ''));
-pagina_inicio('Divulgar um evento | Localiza Fácil', 'Divulgue de graça o seu show, festa, feira ou encontro na agenda de eventos do Localiza Fácil.');
+pagina_inicio('Divulgar um evento | Localiza Fácil App', 'Divulgue de graça o seu show, festa, feira ou encontro na agenda de eventos do Localiza Fácil.');
 ?>
 <main class="documento">
   <h1>Divulgar um evento</h1>

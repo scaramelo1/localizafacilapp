@@ -73,7 +73,7 @@ function exigir_login_web(string $titulo, string $explicacao): array {
     $volta = (string)($_SERVER['REQUEST_URI'] ?? '/');
     $base = config()['url'];
     if ($base !== '' && str_starts_with($volta, $base)) $volta = substr($volta, strlen($base)) ?: '/';
-    pagina_inicio("$titulo | Localiza Fácil", 'Entre com o Google para continuar.', '', ['noindex' => true]);
+    pagina_inicio("$titulo | Localiza Fácil App", 'Entre com o Google para continuar.', '', ['noindex' => true]);
     echo '<main class="documento"><h1>' . h($titulo) . '</h1>'
         . '<p>' . h($explicacao) . '</p>'
         . '<p>Para continuar, <strong>entre com a sua conta Google</strong>. Assim avisamos você no celular quando o pedido for aceito.</p>'

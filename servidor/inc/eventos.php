@@ -156,7 +156,7 @@ function web_pagina_eventos(string $cidade): void {
     $ld = ['@context' => 'https://schema.org', '@type' => 'ItemList', 'name' => "Eventos em $nome - $uf",
         'itemListElement' => array_map(fn($e, $i) => ['@type' => 'ListItem', 'position' => $i + 1, 'url' => web_absoluta(url_evento($e)), 'name' => $e['titulo']],
             $eventos, array_keys($eventos))];
-    pagina_inicio("Eventos em $nome - $uf: agenda | Localiza Fácil",
+    pagina_inicio("Eventos em $nome - $uf: agenda | Localiza Fácil App",
         "Agenda de eventos em $nome ($uf): shows, festas, feiras e programação da cidade, em ordem de data, com local, horário e link oficial.",
         'web', ['canonica' => web_absoluta(url_eventos($cidade)), 'head' => web_json_ld($ld_trilha, $ld), 'anuncios' => true,
             'noindex' => !$eventos || !cidade_no_google($cidade)]);   // Plano D, passo 7: cidade fechada fica fora   // 16/11: agenda vazia fica fora do Google e volta sozinha quando tiver evento
@@ -226,7 +226,7 @@ function web_pagina_evento(array $e): void {
 
     $descricao = $e['titulo'] . ' em ' . $nome_cidade . ' (' . $uf . '): ' . $quando . ($hr ? ", $hr" : '') . ($onde ? ", $onde" : '') . '.'
         . ($e['descricao'] ? ' ' . mb_substr(preg_replace('/\s+/u', ' ', $e['descricao']), 0, 160) : '');
-    pagina_inicio($e['titulo'] . " - $nome_cidade | Eventos | Localiza Fácil", mb_substr($descricao, 0, 300), 'web',
+    pagina_inicio($e['titulo'] . " - $nome_cidade | Eventos | Localiza Fácil App", mb_substr($descricao, 0, 300), 'web',
         ['canonica' => $url, 'imagem' => $imagem, 'noindex' => $terminou || !cidade_no_google((string)$e['cidade']), 'head' => web_json_ld($ld, $ld_trilha), 'anuncios' => true]);
     ?>
 <main class="ficha">

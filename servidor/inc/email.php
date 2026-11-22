@@ -117,7 +117,7 @@ function email_html(array $e): string {
     $logo = url_publica('assets/logo.png');
     $rodape = $e['tipo'] === 'equipe'
         ? 'Você recebeu este e-mail porque tem cadastro no Localiza Fácil. <a href="' . h(email_link_descadastro($e['para'])) . '" style="color:#5B675F">Não quero mais receber</a>.'
-        : 'Localiza Fácil · O comércio da sua cidade, pertinho de você.';
+        : 'Localiza Fácil App · O comércio da sua cidade, pertinho de você.';
     return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>'
         . '<body style="margin:0;background:#F4F6F1;font-family:Arial,Helvetica,sans-serif;color:#123222">'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F4F6F1"><tr><td align="center" style="padding:24px 12px">'
@@ -137,7 +137,7 @@ function email_mensagem(array $e): string {
     $limite = '=_lf_' . bin2hex(random_bytes(12));
     $texto = $e['texto'] . ($e['tipo'] === 'equipe' ? "\n\n--\nNão quer mais receber? " . email_link_descadastro($e['para']) : '');
     $cab = [
-        'From' => email_endereco($de, 'Localiza Fácil'),
+        'From' => email_endereco($de, 'Localiza Fácil App'),
         'To' => email_endereco($e['para'], $e['nome'] ?? null),
         'Subject' => email_cabecalho_utf8($e['assunto']),
         'Date' => date('r'),

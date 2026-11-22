@@ -50,13 +50,13 @@ foreach ($por_uf as &$cidades_do_uf) uksort($cidades_do_uf, fn($a, $b) => strcmp
 unset($cidades_do_uf);
 
 // dados do site para o Google (16/11): nome do site e marca nos resultados
-$ld_site = ['@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => 'Localiza Fácil', 'alternateName' => 'Localiza Fácil',
+$ld_site = ['@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => 'Localiza Fácil App', 'alternateName' => ['Localiza Fácil', 'localizafacilapp.com.br'],
     'url' => url_publica(), 'inLanguage' => 'pt-BR'];
-$ld_org = ['@context' => 'https://schema.org', '@type' => 'Organization', 'name' => 'Localiza Fácil', 'url' => url_publica(),
+$ld_org = ['@context' => 'https://schema.org', '@type' => 'Organization', 'name' => 'Localiza Fácil App', 'alternateName' => 'Localiza Fácil', 'url' => url_publica(),
     'logo' => url_publica('assets/logo.png?v=2'), 'slogan' => 'O comércio da sua cidade, pertinho de você.'];
 // descrição até ~155 caracteres (o Google corta perto de 160)
 $mil = $total >= 1000 ? number_format(intdiv($total, 1000), 0, ',', '.') . ' mil' : (string)$total;
-pagina_inicio('Localiza Fácil: o comércio da sua cidade no seu celular',
+pagina_inicio('Localiza Fácil App: o comércio da sua cidade no seu celular',
     "Guia grátis com $mil comércios em " . count(CIDADES) . ' cidades de ' . implode(' e ', array_keys($por_uf)) . '. Ache restaurante, mercado, oficina ou clínica e chame no WhatsApp.',
     '', ['anuncios' => true, 'head' => web_json_ld($ld_site, $ld_org)]);
 ?>

@@ -89,7 +89,7 @@ $item_html = function (array $it, string $sec) use ($mod, $val, $preco_campo): s
     <?php return (string)ob_get_clean();
 };
 
-pagina_inicio($mod['titulo'] . ' | Painel | Localiza Fácil', 'Monte o catálogo do seu comércio no Localiza Fácil.');
+pagina_inicio($mod['titulo'] . ' | Painel | Localiza Fácil App', 'Monte o catálogo do seu comércio no Localiza Fácil.');
 ?>
 <main class="documento catalogo-editor">
   <p><a href="<?= h(url('painel/')) ?>">&larr; Painel do comércio</a><?php if ($admin && isset($_GET['id'])): ?> · <a href="<?= h(url('admin/comercio.php?id=' . $pid)) ?>">editar no admin</a><?php endif ?></p>

@@ -51,7 +51,7 @@ $planos = [
 ];
 if (!plano_site_pronto()) unset($planos['site']);
 
-pagina_inicio('Planos para o seu negócio | Localiza Fácil', 'Corrija os dados, coloque fotos, apareça em destaque e tenha um site próprio com o Localiza Fácil.');
+pagina_inicio('Planos para o seu negócio | Localiza Fácil App', 'Corrija os dados, coloque fotos, apareça em destaque e tenha um site próprio com o Localiza Fácil.');
 ?>
 <main class="documento" style="max-width:1200px">
   <h1>Planos para o seu negócio</h1>

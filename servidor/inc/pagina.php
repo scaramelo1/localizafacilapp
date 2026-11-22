@@ -69,6 +69,8 @@ function pagina_inicio(string $titulo, string $descricao, string $classe = '', a
 <?php endif ?>
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Localiza Fácil App">
+<meta name="application-name" content="Localiza Fácil App">
 <link rel="icon" href="<?= $base ?>/assets/favicon.ico?v=2" sizes="any">
 <link rel="icon" type="image/png" sizes="192x192" href="<?= $base ?>/assets/favicon.png?v=2">
 <link rel="apple-touch-icon" href="<?= $base ?>/assets/apple-touch-icon.png?v=2">
@@ -119,11 +121,11 @@ function pagina_fim(): void {
     $base = config()['url'];
     ?>
 <footer class="rodape">
-  <p class="rodape-marca"><img src="<?= $base ?>/assets/logo.png?v=2" alt="" width="36" height="36"> <strong>Localiza <b>Fácil</b></strong></p>
+  <p class="rodape-marca"><img src="<?= $base ?>/assets/logo.png?v=2" alt="" width="36" height="36"> <strong>Localiza <b>Fácil</b> App</strong></p>
   <p class="lema">O comércio da sua cidade, pertinho de você.</p>
   <p>Atendemos <?= h(resumo_cidades(true)) ?> · <a href="<?= $base ?>/#cidades">Ver as cidades</a></p>
   <p><a href="<?= $base ?>/contato.php">Fale conosco</a> · <a href="<?= $base ?>/busca.php">Procurar meu negócio</a> · <a href="<?= $base ?>/termos.php">Termos de uso</a> · <a href="<?= $base ?>/privacidade.php">Privacidade</a> · <a href="<?= $base ?>/privacidade.php#excluir-conta">Excluir minha conta</a></p>
-  <p class="discreto">Localiza Fácil · <?= date('Y') ?></p>
+  <p class="discreto">Localiza Fácil App · <?= date('Y') ?></p>
 </footer>
 <div class="convite-avaliar" id="convite-avaliar" hidden>
   <span class="convite-estrela" aria-hidden="true">★</span>

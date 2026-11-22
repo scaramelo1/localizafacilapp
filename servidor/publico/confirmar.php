@@ -48,7 +48,7 @@ if ($achado && e_post()) {
     q('UPDATE confirmacao_links SET aberto_em = NOW() WHERE id = ?', [(int)$achado['link']['id']]);
 }
 
-pagina_inicio('Confirme os dados do seu comércio | Localiza Fácil', 'Confira os dados do seu comércio no Localiza Fácil.', '', ['noindex' => true]);
+pagina_inicio('Confirme os dados do seu comércio | Localiza Fácil App', 'Confira os dados do seu comércio no Localiza Fácil.', '', ['noindex' => true]);
 $base = config()['url'];
 ?>
 <main class="documento">

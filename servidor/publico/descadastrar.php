@@ -17,7 +17,7 @@ if (e_post() && $valido) {
     if (($_POST['List-Unsubscribe'] ?? '') === 'One-Click') { http_response_code(200); exit('ok'); }
 }
 
-pagina_inicio('Não receber mais e-mails | Localiza Fácil', 'Parar de receber os e-mails da equipe do Localiza Fácil.', '', ['noindex' => true]);
+pagina_inicio('Não receber mais e-mails | Localiza Fácil App', 'Parar de receber os e-mails da equipe do Localiza Fácil.', '', ['noindex' => true]);
 ?>
 <main class="documento">
   <h1>Não receber mais e-mails</h1>

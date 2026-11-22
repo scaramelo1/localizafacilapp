@@ -348,3 +348,8 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 - Ter as mesmas páginas abertas para o Google nos dois domínios ao mesmo tempo.
 - Publicar dados do Google Maps como se fossem nossos.
 - Pedir indexação em massa no Search Console.
+54. ✅ Nome da marca "Localiza Fácil App" (22/11, pedido do usuário). Site: títulos das páginas ("... | Localiza Fácil App"),
+    título da inicial, WebSite/Organization para o Google (nome "Localiza Fácil App", alternativo "Localiza Fácil"),
+    og:site_name e application-name, 1º item da trilha, rodapé e e-mails (remetente e rodapé). O topo continua
+    "Localiza Fácil" (cabe no celular) e os textos corridos ("no Localiza Fácil") ficaram como estavam. App: o nome embaixo
+    do ícone continua "Localiza Fácil" (app.json; o Android corta nome longo); na Play o nome é "Localiza Fácil App" (docs/lojas.md).

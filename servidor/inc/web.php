@@ -173,7 +173,7 @@ function web_qtd(int $n, string $um, string $varios): string { return web_num($n
 /** Trilha "Início › Cidade › Área" (HTML + dados estruturados BreadcrumbList). $itens: [[nome, url relativa ou null]]. */
 function web_trilha(array $itens): array {
     $html = '<nav class="trilha" aria-label="Você está em"><a href="' . h(url()) . '">Início</a>';
-    $ld = [['@type' => 'ListItem', 'position' => 1, 'name' => 'Localiza Fácil', 'item' => url_publica()]];
+    $ld = [['@type' => 'ListItem', 'position' => 1, 'name' => 'Localiza Fácil App', 'item' => url_publica()]];
     foreach ($itens as $i => [$nome, $link]) {
         $html .= ' <span aria-hidden="true">›</span> ' . ($link ? '<a href="' . h($link) . '">' . h($nome) . '</a>' : '<span aria-current="page">' . h($nome) . '</span>');
         $item = ['@type' => 'ListItem', 'position' => $i + 2, 'name' => $nome];
@@ -305,7 +305,7 @@ function web_pagina_cidade(string $cidade): void {
         WHERE ' . visivel($cidade) . ' AND NOT ' . SQL_DESTAQUE . ' ORDER BY p.popularidade + p.total_avaliacoes * 5 DESC LIMIT 60) t
         ORDER BY RAND(?) LIMIT 12', [semente_dia()]);
     [$trilha, $ld] = web_trilha([["$nome - $uf", null]]);
-    pagina_inicio("Comércios e serviços em $nome - $uf | Localiza Fácil",
+    pagina_inicio("Comércios e serviços em $nome - $uf | Localiza Fácil App",
         web_num($total) . " comércios e serviços de $nome ($uf): restaurantes, mercados, oficinas, clínicas, lojas e muito mais. Endereço, horário e WhatsApp.",
         'web', ['canonica' => web_absoluta(url_cidade($cidade)), 'head' => web_json_ld($ld), 'anuncios' => true,
             'noindex' => !cidade_no_google($cidade)]);   // Plano D, passo 7
@@ -377,7 +377,7 @@ function web_pagina_lista(string $cidade, array $area, ?string $tipo, ?string $b
     $tipos = $tipo === null ? web_tipos($cidade, (int)$area['id']) : [];
     $bairros = web_bairros($cidade, (int)$area['id'], $tipo);
     $qtd = web_qtd($total, 'lugar', 'lugares');
-    $titulo = ($tipo !== null ? "$tipo em $nome_cidade - $uf" : "{$area['nome']} em $nome_cidade - $uf") . ($pagina > 1 ? " (página $pagina)" : '') . ' | Localiza Fácil';
+    $titulo = ($tipo !== null ? "$tipo em $nome_cidade - $uf" : "{$area['nome']} em $nome_cidade - $uf") . ($pagina > 1 ? " (página $pagina)" : '') . ' | Localiza Fácil App';
     $descricao = "$qtd de " . mb_strtolower($titulo_lista) . " em $nome_cidade ($uf): endereço, horário, WhatsApp e avaliações. Veja quem está aberto e chame direto.";
     // não vai para o Google: filtro de bairro e tipo com poucos comércios
     $noindex = $aberto || $bairro !== null || ($tipo !== null && $total < WEB_TIPO_MINIMO)
@@ -1112,7 +1112,7 @@ document.querySelectorAll('[data-contato]').forEach(function (a) {
 /**
  * Título da ficha para o Google (19/11, passo 117, avaliação item 4): até ~65 letras, que é o que o Google mostra sem cortar.
  * Tira a cidade do fim do nome ("Spani Atacadista São João da Boa Vista" -> "Spani Atacadista") e vai encurtando:
- *   "Nome - Tipo em Cidade | Localiza Fácil" -> "Nome - Tipo em Cidade" -> "Nome em Cidade" -> "Nome - Tipo" -> "Nome" (cortado).
+ *   "Nome - Tipo em Cidade | Localiza Fácil App" -> "Nome - Tipo em Cidade" -> "Nome em Cidade" -> "Nome - Tipo" -> "Nome" (cortado).
  */
 function web_titulo_ficha(string $nome, string $tipo, string $cidade, int $max = 65): string {
     $nome = trim($nome);
@@ -1123,10 +1123,10 @@ function web_titulo_ficha(string $nome, string $tipo, string $cidade, int $max =
     $tipo = trim($tipo);
     $opcoes = [];
     if ($tipo !== '' && mb_stripos($nome, $tipo) === false) {
-        $opcoes[] = "$nome - $tipo em $cidade | Localiza Fácil";
+        $opcoes[] = "$nome - $tipo em $cidade | Localiza Fácil App";
         $opcoes[] = "$nome - $tipo em $cidade";
     }
-    $opcoes[] = "$nome em $cidade | Localiza Fácil";
+    $opcoes[] = "$nome em $cidade | Localiza Fácil App";
     $opcoes[] = "$nome em $cidade";
     if ($tipo !== '' && mb_stripos($nome, $tipo) === false) $opcoes[] = "$nome - $tipo";
     foreach ($opcoes as $o) if (mb_strlen($o) <= $max) return $o;
@@ -1148,7 +1148,7 @@ function web_pagina_busca(string $cidade, string $termo, bool $aberto = false): 
     }
     $url_busca = url(cidade_web($cidade) . '/buscar');
     [$trilha] = web_trilha([["$nome_cidade - $uf", url_cidade($cidade)], ['Busca', null]]);
-    pagina_inicio("Procurar em $nome_cidade | Localiza Fácil", "Procure comércios e serviços em $nome_cidade ($uf).", 'web',
+    pagina_inicio("Procurar em $nome_cidade | Localiza Fácil App", "Procure comércios e serviços em $nome_cidade ($uf).", 'web',
         ['canonica' => web_absoluta(url_cidade($cidade)), 'noindex' => true, 'anuncios' => true]);
     ?>
 <main>
@@ -1229,7 +1229,7 @@ function web_busca_sem_resultado(string $cidade, string $termo): string {
 /** Página não encontrada (404 de verdade, sem ir para o Google). */
 function web_pagina_404(): void {
     http_response_code(404);
-    pagina_inicio('Página não encontrada | Localiza Fácil', 'Esta página não existe ou o comércio saiu do Localiza Fácil.', 'web', ['noindex' => true, 'canonica' => url_publica()]);
+    pagina_inicio('Página não encontrada | Localiza Fácil App', 'Esta página não existe ou o comércio saiu do Localiza Fácil.', 'web', ['noindex' => true, 'canonica' => url_publica()]);
     ?>
 <main class="documento">
   <h1>Página não encontrada</h1>

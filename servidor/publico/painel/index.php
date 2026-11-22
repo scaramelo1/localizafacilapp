@@ -121,7 +121,7 @@ if ($erro) $f = array_merge($f, $valores);
 $val = fn(string $c) => h($f[$c] ?? '');
 $galeria_form = lista_fotos($f['fotos'] ?? null);
 
-pagina_inicio('Painel do comércio | Localiza Fácil', 'Painel do dono do comércio no Localiza Fácil.');
+pagina_inicio('Painel do comércio | Localiza Fácil App', 'Painel do dono do comércio no Localiza Fácil.');
 ?>
 <main class="documento">
 <?php mostrar_flash(); ?>

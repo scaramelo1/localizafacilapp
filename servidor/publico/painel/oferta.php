@@ -96,7 +96,7 @@ if (e_post()) {
     }
 }
 
-pagina_inicio('Oferta da semana | Localiza Fácil', 'Oferta da semana do seu comércio no Localiza Fácil.', '', ['noindex' => true]);
+pagina_inicio('Oferta da semana | Localiza Fácil App', 'Oferta da semana do seu comércio no Localiza Fácil.', '', ['noindex' => true]);
 $v = fn(string $k) => h((string)($dados[$k] ?? ''));
 $preco_campo = fn(string $k) => isset($dados[$k]) && $dados[$k] !== null && $dados[$k] !== 'erro' ? h(number_format((float)$dados[$k], 2, ',', '')) : '';
 $pode_escrever = !$o || in_array($o['status'], ['aguardando_pagamento', 'recusada'], true);
