@@ -333,6 +333,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     (enviar por Admin > E-mails > Um e-mail só).
     Ficha de teste 103623 "Lanchonete Exemplo 2 (teste de pedidos)": cópia da 103616 (mesmo cardápio), pausada, só
     admin vê, pedidos para o WhatsApp 19992799811. NÃO APAGAR: fica pausada para futuros testes (pedido do usuário).
+51. ✅ Aviso de avaliação (22/11): conferido que o aviso da avaliação da Sr Burgers saiu (e-mail ao dono enviado; aviso
+    aos admins disparado). 2 aparelhos mortos do admin removidos. Registro de cada aviso no celular em
+    /var/lib/guia-novo/avisos-enviados.log (últimos 500).
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

@@ -87,5 +87,12 @@ function expo_enviar(array $tokens, string $titulo, string $texto, array $dados,
             $falhas += count($lote);
         }
     }
+    // 22/11: registro de cada envio (para conferir se um aviso saiu), guarda só os últimos 500
+    try {
+        $arq = config()['dados_dir'] . '/avisos-enviados.log';
+        $linhas = is_file($arq) ? array_slice(file($arq, FILE_IGNORE_NEW_LINES) ?: [], -499) : [];
+        $linhas[] = date('Y-m-d H:i:s') . " [$canal] " . count($tokens) . " aparelho(s), $ok ok, $falhas falha(s): " . mb_substr($titulo, 0, 80);
+        @file_put_contents($arq, implode("\n", $linhas) . "\n", LOCK_EX);
+    } catch (Throwable) {}
     return [$ok, $falhas];
 }
