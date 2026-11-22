@@ -76,14 +76,14 @@ function pagina_inicio(string $titulo, string $descricao, string $classe = '', a
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap">
-<link rel="stylesheet" href="<?= $base ?>/assets/site.css?v=56">
+<link rel="stylesheet" href="<?= $base ?>/assets/site.css?v=58">
 <?= $opc['head'] ?? '' ?>
 <?= !empty($opc['anuncios']) ? anuncios_head() : '' ?>
 </head>
 <body class="<?= h($classe) ?>">
 <header class="topo">
   <a class="marca" href="<?= $base ?>/"><img src="<?= $base ?>/assets/logo.png?v=2" alt="" width="40" height="40"><span>Localiza <b>Fácil</b></span></a>
-  <nav><a href="<?= $base ?>/#cidades">Cidades</a><a href="<?= $base ?>/#seu-negocio">Seu negócio</a><a href="<?= $base ?>/#baixar" class="nav-botao">Baixar o app</a>
+  <nav><a href="<?= $base ?>/#cidades">Cidades</a><a href="<?= $base ?>/#seu-negocio">Seu negócio</a><a href="<?= $base ?>/#baixar" class="nav-botao" aria-label="Baixar o app"><span class="nav-longo">Baixar o app</span><span class="nav-curto" aria-hidden="true">📲 App</span></a>
     <a href="<?= $base ?>/entrar.php" class="nav-conta" id="conta-topo" rel="nofollow">Entrar</a></nav>
 </header>
 <script>
@@ -102,7 +102,9 @@ function pagina_inicio(string $titulo, string $descricao, string $classe = '', a
       if (j.usuario.foto) { var i = document.createElement('img'); i.src = j.usuario.foto; i.alt = ''; i.referrerPolicy = 'no-referrer';
         i.onerror = function () { i.remove(); }; a.appendChild(i); }
       var s = document.createElement('span'); s.textContent = nome || 'Minha conta'; a.appendChild(s);
-      if (j.usuario.admin) { var ad = document.createElement('a'); ad.href = base + '/admin/'; ad.className = 'nav-admin'; ad.textContent = 'Administração';
+      if (j.usuario.admin) { var ad = document.createElement('a'); ad.href = base + '/admin/'; ad.className = 'nav-admin'; ad.title = 'Administração';
+        // 21/11 (passo 39): no celular fica só a engrenagem, para não cobrir o nome Localiza Fácil
+        ad.innerHTML = '<span aria-hidden="true">⚙️</span><span class="nav-texto"> Administração</span>';
         a.parentNode.insertBefore(ad, a);
         // lápis de editar na ficha (16/11): fica escondido na página em cache e só aparece para admin
         var mostrar = function () { document.querySelectorAll('[data-so-admin]').forEach(function (e) { e.hidden = false; }); };

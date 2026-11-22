@@ -251,6 +251,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     robô da Amazon (54.70.53.60, navegador automático que roda JavaScript); apagadas as 66 imagens geradas por robô.
 38. ✅ "Não achou o seu negócio? Inclua o seu negócio de graça" no topo da página inicial, logo abaixo da busca e de
     "Grátis. Não precisa criar conta" (21/11, pedido do usuário; antes só no fim da página e na busca). Leva a /incluir.php.
+39. ✅ Topo do site no celular sem cobrir a marca (21/11, pedido do usuário; com admin logado "Baixar o app" ficava por cima
+    de "Localiza Fácil"): até 760 px a marca fica em duas linhas (Localiza / Fácil), "Baixar o app" vira "📲 App" e
+    "Administração" vira só ⚙️ (texto inteiro no computador). Tirado "Grátis. Não precisa criar conta para procurar." da inicial.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

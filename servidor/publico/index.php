@@ -84,7 +84,6 @@ pagina_inicio('Localiza Fácil: o comércio da sua cidade no seu celular',
         <li><b><?= $num($total) ?></b> comércios e serviços</li>
         <li><b><?= count(CIDADES) ?></b> <a href="#cidades">cidades</a></li>
       </ul>
-      <p class="discreto">Grátis. Não precisa criar conta para procurar.</p>
       <?php // 21/11 (passo 38, pedido do usuário): convite para incluir o negócio já no topo (antes só no fim da página e na busca) ?>
       <a class="hero-incluir" href="<?= $base ?>/incluir.php"><span aria-hidden="true">🏪</span>
         <span>Não achou o seu negócio? <b>Inclua o seu negócio de graça</b></span><span class="seta" aria-hidden="true">›</span></a>
