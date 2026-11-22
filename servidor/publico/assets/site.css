@@ -831,3 +831,14 @@ body.sem-rolagem { overflow: hidden; }
 .cc-caixa .botao { display: flex; width: 100%; justify-content: center; margin-top: 10px; min-height: 52px; box-sizing: border-box; }
 .cc-cancelar { margin-top: 8px; color: var(--texto2); }
 
+/* 22/11 (passo 55): "Perto de" na ficha e a frase da localização */
+.perto { margin: 28px 0 8px; }
+.perto-lista { list-style: none; padding: 0; margin: 10px 0 6px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.perto-lista a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #dfe7e2; border-radius: 12px; color: inherit; text-decoration: none; background: #fff; }
+.perto-lista a:hover { border-color: var(--verde2); }
+.perto-emoji { font-size: 1.3rem; flex: none; }
+.perto-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.perto-texto b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.perto-texto small { color: var(--texto2); }
+.perto-dist { flex: none; font-weight: 800; color: var(--verde); font-size: .9rem; }
+.ficha-local { margin-top: 0; }

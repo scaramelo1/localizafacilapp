@@ -146,6 +146,116 @@ function web_parecidos(array $p, int $limite = 6): array {
     return [linhas("$campos AND p.categoria_id = ?$ordem", [$p['id'], $p['categoria_id'], semente_dia() + (int)$p['id']]), false];
 }
 
+// ---------- perto daqui e localização (22/11, passo 55: B e C) ----------
+// Ponto do mapa exato só quando veio do Google. 'rua' é UM ponto para a rua inteira (toda a Av. João Pinheiro no mesmo
+// lugar), 'endereco' e 'bairro' também se repetem: com eles a distância sairia errada ("a 10 m" de tudo).
+const GEO_PRECISOS = ['google'];
+function web_geo_preciso(array $p): bool {
+    return $p['lat'] !== null && $p['lng'] !== null && in_array((string)($p['geo_origem'] ?? ''), GEO_PRECISOS, true);
+}
+/** Metros -> "a 150 m" / "a 1,2 km". */
+function web_distancia_txt(float $m): string {
+    return $m < 1000 ? 'a ' . max(10, (int)(round($m / 10) * 10)) . ' m' : 'a ' . number_format($m / 1000, 1, ',', '') . ' km';
+}
+/** Distância em metros entre dois pontos (conta plana: serve para poucos km). */
+function web_metros(float $lat1, float $lng1, float $lat2, float $lng2): float {
+    return 111320 * sqrt(($lat1 - $lat2) ** 2 + (($lng1 - $lng2) * cos(deg2rad($lat1))) ** 2);
+}
+/** "Av. João Pinheiro, 5638" -> ['Av. João Pinheiro', 5638]; sem número -> null. */
+function web_rua_numero(?string $endereco): ?array {
+    $e = trim((string)$endereco);
+    if (!preg_match('/^(.{4,80}?)[,\s]+(?:n[º°o.]*\s*)?(\d{1,5})(?!\d)/iu', $e, $m)) return null;
+    $rua = trim($m[1], " ,.-");
+    if (preg_match('/^(km|br|sp|mg|rod)\b/iu', $rua) || mb_strlen($rua) < 4) return null;
+    return [$rua, (int)$m[2]];
+}
+/** Um de cada área (primeiro áreas diferentes da ficha), até $limite, na ordem em que vieram. */
+function web_variados(array $p, array $r, int $limite): array {
+    $nome = mb_strtolower(nome_curto((string)$p['nome']));
+    $r = array_values(array_filter($r, fn($x) => mb_strtolower(nome_curto((string)$x['nome'])) !== $nome));   // a mesma loja cadastrada 2x
+    $escolhidos = []; $areas = []; $tipos = [];
+    foreach ([true, false] as $outra_area) {   // 1ª volta: áreas diferentes da ficha; 2ª: completa com tipos diferentes
+        foreach ($r as $x) {
+            if (count($escolhidos) >= $limite) break 2;
+            if (isset($escolhidos[$x['id']])) continue;
+            $tipo = mb_strtolower((string)($x['tipo'] ?: $x['categoria']));
+            if ($outra_area ? ((int)$x['categoria_id'] === (int)$p['categoria_id'] || isset($areas[$x['categoria_id']])) : isset($tipos[$tipo])) continue;
+            $escolhidos[$x['id']] = $x; $areas[$x['categoria_id']] = 1; $tipos[$tipo] = 1;
+        }
+    }
+    return array_values($escolhidos);
+}
+/**
+ * Vizinhos da ficha. Com ponto exato: ['modo' => 'perto', 'itens' => [... 'distancia' em metros]] (até 1,5 km, ponto
+ * exato também). Sem ponto exato mas com rua e número: ['modo' => 'rua', 'rua' => 'Av. ...', 'itens' => [... 'numero']],
+ * os da mesma rua com o número mais perto. Nada: null.
+ */
+function web_perto(array $p, int $limite = 6, int $raio = 1500): ?array {
+    $vis = visivel($p['cidade']);
+    if (web_geo_preciso($p)) {
+        $lat = (float)$p['lat']; $lng = (float)$p['lng']; $cos = cos(deg2rad($lat));
+        $f = fn(float $x) => sprintf('%.7F', $x);
+        $dist = '111320 * SQRT(POW(p.lat - ' . $f($lat) . ', 2) + POW((p.lng - ' . $f($lng) . ') * ' . $f($cos) . ', 2))';
+        $dlat = $raio / 111320; $dlng = $raio / (111320 * max($cos, 0.1));
+        $r = linhas('SELECT ' . CAMPOS_RESUMO . ", $dist AS distancia FROM profissionais p JOIN categorias c ON c.id = p.categoria_id
+            WHERE $vis AND p.id <> ? AND p.geo_origem IN ('" . implode("','", GEO_PRECISOS) . "')
+              AND p.lat BETWEEN ? AND ? AND p.lng BETWEEN ? AND ?
+            HAVING distancia <= $raio ORDER BY distancia LIMIT 120",
+            [(int)$p['id'], $lat - $dlat, $lat + $dlat, $lng - $dlng, $lng + $dlng]);
+        $itens = web_variados($p, $r, $limite);
+        usort($itens, fn($a, $b) => $a['distancia'] <=> $b['distancia']);
+        if (count($itens) >= 2) return ['modo' => 'perto', 'itens' => $itens];
+    }
+    $rn = web_rua_numero($p['endereco'] ?? null);
+    if (!$rn) return null;
+    [$rua, $num] = $rn;
+    $como = strtr($rua, ['\\' => '\\\\', '%' => '\%', '_' => '\_']) . '%';
+    $r = [];
+    foreach (linhas('SELECT ' . CAMPOS_RESUMO . ", p.endereco FROM profissionais p JOIN categorias c ON c.id = p.categoria_id
+        WHERE $vis AND p.id <> ? AND p.endereco LIKE ? LIMIT 400", [(int)$p['id'], $como]) as $x) {
+        $o = web_rua_numero($x['endereco']);
+        if (!$o || mb_strtolower($o[0]) !== mb_strtolower($rua)) continue;   // "Rua São Paulo" não é "Rua São Paulo Filho"
+        $x['numero'] = $o[1]; $x['longe'] = abs($o[1] - $num); $r[] = $x;
+    }
+    usort($r, fn($a, $b) => $a['longe'] <=> $b['longe'] ?: $a['id'] <=> $b['id']);
+    $r = array_values(array_filter($r, fn($x) => $x['longe'] <= 1500));   // numeração: até uns 15 quarteirões
+    $itens = web_variados($p, $r, $limite);
+    usort($itens, fn($a, $b) => $a['numero'] <=> $b['numero']);
+    return count($itens) >= 2 ? ['modo' => 'rua', 'rua' => $rua, 'itens' => $itens] : null;
+}
+/** Centro da cidade (tabela cidades) ou null. */
+function web_centro_cidade(string $cidade): ?array {
+    static $c = [];
+    if (!array_key_exists($cidade, $c)) {
+        $l = linha('SELECT lat, lng FROM cidades WHERE slug = ?', [$cidade]);
+        $c[$cidade] = $l && $l['lat'] !== null ? [(float)$l['lat'], (float)$l['lng']] : null;
+    }
+    return $c[$cidade];
+}
+/** Quantos comércios do Localiza Fácil há no mesmo bairro (para o texto da localização). */
+function web_qtd_bairro(array $p): int {
+    if (!$p['bairro']) return 0;
+    return (int)valor('SELECT COUNT(*) FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE ' . visivel($p['cidade']) . ' AND p.bairro = ?', [$p['bairro']]);
+}
+/**
+ * Frase da localização: "Fica no bairro Bortolan, a 2,3 km do centro de Poços de Caldas. No bairro, o Localiza Fácil
+ * tem 85 comércios e serviços." Só com o que é verdade: sem ponto preciso, sem a distância; sem bairro, sem o bairro.
+ */
+function web_local_texto(array $p, string $nome_cidade): string {
+    $bairro = trim((string)$p['bairro']);
+    $centro = web_geo_preciso($p) ? web_centro_cidade((string)$p['cidade']) : null;
+    $m = $centro ? web_metros((float)$p['lat'], (float)$p['lng'], $centro[0], $centro[1]) : null;
+    if ($m !== null && $m > 25000) $m = null;   // ponto fora da cidade: melhor não dizer
+    $e_centro = $bairro !== '' && preg_match('/^centro$/iu', $bairro);
+    if ($e_centro || ($m !== null && $m < 600 && $bairro === '')) $frase = "Fica no Centro de $nome_cidade.";
+    elseif ($bairro !== '') $frase = "Fica no bairro $bairro" . ($m !== null ? ', ' . web_distancia_txt($m) . " do centro de $nome_cidade" : ", em $nome_cidade") . '.';
+    elseif ($m !== null) $frase = 'Fica ' . web_distancia_txt($m) . " do centro de $nome_cidade.";
+    else return '';
+    $n = web_qtd_bairro($p);
+    if ($bairro !== '' && $n >= 5) $frase .= ' No ' . ($e_centro ? 'Centro' : 'bairro') . ', o Localiza Fácil tem ' . web_qtd($n, 'comércio ou serviço', 'comércios e serviços') . '.';
+    return $frase;
+}
+
 // ---------- horário ----------
 // aberto_agora() foi para inc/horarios.php (19/11)
 function campo_de_hoje(?int $agora = null): string {
@@ -239,7 +349,7 @@ function web_faltam(array $faltam): string {
     $txt = count($lista) > 1 ? implode(', ', array_slice($lista, 0, -1)) . ' e ' . end($lista) : $lista[0];
     return '<section class="faltam" aria-label="Informações que faltam"><p class="faltam-titulo"><span aria-hidden="true">🔒</span> '
         . 'Faltam nesta ficha: ' . h($txt) . '</p>'
-        . '<p class="faltam-texto">Toque em <b>Pedir</b> e a gente avisa o comércio que você quer essa informação.</p>'
+        . '<p class="faltam-texto">Toque em <b>Pedir</b> e a gente avisa o comércio.</p>'
         . '<ul class="faltam-lista">' . $itens . '</ul></section>';
 }
 function web_avisos_ligados(): bool {
@@ -456,7 +566,7 @@ function web_pagina_ficha(array $p): void {
     $ld = ['@context' => 'https://schema.org', '@type' => 'LocalBusiness', '@id' => $url, 'name' => $nome, 'url' => $url];
     if ($nome !== $p['nome']) $ld['alternateName'] = $p['nome'];
     if ($imagem) $ld['image'] = $imagem;
-    if ($p['descricao']) $ld['description'] = mb_substr($p['descricao'], 0, 300);
+    if ($p['descricao'] || !empty($p['sobre_site'])) $ld['description'] = mb_substr((string)($p['descricao'] ?: $p['sobre_site']), 0, 300);
     if ($tel = $p['telefone'] ?: $p['whatsapp']) $ld['telephone'] = telefone_discar($tel);
     $ld['address'] = array_filter(['@type' => 'PostalAddress', 'streetAddress' => $p['endereco'], 'addressLocality' => $nome_cidade,
         'addressRegion' => $uf, 'addressCountry' => 'BR']);
@@ -476,9 +586,19 @@ function web_pagina_ficha(array $p): void {
     $sub = array_filter([$tipo ?? $p['categoria'], $p['bairro'], "$nome_cidade - $uf"]);
     // 19/11 (avaliação do site): "Endereço: Atendimento a domicílio" ficava estranho no Google; sem rua de verdade vira "Atende a domicílio"
     $tem_rua = $p['endereco'] && !preg_match('/domic[ií]lio|em casa|delivery|online|sem endere/iu', $p['endereco']);
-    $descricao = $nome . ' em ' . $nome_cidade . ' (' . $uf . ')' . ($tipo ? ", $tipo" : '') . '. '
-        . ($tem_rua ? 'Endereço: ' . $p['endereco'] . '. ' : ($p['atende_em_casa'] || $p['endereco'] ? 'Atende a domicílio. ' : ''))
-        . 'Veja horário, telefone e WhatsApp no Localiza Fácil.';
+    // 22/11 (passo 55, D): só o que a ficha tem de verdade (antes prometia "Veja horário" e quase nenhuma tem)
+    $contato = array_filter([
+        $p['whatsapp'] ? 'WhatsApp ' . telefone_formatado((string)$p['whatsapp']) : null,
+        $p['telefone'] && telefone_discar((string)$p['telefone']) !== telefone_discar((string)$p['whatsapp']) ? 'telefone ' . telefone_formatado((string)$p['telefone']) : null,
+    ]);
+    $tem_hor = $h || $p['horario'];
+    $descricao = $nome . ($tipo ? ', ' . mb_strtolower($tipo) : '') . ($p['bairro'] && !preg_match('/^centro$/iu', (string)$p['bairro']) ? ' no bairro ' . $p['bairro'] . ',' : (preg_match('/^centro$/iu', (string)$p['bairro']) ? ' no Centro de' : ' em'))
+        . ' ' . $nome_cidade . ' (' . $uf . '). '
+        . ($tem_rua ? $p['endereco'] . '. ' : ($p['atende_em_casa'] || $p['endereco'] ? 'Atende a domicílio. ' : ''))
+        . ($contato ? ucfirst(implode(' e ', $contato)) . '. ' : '')
+        . ($tem_hor ? 'Veja o horário de hoje. ' : '')
+        . (($p['descricao'] ?: ($p['sobre_site'] ?? '')) ? mb_substr(trim(preg_replace('/\s+/u', ' ', (string)($p['descricao'] ?: $p['sobre_site']))), 0, 120) : '');
+    $descricao = trim($descricao);
     pagina_inicio(web_titulo_ficha((string)$nome, (string)$tipo, (string)$nome_cidade), mb_substr($descricao, 0, 300), 'web',
         ['canonica' => $url, 'imagem' => $imagem, 'head' => web_json_ld($ld, $ld_trilha), 'noindex' => !ficha_no_google($p),
             'anuncios' => $p['importado'] && !$p['destaque_pago']]);   // 17/11 (pedido do usuário): anúncio também no Básico; só o Destaque fica sem
@@ -486,7 +606,7 @@ function web_pagina_ficha(array $p): void {
     $sem_dono = $p['importado'] && !tem_dono($p);
     $link_dono = $sem_dono ? $c['linkAssumir'] : null;
     $tem_horario = $h || $p['horario'];
-    $tem_sobre = $p['descricao'] || $c['servicos'];
+    $tem_sobre = $p['descricao'] || $c['servicos'] || !empty($p['sobre_site']);
     ?>
 <main class="ficha">
   <div class="conteudo">
@@ -582,13 +702,17 @@ function web_pagina_ficha(array $p): void {
       <?php endif ?>
       <div class="ficha-colunas">
         <div>
-          <?php if ($p['descricao']): ?><h2>Sobre</h2><p><?= nl2br(h($p['descricao'])) ?></p><?php endif ?>
+          <?php if ($p['descricao']): ?><h2>Sobre</h2><p><?= nl2br(h($p['descricao'])) ?></p>
+          <?php elseif (!empty($p['sobre_site'])): // 22/11 (passo 55, E): texto do site do próprio comércio, aprovado no admin ?><h2>Sobre</h2><p><?= h($p['sobre_site']) ?></p>
+            <p class="discreto">Do site do comércio<?php if (!empty($p['sobre_site_url'])): ?>: <a href="<?= h($p['sobre_site_url']) ?>" rel="nofollow noopener" target="_blank"><?= h(preg_replace('#^www\.#', '', (string)parse_url($p['sobre_site_url'], PHP_URL_HOST))) ?></a><?php endif ?></p><?php endif ?>
           <?php if ($c['servicos']): ?><h2>O que faz ou vende</h2><p class="chips chips-texto"><?php foreach ($c['servicos'] as $s): ?><span><?= h($s) ?></span><?php endforeach ?></p><?php endif ?>
           <h2>Endereço</h2>
           <p><?= $p['endereco'] ? h($p['endereco']) : 'Endereço não informado.' ?><?= $p['bairro'] && !str_contains((string)$p['endereco'], $p['bairro']) ? '<br>Bairro ' . h($p['bairro']) : '' ?><br><?= h("$nome_cidade - $uf") ?></p>
           <?php if ($p['atende_em_casa']): ?><p class="selo-verificado">🏠 Atende em casa</p><?php endif ?>
         </div>
         <div>
+          <?php $local_txt = web_local_texto($p, (string)$nome_cidade); ?>
+          <?php if ($tem_horario): // 22/11 (passo 55): sem horário, a coluna mostra a localização (o que falta já está no quadro acima) ?>
           <h2>Horário</h2>
           <?php if ($h): ?>
             <ul class="horarios-web">
@@ -596,11 +720,11 @@ function web_pagina_ficha(array $p): void {
                 <li<?= $campo === campo_de_hoje() ? ' class="hoje"' : '' ?>><span><?= h($nome) ?></span><span><?= h(horario_campo_texto($h[$campo])) ?></span></li>
               <?php endforeach ?>
             </ul>
-          <?php elseif ($p['horario']): ?>
-            <p><?= h($p['horario']) ?></p>
           <?php else: ?>
-            <p class="discreto">Não informado.</p>
+            <p><?= h($p['horario']) ?></p>
           <?php endif ?>
+          <?php endif ?>
+          <?php if ($local_txt): ?><h2>Localização</h2><p class="ficha-local"><?= h($local_txt) ?></p><?php endif ?>
         </div>
       </div>
 
@@ -821,6 +945,16 @@ function web_pagina_ficha(array $p): void {
 
       <?php // 19/11: o convite ao dono fica só na caixa "Este comércio é seu?" (antes repetia aqui) ?>
 
+      <?php $perto = web_perto($p); if ($perto): // 22/11 (passo 55, B): vizinhos de áreas diferentes (pelo mapa ou na mesma rua) ?>
+      <section class="perto" aria-labelledby="perto-titulo">
+        <h2 id="perto-titulo"><?= $perto['modo'] === 'perto' ? 'Perto de ' . h($nome) : 'Também na ' . h($perto['rua']) ?></h2>
+        <ul class="perto-lista">
+          <?php foreach ($perto['itens'] as $x): ?><li><a href="<?= h(url_ficha($x)) ?>"><span class="perto-emoji" aria-hidden="true"><?= emoji_area(icone_comercio($x)) ?></span><span class="perto-texto"><b><?= h(nome_curto((string)$x['nome'])) ?></b><small><?= h((string)($x['tipo'] ?: $x['categoria'])) ?></small></span><span class="perto-dist"><?= $perto['modo'] === 'perto' ? h(web_distancia_txt((float)$x['distancia'])) : 'nº ' . (int)$x['numero'] ?></span></a></li><?php endforeach ?>
+        </ul>
+        <?php if ($perto['modo'] === 'perto'): ?><p class="discreto">Distância em linha reta, pelo ponto no mapa.</p><?php endif ?>
+      </section>
+      <?php endif ?>
+
       <h2>Avaliações de quem usa o Localiza Fácil</h2>
       <?php if (!$c['comentarios']): ?><p class="discreto">Ainda sem avaliações. Seja o primeiro a avaliar!</p><?php endif ?>
       <?php if ($c['comentarios']): ?>
@@ -835,7 +969,7 @@ function web_pagina_ficha(array $p): void {
       <section class="avaliar" id="avaliar">
         <h3><?= $minha ? 'Sua avaliação' : 'Avaliar este comércio' ?></h3>
         <?php if (!$eu): ?>
-          <p>Entre com a sua conta Google para dar estrelas e comentar. É a mesma conta do app.</p>
+          <p>Entre com o Google para dar estrelas e comentar.</p>
           <?= botao_google(url_ficha($p) . '#avaliar') ?>
         <?php else: ?>
           <form id="form-avaliar">
@@ -863,12 +997,11 @@ function web_pagina_ficha(array $p): void {
         if ($vistas30 >= 3 || $pedidos30): ?>
         <p class="numeros-dono">👀 Esta página foi vista <strong><?= web_num($vistas30) ?> vezes</strong> nos últimos 30 dias<?= $pedidos30 ? ' e <strong>' . web_num($pedidos30) . ($pedidos30 === 1 ? ' pessoa pediu' : ' pessoas pediram') . '</strong> informações que faltam' : '' ?>.</p>
         <?php endif ?>
-        <p>Cadastre-se <strong>grátis</strong> com a sua conta Google e corrija o telefone, o WhatsApp, o endereço e o horário.
-          <?php if (!web_tem_horario($p)): ?><br>🕒 Informando o horário, sua ficha aparece no filtro <strong>"Aberto agora"</strong> e antes das outras nas listas.<?php endif ?>
+        <?php // 22/11 (passo 55, A): caixa mais curta (o texto se repetia igual em todas as fichas) ?>
+        <p>Corrija os dados de graça<?= !web_tem_horario($p) ? ' e informe o horário' : '' ?>.
           <a class="botao amarelo" href="<?= h(url('perfil.php?acao=assumir&id=' . (int)$p['id'])) ?>" rel="nofollow">Cadastrar grátis</a>
           <a class="botao contorno" href="<?= h($c['linkAssumir']) ?>" rel="nofollow">Ver os planos</a></p>
-        <p class="discreto">Os dados vieram de informações públicas do comércio na internet. Não quer aparecer? <a href="<?= h($c['linkRemover']) ?>" rel="nofollow">Tirar meu comércio do Localiza Fácil</a>.</p>
-        <p class="discreto">Informação errada? <a href="<?= h(url('suporte.php?id=' . (int)$p['id'])) ?>" rel="nofollow">Envie uma mensagem para a equipe</a> (precisa entrar com a conta Google).</p>
+        <p class="discreto">Dados públicos da internet · <a href="<?= h(url('suporte.php?id=' . (int)$p['id'])) ?>" rel="nofollow">Informação errada?</a> · <a href="<?= h($c['linkRemover']) ?>" rel="nofollow">Tirar meu comércio</a></p>
       <?php else: ?>
         <h2 class="h-pequeno">Informação errada ou algum problema?</h2>
         <p>Mande uma mensagem para a equipe do Localiza Fácil. É preciso <strong>entrar com a conta Google</strong>: assim a
@@ -885,7 +1018,7 @@ function web_pagina_ficha(array $p): void {
       </section>
     <?php endif ?>
   </div>
-  <?= web_baixe_app($cidade) ?>
+  <?php // 22/11 (passo 55, A): sem o "Leve o Localiza Fácil no bolso" na ficha (continua na cidade e nas listas; o topo tem "Baixar o app") ?>
 </main>
 <script>
 // toques em WhatsApp, ligar, mapa... contam nos números do comércio (origem "site")

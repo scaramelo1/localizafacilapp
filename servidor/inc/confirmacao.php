@@ -83,9 +83,12 @@ function fila_sql(string $cidade): string {
 }
 /** A próxima ficha da fila (pular = quantas passar). Ordem: prioridade das áreas, depois as mais conhecidas. */
 function fila_proxima(string $cidade, int $pular = 0): ?array {
-    return linha('SELECT p.*, c.nome AS categoria, f.situacao AS fila_situacao, f.tentativas AS fila_tentativas, f.atualizado_em AS fila_quando
+    // 22/11 (passo 55, F): primeiro as fichas que já estão no Google (as que o Google julga), depois a ordem de antes
+    $no = sql_no_google();
+    return linha("SELECT p.*, c.nome AS categoria, f.situacao AS fila_situacao, f.tentativas AS fila_tentativas, f.atualizado_em AS fila_quando,
+        $no AS no_google
         FROM profissionais p JOIN categorias c ON c.id = p.categoria_id LEFT JOIN confirmar_fila f ON f.profissional_id = p.id
-        WHERE ' . fila_sql($cidade) . ' ORDER BY ' . sql_prioridade_area() . ', p.popularidade DESC, p.id LIMIT 1 OFFSET ' . max(0, $pular));
+        WHERE " . fila_sql($cidade) . " ORDER BY $no DESC, " . sql_prioridade_area() . ', p.popularidade DESC, p.id LIMIT 1 OFFSET ' . max(0, $pular));
 }
 /** Números da cidade para o topo da tela. */
 function fila_numeros(string $cidade): array {

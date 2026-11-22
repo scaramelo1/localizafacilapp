@@ -353,3 +353,19 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     og:site_name e application-name, 1º item da trilha, rodapé e e-mails (remetente e rodapé). O topo continua
     "Localiza Fácil" (cabe no celular) e os textos corridos ("no Localiza Fácil") ficaram como estavam. App: o nome embaixo
     do ícone continua "Localiza Fácil" (app.json; o Android corta nome longo); na Play o nome é "Localiza Fácil App" (docs/lojas.md).
+55. ✅ Ficha com mais conteúdo próprio (22/11, pedido do usuário: subir a nota da ficha de 4 para 6–7; itens A, B, C, D, F e E).
+    A) Menos texto repetido: caixa "Este comércio é seu?" curta (dados públicos · informação errada · tirar numa linha só),
+       "Faltam nesta ficha" mais curto, avaliar sem login em 1 frase, sem o "Leve o Localiza Fácil no bolso" na ficha.
+    B) Vizinhos de áreas diferentes (web_perto, inc/web.php): com ponto exato (geo_origem 'google', 3.078 fichas) "Perto de X"
+       com a distância (até 1,5 km); senão "Também na Av. X" com os da mesma rua pelo número mais perto (web_rua_numero).
+       ATENÇÃO: geo_origem 'rua' é UM ponto para a rua inteira (11.633 fichas em 1.812 pontos): nunca usar para distância.
+    C) "Localização": "Fica no bairro X, a 2,5 km do centro de Y. No bairro, o Localiza Fácil tem N comércios" (km só com
+       ponto exato; centro = cidades.lat/lng). Sem horário, a coluna Horário some ("Não informado" repetia o quadro Faltam).
+    D) Descrição para o Google só com o que a ficha tem (bairro, endereço, WhatsApp/telefone, "Veja o horário" só com horário).
+    F) /admin/confirmar.php: fila começa pelas fichas que já estão no Google (selo "🌐 já está no Google").
+    E) "Sobre (do site do comércio)": mudança 042 (profissionais.sobre_site/sobre_site_url, tabela sobre_site), já aplicada.
+       servidor/sobre-do-site.php lê a página inicial do site próprio (meta description), respeita robots.txt, pula
+       Facebook/Instagram/Linktree/iFood/gov.br etc., grava como pendente. Admin > Comércios > "🌐 Sobre pelo site"
+       (/admin/sobre-site.php): aprovar (corrige antes), recusar, tirar da ficha; aba "Sites que não abrem" com
+       "Tirar o site da ficha". Descrição do dono tem prioridade. 1ª leitura: as 242 fichas no Google com site (22/11).
+       Falta: mostrar o sobre_site no app.

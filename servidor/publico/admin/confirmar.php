@@ -77,7 +77,8 @@ admin_inicio('Confirmar fichas', $admin);
 ?>
 <h1>✅ Confirmar fichas</h1>
 <p class="discreto">Ligue, confira os dados e marque. A ficha confirmada ganha o selo “Dados conferidos” e entra no Google fora da fila das ondas.
-  Ordem: Veículos, Saúde, Alimentação, Casa, Mercados, Lojas, outras; em cada área, os mais conhecidos.</p>
+  Ordem: primeiro as fichas que já estão no Google (são elas que o Google julga); depois Veículos, Saúde, Alimentação, Casa,
+  Mercados, Lojas, outras; em cada área, os mais conhecidos.</p>
 <form method="get" class="filtros-linha">
   <label for="cidade">Cidade</label>
   <select id="cidade" name="cidade" onchange="this.form.submit()"><?php foreach (CIDADES as $s => $c): ?><option value="<?= h($s) ?>"<?= $s === $cidade ? ' selected' : '' ?>><?= h($c[0]) ?></option><?php endforeach ?></select>
@@ -106,7 +107,7 @@ admin_inicio('Confirmar fichas', $admin);
   <div class="aviso ok"><strong>Fila vazia em <?= h(nome_cidade($cidade)) ?>.</strong> Os que não atenderam ou receberam o link voltam sozinhos depois.</div>
 <?php else: $tel = (string)($p['telefone'] ?? ''); $wa_num = confirmacao_numero_whats($p); ?>
   <div class="quadro">
-    <h2 style="margin-top:0"><?= h($p['nome']) ?></h2>
+    <h2 style="margin-top:0"><?= h($p['nome']) ?><?php if (!empty($p['no_google'])): ?> <small style="background:#E8F3EC;color:#005C38;border-radius:6px;padding:2px 8px;font-size:.6em;vertical-align:middle">🌐 já está no Google</small><?php endif ?></h2>
     <p class="discreto"><?= h(implode(' · ', array_filter([$p['categoria'], $p['tipo'], $p['bairro']]))) ?>
       · <?= (int)$p['popularidade'] ?> avaliações no Google
       <?= $p['fila_situacao'] ? ' · já tentado ' . (int)$p['fila_tentativas'] . 'x (' . h(str_replace('_', ' ', $p['fila_situacao'])) . ', ' . h(datahora_br($p['fila_quando'])) . ')' : '' ?></p>
