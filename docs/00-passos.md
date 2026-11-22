@@ -336,6 +336,8 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 51. ✅ Aviso de avaliação (22/11): conferido que o aviso da avaliação da Sr Burgers saiu (e-mail ao dono enviado; aviso
     aos admins disparado). 2 aparelhos mortos do admin removidos. Registro de cada aviso no celular em
     /var/lib/guia-novo/avisos-enviados.log (últimos 500).
+52. ✅ Robô com Chrome antigo (22/11): 3 entradas de 22/11 (10:58, 11:16, 11:30; servidores OVH, Chrome 102 no Windows,
+    entrada mandada de outro IP) apagadas; e_robo() trata Chrome/Edge abaixo do 120 como robô.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

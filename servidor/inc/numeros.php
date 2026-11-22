@@ -38,6 +38,9 @@ function e_robo(): bool {
     if (in_array(ip(), ['127.0.0.1', '::1', (string)($_SERVER['SERVER_ADDR'] ?? '-')], true)) return true;
     if ($ua === '' || preg_match('/bot|crawl|spider|slurp|preview|facebookexternalhit|whatsapp\/|curl|wget|python|httpclient|headless|lighthouse|'
         . 'mediapartners|adsbot|googleother|google-|playstore-google|privacy preserving prefetch/i', $ua)) return true;
+    // 22/11: robô de anúncios/varredura em servidores (OVH) com Chrome 102 de 2022 no Windows, que roda o JavaScript e
+    // manda a entrada de outro IP. Navegador de verdade se atualiza sozinho: Chrome/Edge abaixo do 120 = robô.
+    if (preg_match('/(?:Chrome|Edg)\/(\d+)\./', $ua, $m) && (int)$m[1] < 120) return true;
     // 21/11: teste automático da Google Play (pre-launch report): o app de verdade (okhttp) rodando em celulares dos
     // servidores do Google; pesquisava, abria fichas e ligava avisos como se fosse gente
     if (stripos($ua, 'okhttp') !== false && preg_match('/^(108\.177\.|66\.249\.|74\.125\.|64\.233\.|209\.85\.|172\.217\.|142\.25[01]\.|216\.58\.|173\.194\.)/', ip())) return true;
