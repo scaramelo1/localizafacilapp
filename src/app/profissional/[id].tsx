@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useCallback, useRef, useState } from 'react';
-import { Alert, Image, Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { chamar, ORIGENS, reais, registrarContato, type Oferta, type Origem, type Profissional } from '../../api/cliente';
 import { Cabecalho } from '../../componentes/Cabecalho';
@@ -10,6 +10,7 @@ import { CapaComercio } from '../../componentes/CapaComercio';
 import { Horarios } from '../../componentes/Horarios';
 import { Trancado } from '../../componentes/Trancado';
 import { Botao, Estrelas, Etiqueta, Falha, Carregando, SeloVerificado, estilos as ui, useCarregar } from '../../componentes/ui';
+import { compartilharFicha } from '../../compartilhar';
 import { useConta } from '../../conta';
 import { deveConvidar, fecharConvite, lembrarContato } from '../../pedirAvaliacao';
 import { cartao, cores, fonte, RAIO } from '../../tema';
@@ -60,16 +61,8 @@ export default function TelaProfissional() {
   };
   // passo 59: o convite ao dono fica só no cartao "Este comércio é seu?", logo abaixo dos espaços trancados
   const temHorario = !!(p.horarios?.length || p.horario);
-  // 19/11: "Olha esse lugar" com o link da ficha no site (abre para quem nao tem o app); conta como 'compartilhar'
-  const compartilhar = async () => {
-    const link = p.linkSite ?? 'https://localizafacilapp.com.br/';
-    try {
-      const r = await Share.share({ message: `Olha esse lugar: ${p.nome}${p.tipo ? ` (${p.tipo})` : ''}, em ${p.cidade}\n${link}` });
-      if (r.action === Share.sharedAction) registrarContato(p.id, 'compartilhar');
-    } catch {
-      // cancelou ou o celular nao deixou: nada a fazer
-    }
-  };
+  // 19/11: "Olha esse lugar" com o link da ficha no site; 21/11 (passo 36): com imagem para Stories e Status (src/compartilhar.ts)
+  const compartilhar = () => compartilharFicha(p);
 
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 48 }}>

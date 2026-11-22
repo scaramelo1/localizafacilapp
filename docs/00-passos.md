@@ -238,6 +238,13 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     "Olha esse lugar" + link. No computador (ou se o celular recusar) abre um menu: WhatsApp, Facebook, imagem para
     Stories e Status, copiar link. Conta como 'compartilhar' só quando compartilha ou escolhe uma opção.
     App: já abria o menu do celular, mas só com texto (Stories do Instagram precisa de imagem): falta versão nova.
+36. ✅ Compartilhar com imagem também no app + link copiado para o Stories (21/11, pedido do usuário).
+    - Instagram não deixa nenhum site/app pôr link clicável no Stories sozinho (só o adesivo "Link", que a pessoa põe).
+      Então, ao compartilhar com imagem, o link vai para a área de transferência e aparece a dica "toque no adesivo
+      Link e cole" (site: aviso verde embaixo; app: aviso na tela). WhatsApp com imagem também perde o texto: cola na legenda.
+    - App 1.15.0 (src/compartilhar.ts): o botão Compartilhar pergunta "Com imagem (Stories e Status)" ou "Só o link
+      (conversa)". Com imagem baixa story.php e abre o menu do celular (expo-sharing). FALTA no PC:
+      npx expo install expo-sharing expo-file-system expo-clipboard, depois gerar e testar o app.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

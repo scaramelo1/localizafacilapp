@@ -810,6 +810,15 @@ function afMarcarAvaliar(fechar) {
     var obs = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { pegarImagem(); obs.disconnect(); } });
     obs.observe(b);
   }
+  // 21/11 (passo 36): Instagram e WhatsApp não levam o link junto com a imagem: o link vai copiado e a dica explica
+  function copiarComDica() {
+    try { if (navigator.clipboard) navigator.clipboard.writeText(url).catch(function () {}); } catch (e) {}
+    var t = document.getElementById('dica-compartilhar');
+    if (!t) { t = document.createElement('div'); t.id = 'dica-compartilhar'; t.className = 'dica-compartilhar'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+    t.innerHTML = '<strong>🔗 Link copiado!</strong> No Stories do Instagram, toque no adesivo <b>Link</b> e cole. No WhatsApp, cole na legenda ou no status.';
+    t.classList.add('visivel');
+    clearTimeout(t._fim); t._fim = setTimeout(function () { t.classList.remove('visivel'); }, 9000);
+  }
   function abrirMenu(abrir) {
     menu.hidden = !abrir;
     b.setAttribute('aria-expanded', abrir ? 'true' : 'false');
@@ -817,6 +826,7 @@ function afMarcarAvaliar(fechar) {
   b.addEventListener('click', function () {
     if (!menu.hidden) { abrirMenu(false); return; }
     if (!celular) { abrirMenu(true); return; }
+    if (podeArquivo) copiarComDica();   // ainda dentro do toque (a área de transferência exige)
     (podeArquivo ? pegarImagem() : Promise.resolve(null)).then(function (f) {
       var d = f && navigator.canShare({ files: [f] }) ? { files: [f], title: titulo, text: texto } : { title: titulo, text: texto.replace('\n' + url, ''), url: url };
       return navigator.share(d);
@@ -828,6 +838,7 @@ function afMarcarAvaliar(fechar) {
     var a = ev.target.closest('[data-comp]');
     if (!a) return;
     contar();
+    if (a.dataset.comp === 'imagem') copiarComDica();
     if (a.dataset.comp === 'copiar') {
       var rot = a.querySelector('span:last-child');
       (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () { rot.textContent = 'Link copiado!'; },
