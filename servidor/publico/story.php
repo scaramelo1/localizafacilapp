@@ -5,6 +5,8 @@
 require __DIR__ . '/../inc/base.php';
 require_once __DIR__ . '/../inc/guia.php';
 
+// 21/11 (passo 37): robôs (ClaudeBot pedia centenas) não geram imagem: cada uma roda o Python na VPS de 1 GB
+if (e_robo()) { http_response_code(403); header('X-Robots-Tag: noindex'); exit; }
 $p = profissional_visivel((int)($_GET['id'] ?? 0));
 if (!$p) { http_response_code(404); exit; }
 $foto = '';

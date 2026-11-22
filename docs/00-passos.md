@@ -245,6 +245,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     - App 1.15.0 (src/compartilhar.ts): o botão Compartilhar pergunta "Com imagem (Stories e Status)" ou "Só o link
       (conversa)". Com imagem baixa story.php e abre o menu do celular (expo-sharing). FALTA no PC:
       npx expo install expo-sharing expo-file-system expo-clipboard, depois gerar e testar o app.
+37. ✅ Contagem de entradas: volta do login do Google não conta mais como chegada nova "pelo Google" (accounts.google.com
+    era lido como Google e a mesma pessoa contava 2x ao entrar para avaliar); story.php recusa robôs e está no robots.txt
+    (o ClaudeBot pedia centenas de imagens, cada uma roda o Python). Limpeza de 21/11: tiradas 2 duplicadas do login e 1
+    robô da Amazon (54.70.53.60, navegador automático que roda JavaScript); apagadas as 66 imagens geradas por robô.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

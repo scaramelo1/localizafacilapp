@@ -102,6 +102,8 @@ function origem_do_referer(?string $ref = null): ?string {
     if ($host === '') return null;
     $proprio = strtolower((string)preg_replace('/:\d+$/', '', (string)($_SERVER['HTTP_HOST'] ?? '')));
     if ($host === $proprio || preg_match('/(^|\.)(localizafacilapp\.com\.br|fsadesigners\.com\.br)$/', $host)) return null;
+    // 21/11 (passo 37): voltar do login com o Google (accounts.google.com) é a mesma visita, não uma chegada nova pelo Google
+    if (preg_match('/^accounts\.google\.|^accounts\.youtube\.com$/', $host)) return null;
     if (preg_match('/(^|\.)achafacilapp\.com\.br$/', $host)) return 'acha_facil';   // 21/11 (antes contava em outros_sites)
     // o app do Google no Android manda android-app://com.google.android.googlequicksearchbox
     if (preg_match('/(^|\.)google\.|googlequicksearchbox|^com\.google\./', $host)) return 'google';

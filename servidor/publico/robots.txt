@@ -17,5 +17,7 @@ Disallow: /planos.php?
 Disallow: /suporte.php
 Disallow: /incluir.php?
 Disallow: /confirmar.php
+# 21/11 (passo 37): imagem de compartilhar de cada ficha (gerada na hora; robô não precisa)
+Disallow: /story.php
 
 Sitemap: https://localizafacilapp.com.br/sitemap.xml
