@@ -771,4 +771,11 @@ details.chips-mais .chips { margin: 0 0 4px; }
 .cardapio-pedir { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 8px; }
 .cardapio-pedir .botao { flex: 1 1 180px; min-height: 50px; }
 @media (max-width: 760px) { .abas-ficha { top: 74px; } }
+/* 22/11 (passo 43): catálogo por segmento: de/por, a partir de, unidade, etiquetas, validade */
+.cardapio-preco s { color: #9a9a9a; font-weight: 700; font-size: .85em; }
+.cardapio-preco small { font-weight: 700; color: var(--texto2); font-size: .75em; }
+.cardapio-etiquetas { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0 0; }
+.cardapio-etiquetas span { font-size: .78rem; font-weight: 800; padding: 2px 9px; border-radius: 999px; background: var(--verde-claro); color: var(--verde); }
+.cardapio-validade { display: inline-block; background: var(--amarelo); color: var(--verde); font-weight: 900; border-radius: 999px; padding: 5px 14px; margin: 0 0 10px; font-size: .92rem; }
+.cardapio-mercado .cardapio-preco { color: #c0392b; font-size: 1.1rem; }
 

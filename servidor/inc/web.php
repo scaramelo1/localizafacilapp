@@ -141,8 +141,53 @@ function cardapio_ler(?string $json): array {
     }
     return $secoes;
 }
+/**
+ * 22/11 (passo 43): o mesmo catálogo muda de cara conforme o segmento (pelo tipo; senão pela área).
+ * aba, título, palavra para os itens, aviso no fim e texto do botão de WhatsApp.
+ */
+const CATALOGO_MODELOS = [
+    'comida' => ['aba' => '🍔 Cardápio', 'titulo' => 'Cardápio', 'itens' => 'itens', 'botao' => 'Pedir pelo WhatsApp',
+        'aviso' => 'Preços informados pelo comércio e podem mudar. Confirme na hora de pedir.'],
+    'roupas' => ['aba' => '👕 Produtos', 'titulo' => 'Produtos e coleção', 'itens' => 'produtos', 'botao' => 'Perguntar se tem pelo WhatsApp',
+        'aviso' => 'Tamanhos e cores sujeitos à disponibilidade. Pergunte pelo WhatsApp antes de ir até a loja.'],
+    'mercado' => ['aba' => '🛒 Ofertas', 'titulo' => 'Ofertas', 'itens' => 'ofertas', 'botao' => 'Fazer pedido pelo WhatsApp',
+        'aviso' => 'Ofertas enquanto durar o estoque. Fotos e preços informados pelo mercado.'],
+    'bebidas' => ['aba' => '🍺 Bebidas', 'titulo' => 'Bebidas e preços', 'itens' => 'produtos', 'botao' => 'Pedir pelo WhatsApp',
+        'aviso' => 'Venda proibida para menores de 18 anos. Beba com moderação. Preços informados pelo comércio.'],
+    'pecas' => ['aba' => '🔧 Peças', 'titulo' => 'Peças e serviços', 'itens' => 'itens', 'botao' => 'Consultar peça pelo WhatsApp',
+        'aviso' => 'Confirme se a peça serve no modelo e no ano do seu veículo antes de comprar. Mande a placa ou o chassi pelo WhatsApp.'],
+    'farmacia' => ['aba' => '💊 Produtos', 'titulo' => 'Produtos e serviços', 'itens' => 'itens', 'botao' => 'Falar com a farmácia no WhatsApp',
+        'aviso' => 'Não anunciamos medicamentos. Para remédios, fale com o farmacêutico. Medicamentos com receita só na farmácia, com a receita.'],
+    'otica' => ['aba' => '👓 Produtos', 'titulo' => 'Armações, lentes e serviços', 'itens' => 'itens', 'botao' => 'Perguntar pelo WhatsApp',
+        'aviso' => 'Lentes de grau feitas a partir da receita do seu oftalmologista. Preços de referência; o valor final depende da receita.'],
+    'geral' => ['aba' => '🛍️ Produtos', 'titulo' => 'Produtos e serviços', 'itens' => 'itens', 'botao' => 'Perguntar pelo WhatsApp',
+        'aviso' => 'Preços e disponibilidade informados pelo comércio e podem mudar.'],
+];
+function catalogo_modelo(array $p): array {
+    $t = mb_strtolower((string)($p['tipo'] ?? '') . ' ' . (string)($p['nome'] ?? ''));
+    $chave = match (true) {
+        (bool)preg_match('/farm[aá]c|drogar/u', $t) => 'farmacia',
+        (bool)preg_match('/[óo]tica/u', $t) => 'otica',
+        (bool)preg_match('/autope[çc]|pe[çc]as para|pe[çc]as automot|auto ?pe[çc]/u', $t) => 'pecas',
+        (bool)preg_match('/bebida|adega|cervej|distribuidora/u', $t) => 'bebidas',
+        (bool)preg_match('/supermerc|mercad|mercearia|hortifr|conveni[êe]ncia|a[çc]ougue/u', $t) => 'mercado',
+        (bool)preg_match('/roupa|moda|boutique|cal[çc]ado|vestu/u', $t) => 'roupas',
+        ($p['categoria_slug'] ?? '') === 'alimentacao' => 'comida',
+        ($p['categoria_slug'] ?? '') === 'moda' => 'roupas',
+        ($p['categoria_slug'] ?? '') === 'mercados' => 'mercado',
+        default => 'geral',
+    };
+    return CATALOGO_MODELOS[$chave] + ['chave' => $chave];
+}
+/** Validade das ofertas e outros dados do catálogo inteiro (fora das seções). */
+function cardapio_info(?string $json): array {
+    $d = $json ? json_decode($json, true) : null;
+    return ['validade' => trim((string)($d['validade'] ?? ''))];
+}
+
 function cardapio_preco(mixed $v): string {
     if ($v === null || $v === '') return '';
+    if ((float)str_replace(',', '.', (string)$v) == 0) return 'Grátis';
     return 'R$ ' . number_format((float)str_replace(',', '.', (string)$v), 2, ',', '.');
 }
 
@@ -581,10 +626,12 @@ function web_pagina_ficha(array $p): void {
       <?php // 22/11 (passo 42): cardápio em aba (Informações | Cardápio); sem JavaScript as duas partes aparecem uma embaixo da outra
         $cardapio = cardapio_ler($p['cardapio'] ?? null);
         $n_itens = array_sum(array_map(fn($s) => count($s['itens']), $cardapio));
+        $mod = catalogo_modelo($p);   // 22/11 (passo 43): Cardápio, Produtos, Ofertas, Peças... conforme o segmento
+        $info_cat = cardapio_info($p['cardapio'] ?? null);
         if ($cardapio): ?>
       <div class="abas-ficha" role="tablist" aria-label="Partes da ficha" hidden>
         <button type="button" role="tab" id="aba-info" aria-controls="painel-info" aria-selected="true">Informações</button>
-        <button type="button" role="tab" id="aba-cardapio" aria-controls="painel-cardapio" aria-selected="false">🍔 Cardápio <small><?= $n_itens ?> itens</small></button>
+        <button type="button" role="tab" id="aba-cardapio" aria-controls="painel-cardapio" aria-selected="false"><?= h($mod['aba']) ?> <small><?= $n_itens ?> <?= h($mod['itens']) ?></small></button>
       </div>
       <div id="painel-info" role="tabpanel" aria-labelledby="aba-info">
       <?php endif ?>
@@ -614,23 +661,29 @@ function web_pagina_ficha(array $p): void {
 
       <?php if ($cardapio): ?>
       </div>
-      <section id="painel-cardapio" class="cardapio" role="tabpanel" aria-labelledby="aba-cardapio">
-        <h2>Cardápio</h2>
-        <?php if (count($cardapio) > 1): ?><nav class="cardapio-secoes" aria-label="Seções do cardápio">
+      <section id="painel-cardapio" class="cardapio cardapio-<?= h($mod['chave']) ?>" role="tabpanel" aria-labelledby="aba-cardapio">
+        <h2><?= h($mod['titulo']) ?></h2>
+        <?php if ($info_cat['validade'] !== ''): ?><p class="cardapio-validade">📅 <?= h($info_cat['validade']) ?></p><?php endif ?>
+        <?php if (count($cardapio) > 1): ?><nav class="cardapio-secoes" aria-label="Seções">
           <?php foreach ($cardapio as $i => $s): ?><a href="#cardapio-<?= $i ?>"><?= h($s['nome']) ?></a><?php endforeach ?></nav><?php endif ?>
         <?php foreach ($cardapio as $i => $s): ?>
           <h3 id="cardapio-<?= $i ?>"><?= h($s['nome']) ?></h3>
           <ul class="cardapio-itens">
             <?php foreach ($s['itens'] as $it): ?><li>
               <div class="cardapio-linha"><span class="cardapio-nome"><?= h((string)$it['nome']) ?><?php if (!empty($it['destaque'])): ?> <span class="cardapio-selo">⭐ Mais pedido</span><?php endif ?></span>
-                <span class="cardapio-pontos" aria-hidden="true"></span><span class="cardapio-preco"><?= h(cardapio_preco($it['preco'] ?? null)) ?></span></div>
+                <span class="cardapio-pontos" aria-hidden="true"></span><span class="cardapio-preco"><?php
+                  // 22/11 (passo 43): "de R$ X por" (oferta), "a partir de" e unidade (/kg, /fardo)
+                  if (!empty($it['preco_de'])): ?><s><?= h(cardapio_preco($it['preco_de'])) ?></s> <?php endif;
+                  if (!empty($it['a_partir'])): ?><small>a partir de</small> <?php endif ?><?= h(cardapio_preco($it['preco'] ?? null)) ?><?php
+                  if (!empty($it['unidade'])): ?><small>/<?= h((string)$it['unidade']) ?></small><?php endif ?></span></div>
               <?php if (!empty($it['desc'])): ?><p class="cardapio-desc"><?= h((string)$it['desc']) ?></p><?php endif ?>
+              <?php if (!empty($it['etiquetas'])): ?><p class="cardapio-etiquetas"><?php foreach ((array)$it['etiquetas'] as $e): ?><span><?= h((string)$e) ?></span><?php endforeach ?></p><?php endif ?>
             </li><?php endforeach ?>
           </ul>
         <?php endforeach ?>
-        <p class="discreto">Preços informados pelo comércio e podem mudar. Confirme na hora de pedir.</p>
+        <p class="discreto"><?= h($mod['aviso']) ?></p>
         <div class="cardapio-pedir">
-          <?php if ($c['whatsapp']): ?><a class="botao whats" href="<?= h($c['whatsapp']) ?>" data-contato="whatsapp" rel="nofollow noopener" target="_blank">Pedir pelo WhatsApp</a><?php endif ?>
+          <?php if ($c['whatsapp']): ?><a class="botao whats" href="<?= h($c['whatsapp']) ?>" data-contato="whatsapp" rel="nofollow noopener" target="_blank"><?= h($mod['botao']) ?></a><?php endif ?>
           <?php if (!empty($c['ifood'])): ?><a class="botao botao-ifood" href="<?= h($c['ifood']) ?>" data-contato="ifood" rel="nofollow noopener" target="_blank">Pedir no iFood</a><?php endif ?>
           <?php if (!empty($c['food99'])): ?><a class="botao botao-99food" href="<?= h($c['food99']) ?>" data-contato="food99" rel="nofollow noopener" target="_blank">Pedir no 99Food</a><?php endif ?>
         </div>

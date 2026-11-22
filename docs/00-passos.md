@@ -275,6 +275,13 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     "Lanchonete Exemplo (teste do cardápio)", pausada, São João:
     https://localizafacilapp.com.br/sao-joao-da-boa-vista/c/lanchonete-exemplo-teste-do-cardapio-103616#cardapio
     Ainda NÃO tem: tela para o dono/admin montar o cardápio, app, plano. Se o usuário não gostar: apagar a ficha 103616.
+43. 🧪 Catálogo por segmento (22/11, TESTE, "como adequar a cada segmento"). O cardápio virou catálogo que muda de cara
+    pelo tipo/área (CATALOGO_MODELOS, catalogo_modelo() em inc/web.php): comida 🍔 Cardápio, roupas 👕 Produtos, mercado
+    🛒 Ofertas (com validade), bebidas 🍺 Bebidas (aviso +18), autopeças 🔧 Peças (aviso de compatibilidade), farmácia
+    💊 Produtos (não anuncia medicamentos: só serviços, higiene e beleza), ótica 👓 Produtos (lentes pela receita).
+    Itens ganharam: preco_de (de/por), a_partir, unidade (/kg, /fardo), etiquetas (tamanhos, cores, carros); preço 0 =
+    "Grátis". Fichas de teste pausadas (prévia só da equipe), São João: 103616 lanchonete, 103617 moda, 103618
+    supermercado, 103619 adega, 103620 autopeças, 103621 farmácia, 103622 ótica. Se não aprovar: apagar 103616–103622.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
