@@ -823,4 +823,11 @@ details.chips-mais .chips { margin: 0 0 4px; }
 .cj-enviar { width: 100%; min-height: 56px; font-size: 1.05rem; margin-top: 6px; }
 .cj-limpar { border: 0; background: none; color: #c0392b; font: inherit; font-weight: 800; font-size: .9rem; cursor: pointer; padding: 6px 0; }
 body.sem-rolagem { overflow: hidden; }
+/* 22/11 (passo 48): um pedido por loja */
+.carrinho-outro { background: var(--amarelo-claro); border: 2px solid var(--amarelo); border-radius: 14px; padding: 10px 14px; font-size: .92rem; margin: 10px 0; }
+.carrinho-outro[hidden] { display: none; }
+.carrinho-outro a { font-weight: 900; color: var(--verde); }
+.cc-caixa { text-align: center; } .cc-caixa h3 { margin-top: 4px; }
+.cc-caixa .botao { display: flex; width: 100%; justify-content: center; margin-top: 10px; min-height: 52px; box-sizing: border-box; }
+.cc-cancelar { margin-top: 8px; color: var(--texto2); }
 

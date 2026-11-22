@@ -313,6 +313,11 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     ficha; nome e endereço guardados para o próximo pedido. Item sem preço fixo ("a partir de") vai como "a confirmar".
     api/item.php recebe a lista inteira (cada item conta; 1 toque no WhatsApp). Na prévia sem WhatsApp abre
     wa.me/ para escolher o contato. Testado com jsdom (fluxo completo, mensagem, contagem). Falta: app e aprovação.
+48. ✅ Um pedido por loja (22/11, pedido do usuário). O carrinho é um só no celular (lf_carrinho, guarda a loja). Com
+    pedido aberto numa loja, a outra mostra "Você tem um pedido aberto em X" e, ao tentar adicionar, a janela
+    "Limpar o pedido?" (Limpar pedido e adicionar / Voltar ao pedido de X / Cancelar); o item só entra depois de
+    limpar. Ficha de teste 103616 com o WhatsApp do usuário (19992302598) para testar o pedido de verdade.
+    Testado com jsdom (duas lojas: aviso, janela, cancelar, limpar e adicionar, 2º item direto).
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

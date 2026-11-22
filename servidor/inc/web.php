@@ -648,6 +648,16 @@ function web_pagina_ficha(array $p): void {
         <?php endforeach ?>
         <p class="discreto"><?= h($mod['aviso']) ?></p>
         <?php if ($carrinho): ?>
+        <p class="carrinho-outro" id="carrinho-outro" hidden>🛒 Você tem um pedido aberto em <a id="co-link" href="#"></a>. Só dá para pedir de uma loja por vez.</p>
+        <div class="carrinho-janela" id="carrinho-conflito" role="alertdialog" aria-modal="true" aria-labelledby="cc-titulo" hidden>
+          <div class="cj-caixa cc-caixa">
+            <h3 id="cc-titulo">Limpar o pedido?</h3>
+            <p>Seu pedido tem itens de <b id="cc-loja"></b>. Para adicionar itens de <b><?= h($p['nome']) ?></b>, é preciso limpar o pedido anterior.</p>
+            <button type="button" class="botao amarelo cc-limpar" id="cc-limpar">Limpar pedido e adicionar</button>
+            <a class="botao contorno cc-voltar" id="cc-voltar" href="#">Voltar ao pedido de <span id="cc-loja2"></span></a>
+            <button type="button" class="cj-limpar cc-cancelar" id="cc-cancelar">Cancelar</button>
+          </div>
+        </div>
         <div class="carrinho-barra" id="carrinho-barra" hidden>
           <button type="button" class="botao whats" id="carrinho-abrir">🛒 Ver pedido · <span id="cb-qtd">0 itens</span> · <b id="cb-total"></b></button>
         </div>
@@ -675,11 +685,23 @@ function web_pagina_ficha(array $p): void {
         </div>
         <script>(function () {   // 22/11 (passo 47): carrinho do catálogo -> pedido inteiro no WhatsApp
           var pid = <?= (int)$p['id'] ?>, base = <?= json_encode($whats_base, JSON_UNESCAPED_SLASHES) ?>, comercio = <?= json_encode((string)$p['nome'], JSON_UNESCAPED_UNICODE) ?>;
-          var chave = 'lf_carrinho_' + pid, itens = {};
-          try { itens = JSON.parse(localStorage.getItem(chave) || '{}') || {}; } catch (e) {}
+          // 22/11 (passo 48): um pedido por vez, de uma loja só. O carrinho é um só no celular (lf_carrinho) e guarda a loja.
+          var chave = 'lf_carrinho', itens = {}, outro = null, pendente = null;
+          var esta = { pid: pid, nome: comercio, url: <?= json_encode(url_ficha($p) . '#cardapio', JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?> };
+          try {
+            var salvo = JSON.parse(localStorage.getItem(chave) || 'null');
+            if (salvo && salvo.pid === pid) itens = salvo.itens || {};
+            else if (salvo && salvo.itens && Object.keys(salvo.itens).length) outro = salvo;   // pedido aberto em outra loja
+            localStorage.removeItem('lf_carrinho_' + pid);   // carrinho do formato antigo (passo 47)
+          } catch (e) {}
           var $ = function (id) { return document.getElementById(id); };
           var reais = function (v) { return 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'); };
-          function guardar() { try { localStorage.setItem(chave, JSON.stringify(itens)); } catch (e) {} }
+          function guardar() {
+            try {
+              if (Object.keys(itens).length) localStorage.setItem(chave, JSON.stringify({ pid: esta.pid, nome: esta.nome, url: esta.url, itens: itens }));
+              else if (!outro) localStorage.removeItem(chave);   // vazio: não apaga o pedido de outra loja
+            } catch (e) {}
+          }
           function controles() { return document.querySelectorAll('.carrinho-qtd'); }
           function dados(el) { return { id: el.dataset.item, nome: el.dataset.nome, preco: el.dataset.preco === '' ? null : parseFloat(el.dataset.preco), un: el.dataset.unidade }; }
           // tira do carrinho guardado o que não existe mais (item apagado ou esgotado)
@@ -716,6 +738,7 @@ function web_pagina_ficha(array $p): void {
             if (c.q === 0 && !$('carrinho-janela').hidden) fechar();
           }
           function mudar(id, d, el) {
+            if (d > 0 && outro && !Object.keys(itens).length) { pendente = [id, d, el]; conflito(); return; }   // pedido de outra loja
             var it = itens[id];
             if (!it && d > 0 && el) { var x = dados(el); it = itens[id] = { nome: x.nome, preco: x.preco, un: x.un, n: 0 }; }
             if (!it) return;
@@ -729,12 +752,24 @@ function web_pagina_ficha(array $p): void {
             var id = el.dataset.item, alvo = document.querySelector('.carrinho-qtd[data-item="' + id + '"]');
             mudar(id, b.hasAttribute('data-mais') ? 1 : -1, alvo);
           });
+          function conflito() {
+            $('cc-loja').textContent = $('cc-loja2').textContent = outro.nome; $('cc-voltar').href = outro.url;
+            $('carrinho-conflito').hidden = false; document.body.classList.add('sem-rolagem');
+          }
+          function fecharConflito() { $('carrinho-conflito').hidden = true; document.body.classList.remove('sem-rolagem'); pendente = null; }
+          $('cc-cancelar').addEventListener('click', fecharConflito);
+          $('carrinho-conflito').addEventListener('click', function (ev) { if (ev.target.id === 'carrinho-conflito') fecharConflito(); });
+          $('cc-limpar').addEventListener('click', function () {
+            var p = pendente; outro = null; $('carrinho-outro').hidden = true; fecharConflito();
+            if (p) mudar(p[0], p[1], p[2]);
+          });
+          if (outro) { $('co-link').textContent = outro.nome; $('co-link').href = outro.url; $('carrinho-outro').hidden = false; }
           function abrir() { $('carrinho-janela').hidden = false; document.body.classList.add('sem-rolagem'); }
           function fechar() { $('carrinho-janela').hidden = true; document.body.classList.remove('sem-rolagem'); }
           $('carrinho-abrir').addEventListener('click', abrir);
           $('cj-fechar').addEventListener('click', fechar);
           $('carrinho-janela').addEventListener('click', function (ev) { if (ev.target.id === 'carrinho-janela') fechar(); });
-          document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') fechar(); });
+          document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { fechar(); fecharConflito(); } });
           $('cj-limpar').addEventListener('click', function () { if (confirm('Esvaziar o pedido?')) { itens = {}; guardar(); desenhar(); } });
           document.querySelectorAll('input[name="cj-receber"]').forEach(function (r) { r.addEventListener('change', function () { $('cj-end-rot').hidden = !document.querySelector('input[name="cj-receber"][value="entrega"]').checked; }); });
           $('cj-pagamento').addEventListener('change', function () { $('cj-troco-rot').hidden = this.value !== 'Dinheiro'; });
