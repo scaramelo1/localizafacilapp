@@ -381,3 +381,8 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 57. ✅ Recusados podem ser aprovados (22/11, pedido do usuário: "alguns estão certos, vou verificar todos"). Em
     /admin/sobre-site.php, aba Recusados: mostra o motivo, o texto em caixa editável e "✅ Aprovar" (vai para a ficha na
     hora). Todas as abas com páginas de 100 (?pagina=), e aprovar/recusar volta para a mesma página.
+58. ✅ Aprovar sem recarregar (22/11, pedido do usuário: "está demorando atualizando toda hora"). /admin/sobre-site.php:
+    Aprovar, Recusar, Tirar da ficha e Tirar o site mandam por fetch (ajax=1, resposta JSON em sobre_resposta()); o
+    quadro fica verde/cinza com o resultado e some em 1,5 s; o número da aba desce. Ctrl+Enter na caixa = Aprovar.
+    Sem JavaScript continua funcionando como antes. Tirado o web_cache_limpar() de cada clique (a ficha não fica em
+    cache e as listas não mostram o Sobre).
