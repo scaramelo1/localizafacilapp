@@ -221,6 +221,12 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     cidades, áreas, 10 comércios mais abertos, tipos de contato, horários de pico, páginas de entrada; no fim a tabela
     de todas as fichas (área, tipo, plano, só abertas, CSV, páginas) e "Como ler estes números". /admin/entradas.php
     redireciona para cá; menu Números > "Números e de onde vêm".
+33. ✅ Aviso de avaliação (21/11, pedido do usuário). inc/avaliacao-aviso.php, chamado por api/avaliar.php (app e site usam
+    o mesmo endereço): o dono recebe aviso no celular (contas do app dos pedidos do comércio: pago, painel liberado ou
+    cadastro aprovado) e e-mail (o do pedido ou o da conta Google), com estrelas, comentário e link da ficha; os admins
+    recebem aviso no celular, que abre a ficha no app. Avaliação editada só avisa se mudou nota ou comentário, e a
+    mesma pessoa na mesma ficha só avisa de novo depois de 10 min (dados_dir/avaliacoes-avisadas.json). O dono
+    avaliando a própria ficha não recebe. Ficha sem dono: o aviso dos admins diz "comércio sem dono cadastrado".
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
