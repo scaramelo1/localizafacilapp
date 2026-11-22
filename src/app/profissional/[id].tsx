@@ -8,6 +8,7 @@ import { chamar, ORIGENS, reais, registrarContato, type Oferta, type Origem, typ
 import { Cabecalho } from '../../componentes/Cabecalho';
 import { CapaComercio } from '../../componentes/CapaComercio';
 import { Catalogo } from '../../componentes/Catalogo';
+import { BarraPedido } from '../../componentes/Pedido';
 import { Horarios } from '../../componentes/Horarios';
 import { Trancado } from '../../componentes/Trancado';
 import { Botao, Estrelas, Etiqueta, Falha, Carregando, SeloVerificado, estilos as ui, useCarregar } from '../../componentes/ui';
@@ -67,6 +68,7 @@ export default function TelaProfissional() {
   const compartilhar = () => compartilharFicha(p);
 
   return (
+    <View style={{ flex: 1 }}>
     <ScrollView contentContainerStyle={{ paddingBottom: 48 }}>
       <Cabecalho voltar />
       {/* capa: carrossel com as fotos do comércio e o logo num círculo por cima (sem fotos, a cor da área) */}
@@ -119,7 +121,7 @@ export default function TelaProfissional() {
             ))}
           </View>
         ) : null}
-        {aba === 'catalogo' && p.catalogo ? <Catalogo id={p.id} catalogo={p.catalogo} /> : null}
+        {aba === 'catalogo' && p.catalogo ? <Catalogo id={p.id} loja={p.nome} catalogo={p.catalogo} /> : null}
         {(aba === 'info' || !p.catalogo) && (
           <>
           {!p.whatsapp && !p.telefone && (
@@ -283,6 +285,9 @@ export default function TelaProfissional() {
         )}
       </View>
     </ScrollView>
+    {/* 22/11 (passo 49): barra "Ver pedido" (so com itens desta loja no pedido) */}
+    {p.catalogo?.carrinho ? <BarraPedido pid={p.id} /> : null}
+    </View>
   );
 }
 

@@ -197,6 +197,9 @@ function catalogo_api(array $p): ?array {
     $info = cardapio_info($p['cardapio'] ?? null);
     return [
         'aba' => $mod['aba'], 'titulo' => $mod['titulo'], 'aviso' => $mod['aviso'], 'botao' => $mod['botao'],
+        // 22/11 (passo 49): pedido de vários itens no app (comida, mercado, bebidas com WhatsApp)
+        'carrinho' => !empty($mod['carrinho']) && !empty($p['whatsapp']),
+        'whatsapp' => !empty($p['whatsapp']) ? link_whatsapp((string)$p['whatsapp']) : null,
         'atualizado' => $info['atualizado'] ? catalogo_dia($info['atualizado']) : null,
         'validade' => $info['validade_ate'] ? 'Ofertas válidas até ' . catalogo_dia($info['validade_ate']) : ($info['validade'] ?: null),
         'secoes' => array_map(fn($s) => ['nome' => $s['nome'], 'itens' => array_map(fn($it) => [
@@ -204,6 +207,8 @@ function catalogo_api(array $p): ?array {
             'preco' => isset($it['preco']) ? cardapio_preco($it['preco']) : null,
             'precoDe' => !empty($it['preco_de']) ? cardapio_preco($it['preco_de']) : null,
             'aPartir' => !empty($it['a_partir']), 'unidade' => $it['unidade'] ?? null, 'etiquetas' => $it['etiquetas'] ?? [],
+            // preço em número para somar o pedido (null: sem preço fixo, vai como "a confirmar")
+            'precoNum' => isset($it['preco']) && empty($it['a_partir']) ? round((float)$it['preco'], 2) : null,
             'destaque' => !empty($it['destaque']), 'esgotado' => !empty($it['esgotado']),
             'foto' => !empty($it['foto']) ? foto_url((string)$it['foto']) : null,
             'mensagem' => catalogo_msg_item($it, (string)$p['nome']),

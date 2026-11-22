@@ -1,19 +1,45 @@
 // 22/11 (passo 45): catalogo da ficha no app (Cardapio, Produtos, Ofertas, Pecas...), so Destaque com 1+ item.
 // Cada item tem o botao "Pedir", que abre o WhatsApp do comercio ja com o nome e o preco do item.
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Alert, Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { registrarItem, type Catalogo as TipoCatalogo, type CatalogoItem } from '../api/cliente';
+import { limparPedido, mudarItem, pedidoDeOutraLoja, usePedido } from '../carrinho';
 import { cores, fonte } from '../tema';
 
-export function Catalogo({ id, catalogo }: { id: number; catalogo: TipoCatalogo }) {
+export function Catalogo({ id, loja, catalogo }: { id: number; loja: string; catalogo: TipoCatalogo }) {
+  const router = useRouter();
+  const pedido = usePedido();
+  // 22/11 (passo 49): pedido de varios itens (comida, mercado, bebidas com WhatsApp); um pedido por loja
+  const comPedido = !!catalogo.carrinho && !!catalogo.whatsapp;
+  const outra = pedidoDeOutraLoja(id);
+  const qtd = (itemId: string) => (pedido && pedido.pid === id ? pedido.itens[itemId]?.n ?? 0 : 0);
+  const mexer = (it: CatalogoItem, d: number) => {
+    const dados = { pid: id, nome: loja, whatsapp: catalogo.whatsapp! };
+    const fazer = () => mudarItem(dados, it.id, { nome: it.nome, preco: it.precoNum ?? null }, d);
+    const aberto = d > 0 ? pedidoDeOutraLoja(id) : null;
+    if (!aberto) return fazer();
+    Alert.alert('Limpar o pedido?', `Seu pedido tem itens de ${aberto.nome}. Para adicionar itens de ${loja}, é preciso limpar o pedido anterior.`, [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: `Voltar ao pedido`, onPress: () => router.push(`/profissional/${aberto.pid}?origem=link`) },
+      { text: 'Limpar e adicionar', style: 'destructive', onPress: () => { limparPedido(); fazer(); } },
+    ]);
+  };
   const pedir = (it: CatalogoItem) => {
     if (!it.pedir) return;
     registrarItem(id, it.id);
     Linking.openURL(it.pedir).catch(() => {});
   };
   return (
-    <View style={{ marginTop: 8 }}>
+    <View style={{ marginTop: 8, paddingBottom: comPedido ? 80 : 0 }}>
+      {comPedido && outra ? (
+        <Pressable onPress={() => router.push(`/profissional/${outra.pid}?origem=link`)} style={estilos.outra}>
+          <Text style={estilos.outraTexto}>
+            Você tem um pedido aberto em <Text style={{ fontWeight: '900', color: cores.verde }}>{outra.nome}</Text>. Só dá para pedir de uma loja por vez.
+          </Text>
+        </Pressable>
+      ) : null}
       {catalogo.validade ? (
         <View style={estilos.validade}>
           <MaterialCommunityIcons name="calendar-clock" size={18} color={cores.verde} />
@@ -57,7 +83,24 @@ export function Catalogo({ id, catalogo }: { id: number; catalogo: TipoCatalogo 
                     ))}
                   </View>
                 ) : null}
-                {it.pedir ? (
+                {comPedido && !it.esgotado ? (
+                  qtd(it.id) === 0 ? (
+                    <Pressable accessibilityRole="button" onPress={() => mexer(it, 1)} style={({ pressed }) => [estilos.adicionar, pressed && { opacity: 0.8 }]}>
+                      <MaterialCommunityIcons name="plus" size={18} color={cores.verde} />
+                      <Text style={estilos.adicionarTexto}>Adicionar</Text>
+                    </Pressable>
+                  ) : (
+                    <View style={estilos.qtd}>
+                      <Pressable accessibilityRole="button" accessibilityLabel="Tirar um" onPress={() => mexer(it, -1)} style={estilos.qtdBotao} hitSlop={6}>
+                        <MaterialCommunityIcons name="minus" size={20} color={cores.verde} />
+                      </Pressable>
+                      <Text style={estilos.qtdN}>{qtd(it.id)}</Text>
+                      <Pressable accessibilityRole="button" accessibilityLabel="Pôr mais um" onPress={() => mexer(it, 1)} style={estilos.qtdBotao} hitSlop={6}>
+                        <MaterialCommunityIcons name="plus" size={20} color={cores.verde} />
+                      </Pressable>
+                    </View>
+                  )
+                ) : it.pedir ? (
                   <Pressable accessibilityRole="button" onPress={() => pedir(it)} style={({ pressed }) => [estilos.pedir, pressed && { opacity: 0.8 }]}>
                     <MaterialCommunityIcons name="whatsapp" size={18} color={cores.whatsapp} />
                     <Text style={estilos.pedirTexto}>Pedir</Text>
@@ -91,4 +134,11 @@ const estilos = StyleSheet.create({
   pedir: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', borderWidth: 2, borderColor: cores.whatsapp, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 5, marginTop: 8 },
   pedirTexto: { fontWeight: '800', color: cores.whatsapp, fontSize: fonte.pequena },
   aviso: { color: cores.textoSuave, fontSize: fonte.pequena, marginTop: 14, lineHeight: 20 },
+  outra: { backgroundColor: cores.fundoSuave, borderWidth: 2, borderColor: cores.amarelo, borderRadius: 14, padding: 12, marginTop: 8 },
+  outraTexto: { fontSize: fonte.pequena, color: cores.texto, lineHeight: 21 },
+  adicionar: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', borderWidth: 2, borderColor: cores.verde, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6, marginTop: 8 },
+  adicionarTexto: { fontWeight: '900', color: cores.verde, fontSize: fonte.pequena },
+  qtd: { flexDirection: 'row', alignItems: 'center', gap: 14, alignSelf: 'flex-start', backgroundColor: cores.verde, borderRadius: 999, padding: 4, marginTop: 8 },
+  qtdBotao: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
+  qtdN: { color: '#fff', fontWeight: '900', fontSize: fonte.normal, minWidth: 18, textAlign: 'center' },
 });

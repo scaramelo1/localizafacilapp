@@ -49,6 +49,7 @@ export default function TelaAdmin() {
         ) : dados ? (
           <>
             <Botao titulo="Enviar notificação aos usuários" icone="bell-ring-outline" tipo="amarelo" onPress={() => router.push('/notificar')} />
+            <AbrirFicha />
 
             {(dados.eventos?.length ?? 0) > 0 && (
               <>
@@ -361,3 +362,29 @@ const estilos = StyleSheet.create({
     backgroundColor: cores.cartao,
   },
 });
+
+/** 22/11 (passo 49): abre qualquer ficha pelo numero, inclusive as de teste fora do app (previa da equipe). */
+function AbrirFicha() {
+  const router = useRouter();
+  const [num, setNum] = useState('');
+  const abrir = () => {
+    const n = Number.parseInt(num, 10);
+    if (n > 0) router.push(`/profissional/${n}?origem=link`);
+  };
+  return (
+    <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, alignItems: 'center' }}>
+      <TextInput
+        value={num}
+        onChangeText={(t) => setNum(t.replace(/\D/g, ''))}
+        onSubmitEditing={abrir}
+        placeholder="Nº da ficha (ex.: 103616)"
+        keyboardType="number-pad"
+        returnKeyType="go"
+        style={{ flex: 1, borderWidth: 2, borderColor: cores.borda, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 10, fontSize: fonte.normal, backgroundColor: '#fff', color: cores.texto }}
+        placeholderTextColor={cores.textoSuave}
+      />
+      <Botao titulo="Abrir ficha" icone="open-in-app" tipo="contorno" onPress={abrir} />
+    </View>
+  );
+}
+

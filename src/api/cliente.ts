@@ -356,12 +356,18 @@ export interface CatalogoItem {
   mensagem: string;
   /** Link do WhatsApp ja com o item escrito (null sem WhatsApp ou esgotado). */
   pedir: string | null;
+  /** Preco em numero para somar o pedido (null: sem preco fixo). Servidor antigo nao manda. */
+  precoNum?: number | null;
 }
 export interface Catalogo {
   aba: string;
   titulo: string;
   aviso: string;
   botao: string;
+  /** 22/11 (passo 49): aceita pedido de varios itens pelo WhatsApp (comida, mercado, bebidas). */
+  carrinho?: boolean;
+  /** https://wa.me/55... do comercio (sem texto). */
+  whatsapp?: string | null;
   atualizado: string | null;
   validade: string | null;
   secoes: { nome: string; itens: CatalogoItem[] }[];
@@ -369,5 +375,9 @@ export interface Catalogo {
 /** "Pedir" de um item do catalogo: conta o item e um toque no WhatsApp. */
 export function registrarItem(id: number, item: string) {
   chamar('item.php', 'POST', { id, item, origem: 'app' }).catch(() => {});
+}
+/** Pedido de varios itens enviado pelo WhatsApp: conta cada item e 1 toque no WhatsApp. */
+export function registrarPedido(id: number, itens: string[]) {
+  chamar('item.php', 'POST', { id, itens, origem: 'app' }).catch(() => {});
 }
 

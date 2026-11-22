@@ -318,6 +318,15 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     "Limpar o pedido?" (Limpar pedido e adicionar / Voltar ao pedido de X / Cancelar); o item só entra depois de
     limpar. Ficha de teste 103616 com o WhatsApp do usuário (19992302598) para testar o pedido de verdade.
     Testado com jsdom (duas lojas: aviso, janela, cancelar, limpar e adicionar, 2º item direto).
+49. ✅ Pedido de vários itens no app (22/11, pedido do usuário: "ficou perfeito, pode implantar no app"), app 1.15.0.
+    src/carrinho.ts (um pedido por vez, de uma loja, guardado no celular; mensagem igual à do site, sem emoji),
+    src/componentes/Pedido.tsx (barra "Ver pedido - N itens - R$ X" e janela: itens com - +, total, retirar ou entregar,
+    pagamento Pix/Dinheiro com troco/Cartão, nome, observação, "Enviar pedido pelo WhatsApp", esvaziar), Catalogo.tsx
+    ("Adicionar" e - n + em cada item; trocar de loja pergunta "Limpar o pedido?": Cancelar / Voltar ao pedido / Limpar e
+    adicionar; aviso de pedido aberto em outra loja). API: catalogo.carrinho, catalogo.whatsapp, item.precoNum;
+    registrarPedido() conta todos os itens. Prévia da equipe também no app: api/profissional.php abre ficha fora do app
+    para conta de admin (catálogo como Destaque). Administração do app: "Abrir ficha pelo número" (ex.: 103616).
+    Testes: sintaxe (esbuild), lógica do pedido em node, API como visitante (404) e admin (catálogo com carrinho).
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
