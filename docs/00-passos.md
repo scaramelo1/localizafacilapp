@@ -332,7 +332,7 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     catálogo (venda é do comércio; Destaque vencido = catálogo some, mas fica guardado). E-mail modelo para lanchonetes
     (enviar por Admin > E-mails > Um e-mail só).
     Ficha de teste 103623 "Lanchonete Exemplo 2 (teste de pedidos)": cópia da 103616 (mesmo cardápio), pausada, só
-    admin vê, pedidos para o WhatsApp 19992799811. Se não precisar mais: apagar a 103623.
+    admin vê, pedidos para o WhatsApp 19992799811. NÃO APAGAR: fica pausada para futuros testes (pedido do usuário).
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
