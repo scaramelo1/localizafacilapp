@@ -99,6 +99,9 @@ cat > /etc/cron.d/$NOME <<CRON
 23 * * * * root php $RAIZ/google-visitas.php >/dev/null 2>&1
 # 21/11: fila de e-mails (inc/email.php), de minuto em minuto, como www-data (mesmo dono dos arquivos do admin)
 * * * * * www-data php $RAIZ/enviar-emails.php >> /var/log/guia-novo-emails.log 2>&1
+# 22/11 (passo 45): catálogo - ofertas vencidas saem da busca (madrugada) e lembrete semanal aos Destaque (segunda, 10h23)
+17 3 * * * www-data php $RAIZ/catalogo-diario.php >> /var/log/guia-novo-catalogo.log 2>&1
+23 10 * * 1 www-data php $RAIZ/catalogo-semanal.php >> /var/log/guia-novo-catalogo.log 2>&1
 CRON
 chmod 644 /etc/cron.d/$NOME
 echo; echo "Pronto: https://fsadesigners.com.br/guia-novo/"

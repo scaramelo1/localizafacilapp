@@ -6,7 +6,7 @@ require_once __DIR__ . '/guia.php';
 require_once __DIR__ . '/numeros.php';
 require_once __DIR__ . '/avisos.php';
 
-const AVISO_INFO_TEXTO = ['horario' => 'o horário', 'fotos' => 'fotos', 'sobre' => 'o que vende ou faz', 'whatsapp' => 'o WhatsApp'];
+const AVISO_INFO_TEXTO = ['horario' => 'o horário', 'fotos' => 'fotos', 'sobre' => 'o que vende ou faz', 'whatsapp' => 'o WhatsApp', 'catalogo' => 'os produtos e preços'];
 
 /** A mudança 029 já foi aplicada? Antes disso a pergunta não aparece. */
 function avisos_info_prontos(): bool {

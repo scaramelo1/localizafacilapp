@@ -12,6 +12,7 @@
 // O banco usa utf8mb4_unicode_ci: LIKE já ignora acento, ç e maiúsculas.
 // Cada busca é guardada na tabela buscas (mudança 033) para o /admin/buscas.php.
 declare(strict_types=1);
+require_once __DIR__ . '/guia.php';   // 22/11 (passo 45): SQL_DESTAQUE e o catálogo
 
 /** Palavras que não ajudam a achar nada. */
 const BUSCA_PARADAS = ['de', 'da', 'do', 'das', 'dos', 'e', 'em', 'na', 'no', 'nas', 'nos', 'para', 'pra', 'pro', 'a', 'o', 'as', 'os',
@@ -110,7 +111,9 @@ const BUSCA_SINONIMOS = [
     'material' => ['materia'], 'materiais' => ['materia'],
 ];
 
-const BUSCA_CAMPOS = ['p.nome', 'p.tipo', 'p.servicos', 'p.descricao', 'p.bairro', 'c.nome'];
+// 22/11 (passo 45): itens do catálogo (só Destaque em dia) também são achados: "x-tudo", "pastilha de freio"
+define('BUSCA_CAMPO_CATALOGO', 'IF(' . SQL_DESTAQUE . ', p.catalogo_busca, NULL)');
+const BUSCA_CAMPOS = ['p.nome', 'p.tipo', 'p.servicos', 'p.descricao', 'p.bairro', 'c.nome', BUSCA_CAMPO_CATALOGO];
 const BUSCA_CAMPOS_FORTES = ['p.nome', 'p.tipo', 'c.nome'];   // achou aqui = vem antes na lista
 const BUSCA_LIMITE_PALAVRAS = 5;
 
@@ -190,8 +193,12 @@ function busca_sql(array $grupos, ?string $cidade, int $limite, bool $so_com_hor
         . ($so_com_horario ? " AND p.horarios IS NOT NULL AND p.horarios NOT IN ('', '[]', '{}')" : '');
     $ordem = ($todos ? '' : '(' . implode(' + ', $conds) . ') DESC, ')
         . '(' . implode(' + ', $fortes) . ') DESC, ' . SQL_DESTAQUE . ' DESC, ' . SQL_FICHA_PAGA . ' DESC, ' . SQL_COM_HORARIO . ' DESC, RAND(' . semente_dia() . ')';
-    return linhas('SELECT ' . CAMPOS_RESUMO . ' FROM profissionais p JOIN categorias c ON c.id = p.categoria_id
+    $lista = linhas('SELECT ' . CAMPOS_RESUMO . ' FROM profissionais p JOIN categorias c ON c.id = p.categoria_id
         WHERE ' . $where . ' ORDER BY ' . $ordem . ' LIMIT ' . (int)$limite);
+    // 22/11 (passo 45): qual item do catálogo tem as palavras ("No cardápio: X-Tudo")
+    foreach ($lista as &$l) if (!empty($l['destaque_pago']) && !empty($l['catalogo_busca'])) $l['catalogo_achou'] = catalogo_achou($l['catalogo_busca'], $grupos);
+    unset($l);
+    return $lista;
 }
 
 /** Palavras dos tipos e áreas cadastrados (para corrigir erro de digitação), guardadas por 1 dia. */

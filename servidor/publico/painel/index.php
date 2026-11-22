@@ -207,6 +207,15 @@ pagina_inicio('Painel do comércio | Localiza Fácil', 'Painel do dono do comér
       <br><a class="botao amarelo" href="<?= h(config()['url']) ?>/perfil.php?acao=assumir&amp;plano=basico&amp;id=<?= (int)$p['id'] ?>">Quero o Básico</a>
       <a class="botao contorno" href="<?= h(config()['url']) ?>/planos.php?id=<?= (int)$p['id'] ?>">Ver todos os planos</a></div>
   <?php endif ?>
+  <?php // 22/11 (passo 45): catálogo (Cardápio, Produtos, Ofertas...) - só Destaque; os outros veem o convite
+  $mod_cat = catalogo_modelo($p + ['categoria_slug' => (string)valor('SELECT slug FROM categorias WHERE id = ?', [$p['categoria_id']])]);
+  $tem_cat = (int)($p['catalogo_itens'] ?? 0); ?>
+  <div class="quadro"><strong><?= h($mod_cat['aba']) ?></strong>
+    <?php if ($destaque): ?> · <?= $tem_cat ? h(num($tem_cat)) . ' itens na sua ficha' : 'ainda vazio' ?>. Mostre produtos e preços numa aba da ficha; quem procurar por um item acha você na busca.
+      <br><a class="botao amarelo" href="<?= h(url('painel/catalogo.php')) ?>"><?= $tem_cat ? 'Editar' : 'Montar' ?> <?= h(mb_strtolower($mod_cat['curto'])) ?></a>
+    <?php else: ?> · do plano <b>Destaque</b>. Mostre produtos e preços numa aba da sua ficha e apareça na busca por eles.
+      <br><a class="botao contorno" href="<?= h(url('painel/catalogo.php')) ?>">Ver como funciona</a>
+    <?php endif ?></div>
   <?php if (true): ?>
     <?php if ($erro): ?><div class="aviso erro"><?= h($erro) ?></div><?php endif ?>
     <form method="post" enctype="multipart/form-data">

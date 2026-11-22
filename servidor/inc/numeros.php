@@ -357,7 +357,7 @@ function pct(int $parte, int $total): string { return $total > 0 ? number_format
 
 // ---------- pedidos de informação (passo 59) ----------
 // Botões nas fichas incompletas: "Quero saber o horário", "Quero ver fotos"... Cada pessoa conta 1 vez por dia, por tipo.
-const TIPOS_PEDIDO_INFO = ['horario' => 'Horário', 'fotos' => 'Fotos', 'sobre' => 'O que faz ou vende', 'whatsapp' => 'WhatsApp'];
+const TIPOS_PEDIDO_INFO = ['horario' => 'Horário', 'fotos' => 'Fotos', 'sobre' => 'O que faz ou vende', 'whatsapp' => 'WhatsApp', 'catalogo' => 'Cardápio / produtos'];   // catalogo: 22/11 (passo 45)
 
 /** A mudança 028 já foi aplicada? Antes disso os botões aparecem, mas o pedido não é guardado. */
 function pedidos_info_prontos(): bool {
@@ -404,7 +404,8 @@ function pedidos_info_ficha(int $id, string $desde, ?string $ate = null): array 
 
 /** "3 pessoas pediram o seu horário" (relatório para o comerciante e painel do dono). */
 function pedido_info_frase(string $tipo, int $total): string {
-    $o = ['horario' => 'o seu horário', 'fotos' => 'para ver fotos', 'sobre' => 'para saber o que você vende', 'whatsapp' => 'o seu WhatsApp'][$tipo] ?? $tipo;
+    $o = ['horario' => 'o seu horário', 'fotos' => 'para ver fotos', 'sobre' => 'para saber o que você vende', 'whatsapp' => 'o seu WhatsApp',
+        'catalogo' => 'para ver seus produtos e preços'][$tipo] ?? $tipo;
     return num($total) . ($total > 1 ? ' pessoas pediram ' : ' pessoa pediu ') . $o;
 }
 

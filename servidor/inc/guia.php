@@ -304,7 +304,8 @@ function tem_dono(array $p): bool {
 
 const CAMPOS_RESUMO = 'p.id, p.nome, p.tipo, p.cidade, p.importado, p.servicos, p.bairro, p.atende_em_casa, p.foto, p.fotos, p.verificado, p.plano,
     ' . SQL_DESTAQUE . ' AS destaque_pago, ' . SQL_TEM_DONO . ' AS tem_dono, ' . SQL_FICHA_PAGA . ' AS ficha_paga,
-    p.nota_media, p.total_avaliacoes, p.whatsapp, p.telefone, p.horarios, p.confirmado_em, p.confirmado_por, c.id AS categoria_id, c.nome AS categoria, c.icone, c.cor';
+    p.nota_media, p.total_avaliacoes, p.whatsapp, p.telefone, p.horarios, p.confirmado_em, p.confirmado_por, c.id AS categoria_id, c.nome AS categoria, c.icone, c.cor,
+    p.catalogo_busca, p.catalogo_itens, c.slug AS categoria_slug';   // 22/11 (passo 45): catálogo na busca e no cartão
 
 require_once __DIR__ . '/horarios.php';
 
@@ -345,6 +346,9 @@ function prof_resumo(array $p): array {
         'capa' => foto_url(lista_fotos($p['fotos'] ?? null)[0] ?? null),   // 1ª foto da galeria (faixa do destaque)
         'verificado' => (bool)$p['verificado'] && (bool)($p['destaque_pago'] ?? false),   // o selo é do plano Destaque
         'destaque' => (bool)($p['destaque_pago'] ?? false),   // plano Destaque com a assinatura em dia
+        // 22/11 (passo 45): Destaque com catálogo: selo no cartão ("Cardápio", "Ofertas"...) e o item que a busca achou
+        'catalogoAba' => !empty($p['destaque_pago']) && (int)($p['catalogo_itens'] ?? 0) > 0 ? catalogo_modelo($p)['aba'] : null,
+        'catalogoAchou' => $p['catalogo_achou'] ?? null,
         'nota' => round((float)$p['nota_media'], 1),
         'avaliacoes' => (int)$p['total_avaliacoes'],
         'temWhatsapp' => (bool)$p['whatsapp'],
@@ -476,6 +480,9 @@ function prof_completo(array $p, ?int $usuario_id): array {
         // 22/11 (passo 41): pedir pelo iFood e pelo 99Food (só áreas de comida)
         'ifood' => !empty($p['ifood']) && e_area_comida((int)$p['categoria_id']) ? $p['ifood'] : null,
         'food99' => !empty($p['food99']) && e_area_comida((int)$p['categoria_id']) ? $p['food99'] : null,
+        'catalogo' => ($cat = catalogo_api($p)),   // 22/11 (passo 45): só Destaque com 1+ item
+        // sem catálogo num segmento que costuma ter (comida, roupas, mercado...): espaço trancado "Pedir cardápio"
+        'catalogoTrancado' => !$cat && ($m = catalogo_modelo($p))['chave'] !== 'geral' ? $m['curto'] : null,
         'linkSite' => url_publica(caminho_ficha((int)$p['id'], (string)$p['nome'], (string)$p['cidade'])),   // 19/11: compartilhar no app
         'linkAssumir' => $p['importado'] && !tem_dono($p) ? url_publica('planos.php?id=' . $p['id']) : null,
         'linkRemover' => $p['importado'] && !tem_dono($p) ? url_publica('perfil.php?id=' . $p['id'] . '&acao=remover') : null,
@@ -547,6 +554,7 @@ function recalcular_nota(int $profissional_id): void {
 
 // contar_contato(), contar_visita() e contar_aparicoes() ficam em inc/numeros.php (passo 20)
 require_once __DIR__ . '/numeros.php';
+require_once __DIR__ . '/catalogo.php';   // 22/11 (passo 45): catálogo da ficha (só Destaque)
 
 // Municípios do Brasil (IBGE, dados/municipios.json: {estados: {UF: nome}, cidades: {UF: [nomes]}}) para o
 // "Quero minha Cidade!": o app escolhe o estado e a cidade sai desta lista (nada de nome inventado).

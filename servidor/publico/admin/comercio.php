@@ -140,6 +140,7 @@ $historico = linhas("SELECT r.criado_em, r.acao, r.detalhe, a.nome FROM registro
 admin_inicio('Editar ' . $p['nome'], $admin);
 ?>
 <p><a href="comercios.php">&larr; Comércios</a> · <a href="<?= h(url_ficha($p)) ?>" target="_blank" rel="noopener">ver a ficha no site</a>
+  · <a href="<?= h(url('painel/catalogo.php?id=' . (int)$p['id'])) ?>">catálogo</a>
   · <a href="numeros-ficha.php?id=<?= $id ?>">números</a></p>
 <h1>✏️ <?= adm_comercio($id, $p['nome'], $p['cidade']) ?></h1>
 <p class="discreto">Nº <?= $id ?> · <?= adm_cidade($p['cidade']) ?> · <?= h(STATUS_NOME[$p['status']] ?? $p['status']) ?>

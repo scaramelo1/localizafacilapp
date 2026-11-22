@@ -778,4 +778,19 @@ details.chips-mais .chips { margin: 0 0 4px; }
 .cardapio-etiquetas span { font-size: .78rem; font-weight: 800; padding: 2px 9px; border-radius: 999px; background: var(--verde-claro); color: var(--verde); }
 .cardapio-validade { display: inline-block; background: var(--amarelo); color: var(--verde); font-weight: 900; border-radius: 999px; padding: 5px 14px; margin: 0 0 10px; font-size: .92rem; }
 .cardapio-mercado .cardapio-preco { color: #c0392b; font-size: 1.1rem; }
+/* 22/11 (passo 45): foto do item, esgotado, "Pedir" do item, data de atualização */
+.cardapio-itens li { display: flex; gap: 12px; align-items: flex-start; }
+.cardapio-corpo { flex: 1; min-width: 0; }
+.cardapio-foto { width: 72px; height: 72px; object-fit: cover; border-radius: 12px; flex: 0 0 72px; background: var(--creme); }
+.cardapio-itens li.esgotado .cardapio-nome, .cardapio-itens li.esgotado .cardapio-preco, .cardapio-itens li.esgotado .cardapio-desc { opacity: .5; }
+.cardapio-itens li.esgotado .cardapio-preco { text-decoration: line-through; }
+.cardapio-selo.esgotado { background: #eee; color: #666; }
+.cardapio-pedir-item { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; padding: 6px 14px; border-radius: 999px; border: 2px solid var(--whats);
+  color: var(--whats); font-weight: 800; font-size: .88rem; text-decoration: none; }
+.cardapio-pedir-item:hover { background: var(--whats); color: #fff; }
+.cardapio-atualizado { font-size: .85rem; color: var(--texto2); margin: -6px 0 10px; }
+.cardapio-ate { font-size: .8rem; font-weight: 800; color: #c0392b; margin: 4px 0 0; }
+/* 22/11 (passo 45): selo do catálogo no cartão e item achado pela busca */
+.selo-catalogo { display: inline-block; font-size: .75rem; font-weight: 800; background: var(--amarelo-claro); color: #7a5b00; border-radius: 999px; padding: 1px 9px; margin: 2px 4px 0 0; }
+.cc-achou { display: block; font-size: .82rem; color: var(--verde); margin-top: 3px; }
 

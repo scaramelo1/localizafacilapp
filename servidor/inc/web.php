@@ -131,66 +131,6 @@ function web_ficha_previa(int $id): ?array {
     return $p && isset(CIDADES[$p['cidade']]) ? $p : null;
 }
 
-/** Cardápio guardado na ficha (JSON) -> seções com itens; vazio se não tiver. */
-function cardapio_ler(?string $json): array {
-    $d = $json ? json_decode($json, true) : null;
-    $secoes = [];
-    foreach ((array)($d['secoes'] ?? []) as $s) {
-        $itens = array_values(array_filter((array)($s['itens'] ?? []), fn($i) => trim((string)($i['nome'] ?? '')) !== ''));
-        if ($itens) $secoes[] = ['nome' => trim((string)($s['nome'] ?? '')) ?: 'Cardápio', 'itens' => $itens];
-    }
-    return $secoes;
-}
-/**
- * 22/11 (passo 43): o mesmo catálogo muda de cara conforme o segmento (pelo tipo; senão pela área).
- * aba, título, palavra para os itens, aviso no fim e texto do botão de WhatsApp.
- */
-const CATALOGO_MODELOS = [
-    'comida' => ['aba' => '🍔 Cardápio', 'titulo' => 'Cardápio', 'itens' => 'itens', 'botao' => 'Pedir pelo WhatsApp',
-        'aviso' => 'Preços informados pelo comércio e podem mudar. Confirme na hora de pedir.'],
-    'roupas' => ['aba' => '👕 Produtos', 'titulo' => 'Produtos e coleção', 'itens' => 'produtos', 'botao' => 'Perguntar se tem pelo WhatsApp',
-        'aviso' => 'Tamanhos e cores sujeitos à disponibilidade. Pergunte pelo WhatsApp antes de ir até a loja.'],
-    'mercado' => ['aba' => '🛒 Ofertas', 'titulo' => 'Ofertas', 'itens' => 'ofertas', 'botao' => 'Fazer pedido pelo WhatsApp',
-        'aviso' => 'Ofertas enquanto durar o estoque. Fotos e preços informados pelo mercado.'],
-    'bebidas' => ['aba' => '🍺 Bebidas', 'titulo' => 'Bebidas e preços', 'itens' => 'produtos', 'botao' => 'Pedir pelo WhatsApp',
-        'aviso' => 'Venda proibida para menores de 18 anos. Beba com moderação. Preços informados pelo comércio.'],
-    'pecas' => ['aba' => '🔧 Peças', 'titulo' => 'Peças e serviços', 'itens' => 'itens', 'botao' => 'Consultar peça pelo WhatsApp',
-        'aviso' => 'Confirme se a peça serve no modelo e no ano do seu veículo antes de comprar. Mande a placa ou o chassi pelo WhatsApp.'],
-    'farmacia' => ['aba' => '💊 Produtos', 'titulo' => 'Produtos e serviços', 'itens' => 'itens', 'botao' => 'Falar com a farmácia no WhatsApp',
-        'aviso' => 'Não anunciamos medicamentos. Para remédios, fale com o farmacêutico. Medicamentos com receita só na farmácia, com a receita.'],
-    'otica' => ['aba' => '👓 Produtos', 'titulo' => 'Armações, lentes e serviços', 'itens' => 'itens', 'botao' => 'Perguntar pelo WhatsApp',
-        'aviso' => 'Lentes de grau feitas a partir da receita do seu oftalmologista. Preços de referência; o valor final depende da receita.'],
-    'geral' => ['aba' => '🛍️ Produtos', 'titulo' => 'Produtos e serviços', 'itens' => 'itens', 'botao' => 'Perguntar pelo WhatsApp',
-        'aviso' => 'Preços e disponibilidade informados pelo comércio e podem mudar.'],
-];
-function catalogo_modelo(array $p): array {
-    $t = mb_strtolower((string)($p['tipo'] ?? '') . ' ' . (string)($p['nome'] ?? ''));
-    $chave = match (true) {
-        (bool)preg_match('/farm[aá]c|drogar/u', $t) => 'farmacia',
-        (bool)preg_match('/[óo]tica/u', $t) => 'otica',
-        (bool)preg_match('/autope[çc]|pe[çc]as para|pe[çc]as automot|auto ?pe[çc]/u', $t) => 'pecas',
-        (bool)preg_match('/bebida|adega|cervej|distribuidora/u', $t) => 'bebidas',
-        (bool)preg_match('/supermerc|mercad|mercearia|hortifr|conveni[êe]ncia|a[çc]ougue/u', $t) => 'mercado',
-        (bool)preg_match('/roupa|moda|boutique|cal[çc]ado|vestu/u', $t) => 'roupas',
-        ($p['categoria_slug'] ?? '') === 'alimentacao' => 'comida',
-        ($p['categoria_slug'] ?? '') === 'moda' => 'roupas',
-        ($p['categoria_slug'] ?? '') === 'mercados' => 'mercado',
-        default => 'geral',
-    };
-    return CATALOGO_MODELOS[$chave] + ['chave' => $chave];
-}
-/** Validade das ofertas e outros dados do catálogo inteiro (fora das seções). */
-function cardapio_info(?string $json): array {
-    $d = $json ? json_decode($json, true) : null;
-    return ['validade' => trim((string)($d['validade'] ?? ''))];
-}
-
-function cardapio_preco(mixed $v): string {
-    if ($v === null || $v === '') return '';
-    if ((float)str_replace(',', '.', (string)$v) == 0) return 'Grátis';
-    return 'R$ ' . number_format((float)str_replace(',', '.', (string)$v), 2, ',', '.');
-}
-
 function web_ficha(int $id): ?array {
     if ($id <= 0) return null;
     $p = linha('SELECT p.*, ' . SQL_DESTAQUE . ' AS destaque_pago, c.id AS categoria_id, c.nome AS categoria, c.slug AS categoria_slug, c.icone, c.cor
@@ -274,6 +214,8 @@ function web_cartao(array $p): string {
             : (!empty($p['tem_dono']) ? '<span class="selo-completa">✓ Confirmado pelo dono</span>'
             : (!empty($p['confirmado_em']) ? '<span class="selo-completa">' . (($p['confirmado_por'] ?? '') === 'dono' ? '✓ Confirmado pelo dono' : '✓ Dados conferidos') . '</span>' : ''))))   // passo 78; Plano D passo 8: conferida pela equipe
         . (!$p['destaque_pago'] && web_tem_horario($p) ? '<span class="selo-horario">🕒 Horário informado</span>' : '')   // passo 116
+        . (!empty($p['destaque_pago']) && (int)($p['catalogo_itens'] ?? 0) > 0 ? '<span class="selo-catalogo">' . h(catalogo_modelo($p)['aba']) . '</span>' : '')   // passo 45
+        . (!empty($p['catalogo_achou']) ? '<span class="cc-achou">' . h(catalogo_modelo($p)['curto']) . ': <b>' . h((string)$p['catalogo_achou']) . '</b></span>' : '')
         . web_nota($p) . '</span></a></li>';
 }
 function web_tem_horario(array $p): bool {
@@ -606,6 +548,7 @@ function web_pagina_ficha(array $p): void {
           'fotos' => $fotos ? null : 'Fotos',
           'horario' => $tem_horario ? null : 'Horário',
           'sobre' => $tem_sobre ? null : 'O que vende ou faz',
+          'catalogo' => $c['catalogoTrancado'] ?? null,   // 22/11 (passo 45): Cardápio / Produtos / Ofertas... (só no plano Destaque)
       ])) ?>
 
       <?php if ($fotos): ?>
@@ -666,14 +609,20 @@ function web_pagina_ficha(array $p): void {
       <section id="painel-cardapio" class="cardapio cardapio-<?= h($mod['chave']) ?>" role="tabpanel" aria-labelledby="aba-cardapio">
         <h2><?= h($mod['titulo']) ?></h2>
         <?php if ($previa && empty($p['destaque_pago'])): ?><p class="aviso-previa">👁️ Na ficha de verdade esta aba só aparece para quem tem o plano <b>Destaque</b>.</p><?php endif ?>
-        <?php if ($info_cat['validade'] !== ''): ?><p class="cardapio-validade">📅 <?= h($info_cat['validade']) ?></p><?php endif ?>
+        <?php // 22/11 (passo 45): validade das ofertas, data da última atualização ?>
+        <?php if ($info_cat['validade_ate'] !== ''): ?><p class="cardapio-validade">📅 Ofertas válidas até <?= h(catalogo_dia($info_cat['validade_ate'])) ?></p>
+        <?php elseif ($info_cat['validade'] !== ''): ?><p class="cardapio-validade">📅 <?= h($info_cat['validade']) ?></p><?php endif ?>
+        <?php if ($info_cat['atualizado'] !== ''): ?><p class="cardapio-atualizado">Atualizado em <?= h(catalogo_dia($info_cat['atualizado'])) ?></p><?php endif ?>
         <?php if (count($cardapio) > 1): ?><nav class="cardapio-secoes" aria-label="Seções">
           <?php foreach ($cardapio as $i => $s): ?><a href="#cardapio-<?= $i ?>"><?= h($s['nome']) ?></a><?php endforeach ?></nav><?php endif ?>
-        <?php foreach ($cardapio as $i => $s): ?>
+        <?php $num_whats = $p['whatsapp'] ?: null;
+        foreach ($cardapio as $i => $s): ?>
           <h3 id="cardapio-<?= $i ?>"><?= h($s['nome']) ?></h3>
           <ul class="cardapio-itens">
-            <?php foreach ($s['itens'] as $it): ?><li>
-              <div class="cardapio-linha"><span class="cardapio-nome"><?= h((string)$it['nome']) ?><?php if (!empty($it['destaque'])): ?> <span class="cardapio-selo">⭐ Mais pedido</span><?php endif ?></span>
+            <?php foreach ($s['itens'] as $it): $esg = !empty($it['esgotado']); $item_id = (string)($it['id'] ?? md5((string)$it['nome'])); ?><li class="<?= $esg ? 'esgotado' : '' ?><?= !empty($it['foto']) ? ' com-foto' : '' ?>">
+              <?php if (!empty($it['foto'])): ?><img class="cardapio-foto" src="<?= h(foto_url((string)$it['foto'])) ?>" alt="" loading="lazy" width="72" height="72"><?php endif ?>
+              <div class="cardapio-corpo">
+              <div class="cardapio-linha"><span class="cardapio-nome"><?= h((string)$it['nome']) ?><?php if (!empty($it['destaque']) && !$esg): ?> <span class="cardapio-selo">⭐ Mais pedido</span><?php endif ?><?php if ($esg): ?> <span class="cardapio-selo esgotado">Esgotado</span><?php endif ?></span>
                 <span class="cardapio-pontos" aria-hidden="true"></span><span class="cardapio-preco"><?php
                   // 22/11 (passo 43): "de R$ X por" (oferta), "a partir de" e unidade (/kg, /fardo)
                   if (!empty($it['preco_de'])): ?><s><?= h(cardapio_preco($it['preco_de'])) ?></s> <?php endif;
@@ -681,6 +630,10 @@ function web_pagina_ficha(array $p): void {
                   if (!empty($it['unidade'])): ?><small>/<?= h((string)$it['unidade']) ?></small><?php endif ?></span></div>
               <?php if (!empty($it['desc'])): ?><p class="cardapio-desc"><?= h((string)$it['desc']) ?></p><?php endif ?>
               <?php if (!empty($it['etiquetas'])): ?><p class="cardapio-etiquetas"><?php foreach ((array)$it['etiquetas'] as $e): ?><span><?= h((string)$e) ?></span><?php endforeach ?></p><?php endif ?>
+              <?php if (!empty($it['ate'])): ?><p class="cardapio-ate">Até <?= h(catalogo_dia((string)$it['ate'])) ?></p><?php endif ?>
+              <?php // "Pedir" deste item: WhatsApp já escrito com o nome e o preço; conta no catálogo e como toque no WhatsApp
+              if ($num_whats && !$esg): ?><a class="cardapio-pedir-item" href="<?= h(link_whatsapp($num_whats, catalogo_msg_item($it, (string)$p['nome']))) ?>" data-item="<?= h($item_id) ?>" rel="nofollow noopener" target="_blank">💬 Pedir</a><?php endif ?>
+              </div>
             </li><?php endforeach ?>
           </ul>
         <?php endforeach ?>
@@ -696,6 +649,11 @@ function web_pagina_ficha(array $p): void {
         var bi = document.getElementById('aba-info'), bc = document.getElementById('aba-cardapio');
         function mostrar(c) { info.hidden = c; card.hidden = !c; bi.setAttribute('aria-selected', c ? 'false' : 'true'); bc.setAttribute('aria-selected', c ? 'true' : 'false'); }
         abas.hidden = false;
+        card.addEventListener('click', function (ev) {   // 22/11 (passo 45): "Pedir" de um item
+          var a = ev.target.closest('[data-item]'); if (!a) return;
+          try { fetch(<?= json_encode(url('api/item.php')) ?>, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: <?= (int)$p['id'] ?>, item: a.dataset.item, origem: 'web' }) }); } catch (e) {}
+        });
         bi.addEventListener('click', function () { mostrar(false); history.replaceState(null, '', location.pathname); });
         bc.addEventListener('click', function () { mostrar(true); history.replaceState(null, '', '#cardapio'); });
         mostrar(/^#cardapio/.test(location.hash));
