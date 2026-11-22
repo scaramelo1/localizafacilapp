@@ -282,6 +282,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     Itens ganharam: preco_de (de/por), a_partir, unidade (/kg, /fardo), etiquetas (tamanhos, cores, carros); preço 0 =
     "Grátis". Fichas de teste pausadas (prévia só da equipe), São João: 103616 lanchonete, 103617 moda, 103618
     supermercado, 103619 adega, 103620 autopeças, 103621 farmácia, 103622 ótica. Se não aprovar: apagar 103616–103622.
+44. ✅ Ajustes do catálogo (22/11, pedido do usuário): só Destaque em dia tem catálogo; a aba só aparece com pelo menos
+    1 item; tirada a contagem de itens da aba. Na prévia da equipe (fichas de teste, sem Destaque) a aba aparece com o
+    aviso "na ficha de verdade só para Destaque". Ainda falta a tela para o dono montar o catálogo e o app.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

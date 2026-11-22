@@ -624,14 +624,16 @@ function web_pagina_ficha(array $p): void {
       <?php endif ?>
 
       <?php // 22/11 (passo 42): cardápio em aba (Informações | Cardápio); sem JavaScript as duas partes aparecem uma embaixo da outra
-        $cardapio = cardapio_ler($p['cardapio'] ?? null);
-        $n_itens = array_sum(array_map(fn($s) => count($s['itens']), $cardapio));
+        // 22/11 (passo 44): só Destaque em dia tem catálogo; a aba só aparece com pelo menos 1 item (cardapio_ler tira os vazios).
+        // Na prévia da equipe aparece mesmo sem Destaque, para conferir.
+        $previa = !empty($GLOBALS['ficha_previa']);
+        $cardapio = !empty($p['destaque_pago']) || $previa ? cardapio_ler($p['cardapio'] ?? null) : [];
         $mod = catalogo_modelo($p);   // 22/11 (passo 43): Cardápio, Produtos, Ofertas, Peças... conforme o segmento
         $info_cat = cardapio_info($p['cardapio'] ?? null);
         if ($cardapio): ?>
       <div class="abas-ficha" role="tablist" aria-label="Partes da ficha" hidden>
         <button type="button" role="tab" id="aba-info" aria-controls="painel-info" aria-selected="true">Informações</button>
-        <button type="button" role="tab" id="aba-cardapio" aria-controls="painel-cardapio" aria-selected="false"><?= h($mod['aba']) ?> <small><?= $n_itens ?> <?= h($mod['itens']) ?></small></button>
+        <button type="button" role="tab" id="aba-cardapio" aria-controls="painel-cardapio" aria-selected="false"><?= h($mod['aba']) ?></button>
       </div>
       <div id="painel-info" role="tabpanel" aria-labelledby="aba-info">
       <?php endif ?>
@@ -663,6 +665,7 @@ function web_pagina_ficha(array $p): void {
       </div>
       <section id="painel-cardapio" class="cardapio cardapio-<?= h($mod['chave']) ?>" role="tabpanel" aria-labelledby="aba-cardapio">
         <h2><?= h($mod['titulo']) ?></h2>
+        <?php if ($previa && empty($p['destaque_pago'])): ?><p class="aviso-previa">👁️ Na ficha de verdade esta aba só aparece para quem tem o plano <b>Destaque</b>.</p><?php endif ?>
         <?php if ($info_cat['validade'] !== ''): ?><p class="cardapio-validade">📅 <?= h($info_cat['validade']) ?></p><?php endif ?>
         <?php if (count($cardapio) > 1): ?><nav class="cardapio-secoes" aria-label="Seções">
           <?php foreach ($cardapio as $i => $s): ?><a href="#cardapio-<?= $i ?>"><?= h($s['nome']) ?></a><?php endforeach ?></nav><?php endif ?>
