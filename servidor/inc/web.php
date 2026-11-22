@@ -223,6 +223,13 @@ function web_perto(array $p, int $limite = 6, int $raio = 1500): ?array {
     usort($itens, fn($a, $b) => $a['numero'] <=> $b['numero']);
     return count($itens) >= 2 ? ['modo' => 'rua', 'rua' => $rua, 'itens' => $itens] : null;
 }
+/** Corta o texto em até $max letras sem partir palavra ("... produtos para o corpo…"). */
+function web_corte_palavra(string $t, int $max): string {
+    if (mb_strlen($t) <= $max) return $t;
+    $c = mb_substr($t, 0, $max);
+    $c = preg_replace('/\s+\S*$/u', '', $c) ?: $c;
+    return rtrim($c, " ,.;:-") . '…';
+}
 /** Centro da cidade (tabela cidades) ou null. */
 function web_centro_cidade(string $cidade): ?array {
     static $c = [];
@@ -597,7 +604,7 @@ function web_pagina_ficha(array $p): void {
         . ($tem_rua ? $p['endereco'] . '. ' : ($p['atende_em_casa'] || $p['endereco'] ? 'Atende a domicílio. ' : ''))
         . ($contato ? ucfirst(implode(' e ', $contato)) . '. ' : '')
         . ($tem_hor ? 'Veja o horário de hoje. ' : '')
-        . (($p['descricao'] ?: ($p['sobre_site'] ?? '')) ? mb_substr(trim(preg_replace('/\s+/u', ' ', (string)($p['descricao'] ?: $p['sobre_site']))), 0, 120) : '');
+        . web_corte_palavra(trim(preg_replace('/\s+/u', ' ', (string)($p['descricao'] ?: ($p['sobre_site'] ?? '')))), 150);
     $descricao = trim($descricao);
     pagina_inicio(web_titulo_ficha((string)$nome, (string)$tipo, (string)$nome_cidade), mb_substr($descricao, 0, 300), 'web',
         ['canonica' => $url, 'imagem' => $imagem, 'head' => web_json_ld($ld, $ld_trilha), 'noindex' => !ficha_no_google($p),

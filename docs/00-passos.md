@@ -369,3 +369,12 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
        (/admin/sobre-site.php): aprovar (corrige antes), recusar, tirar da ficha; aba "Sites que não abrem" com
        "Tirar o site da ficha". Descrição do dono tem prioridade. 1ª leitura: as 242 fichas no Google com site (22/11).
        Falta: mostrar o sobre_site no app.
+56. ✅ Revisão dos "Sobre pelo site" (22/11, pedido do usuário: aprovar todos e resumir os grandes no tamanho do exemplo
+    da Perfumaria Emy, ~180 letras). Dos 201 pendentes: 125 aprovados (resumidos, média 95 letras, máx. 178, só com o que
+    o site diz; tirados "Agende agora", "Confira!") e 76 recusados com o motivo: texto da plataforma (MenuDino, Cardápio
+    Web, Meu Carrinho, encurtador, software), de outra empresa (CITUR na cachoeira/café/mercado, Partage na Polo Wear,
+    Oral Lite na NioClinic, Germânica de Campinas), texto de rede igual em várias fichas (Drogal 7, San Michel 5, Magalu 5,
+    Ipiranga 3, modelo "Supermercados Online" em 4 mercados...) e fichas duplicadas (Forte Mix 1478, Art Pel 34962,
+    Cervejaria Gonçalves 34479, Pizza na Roça 35132: aprovado só na outra). Registro em registro_admin (admin NULL).
+    Cópia antes: /var/lib/guia-novo/backups/antes-sobre-site-20261122.sql. Descrição do Google corta o Sobre em palavra
+    inteira (web_corte_palavra, 150 letras).
