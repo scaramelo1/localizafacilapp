@@ -123,6 +123,29 @@ function web_bairros(string $cidade, int $categoria_id, ?string $tipo): array {
         WHERE $sql AND p.bairro IS NOT NULL AND p.bairro <> '' GROUP BY p.bairro ORDER BY p.bairro LIMIT 200", $par), 'bairro');
 }
 /** Ficha visível pelo número, com a área (slug) e só de cidade ativa. */
+/** 22/11 (passo 42): ficha fora do app (pausada, de teste) aberta por alguém da equipe: prévia, sem visivel(). */
+function web_ficha_previa(int $id): ?array {
+    if ($id <= 0 || !da_equipe()) return null;
+    $p = linha('SELECT p.*, ' . SQL_DESTAQUE . ' AS destaque_pago, c.id AS categoria_id, c.nome AS categoria, c.slug AS categoria_slug, c.icone, c.cor
+        FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE p.id = ?', [$id]);
+    return $p && isset(CIDADES[$p['cidade']]) ? $p : null;
+}
+
+/** Cardápio guardado na ficha (JSON) -> seções com itens; vazio se não tiver. */
+function cardapio_ler(?string $json): array {
+    $d = $json ? json_decode($json, true) : null;
+    $secoes = [];
+    foreach ((array)($d['secoes'] ?? []) as $s) {
+        $itens = array_values(array_filter((array)($s['itens'] ?? []), fn($i) => trim((string)($i['nome'] ?? '')) !== ''));
+        if ($itens) $secoes[] = ['nome' => trim((string)($s['nome'] ?? '')) ?: 'Cardápio', 'itens' => $itens];
+    }
+    return $secoes;
+}
+function cardapio_preco(mixed $v): string {
+    if ($v === null || $v === '') return '';
+    return 'R$ ' . number_format((float)str_replace(',', '.', (string)$v), 2, ',', '.');
+}
+
 function web_ficha(int $id): ?array {
     if ($id <= 0) return null;
     $p = linha('SELECT p.*, ' . SQL_DESTAQUE . ' AS destaque_pago, c.id AS categoria_id, c.nome AS categoria, c.slug AS categoria_slug, c.icone, c.cor
@@ -482,6 +505,7 @@ function web_pagina_ficha(array $p): void {
   <div class="conteudo">
     <?= $trilha ?>
     <article class="ficha-caixa">
+      <?php if (!empty($GLOBALS['ficha_previa'])): // 22/11 (passo 42) ?><p class="aviso-previa">👁️ <b>Prévia:</b> esta ficha está fora do app e do site. Só a equipe consegue abrir este endereço.</p><?php endif ?>
       <header class="ficha-topo">
         <?= web_logo($p, 'ficha-logo') ?>
         <div>
@@ -554,6 +578,16 @@ function web_pagina_ficha(array $p): void {
         </div>
       <?php endif ?>
 
+      <?php // 22/11 (passo 42): cardápio em aba (Informações | Cardápio); sem JavaScript as duas partes aparecem uma embaixo da outra
+        $cardapio = cardapio_ler($p['cardapio'] ?? null);
+        $n_itens = array_sum(array_map(fn($s) => count($s['itens']), $cardapio));
+        if ($cardapio): ?>
+      <div class="abas-ficha" role="tablist" aria-label="Partes da ficha" hidden>
+        <button type="button" role="tab" id="aba-info" aria-controls="painel-info" aria-selected="true">Informações</button>
+        <button type="button" role="tab" id="aba-cardapio" aria-controls="painel-cardapio" aria-selected="false">🍔 Cardápio <small><?= $n_itens ?> itens</small></button>
+      </div>
+      <div id="painel-info" role="tabpanel" aria-labelledby="aba-info">
+      <?php endif ?>
       <div class="ficha-colunas">
         <div>
           <?php if ($p['descricao']): ?><h2>Sobre</h2><p><?= nl2br(h($p['descricao'])) ?></p><?php endif ?>
@@ -577,6 +611,41 @@ function web_pagina_ficha(array $p): void {
           <?php endif ?>
         </div>
       </div>
+
+      <?php if ($cardapio): ?>
+      </div>
+      <section id="painel-cardapio" class="cardapio" role="tabpanel" aria-labelledby="aba-cardapio">
+        <h2>Cardápio</h2>
+        <?php if (count($cardapio) > 1): ?><nav class="cardapio-secoes" aria-label="Seções do cardápio">
+          <?php foreach ($cardapio as $i => $s): ?><a href="#cardapio-<?= $i ?>"><?= h($s['nome']) ?></a><?php endforeach ?></nav><?php endif ?>
+        <?php foreach ($cardapio as $i => $s): ?>
+          <h3 id="cardapio-<?= $i ?>"><?= h($s['nome']) ?></h3>
+          <ul class="cardapio-itens">
+            <?php foreach ($s['itens'] as $it): ?><li>
+              <div class="cardapio-linha"><span class="cardapio-nome"><?= h((string)$it['nome']) ?><?php if (!empty($it['destaque'])): ?> <span class="cardapio-selo">⭐ Mais pedido</span><?php endif ?></span>
+                <span class="cardapio-pontos" aria-hidden="true"></span><span class="cardapio-preco"><?= h(cardapio_preco($it['preco'] ?? null)) ?></span></div>
+              <?php if (!empty($it['desc'])): ?><p class="cardapio-desc"><?= h((string)$it['desc']) ?></p><?php endif ?>
+            </li><?php endforeach ?>
+          </ul>
+        <?php endforeach ?>
+        <p class="discreto">Preços informados pelo comércio e podem mudar. Confirme na hora de pedir.</p>
+        <div class="cardapio-pedir">
+          <?php if ($c['whatsapp']): ?><a class="botao whats" href="<?= h($c['whatsapp']) ?>" data-contato="whatsapp" rel="nofollow noopener" target="_blank">Pedir pelo WhatsApp</a><?php endif ?>
+          <?php if (!empty($c['ifood'])): ?><a class="botao botao-ifood" href="<?= h($c['ifood']) ?>" data-contato="ifood" rel="nofollow noopener" target="_blank">Pedir no iFood</a><?php endif ?>
+          <?php if (!empty($c['food99'])): ?><a class="botao botao-99food" href="<?= h($c['food99']) ?>" data-contato="food99" rel="nofollow noopener" target="_blank">Pedir no 99Food</a><?php endif ?>
+        </div>
+      </section>
+      <script>(function () {   // abas Informações | Cardápio (#cardapio abre direto no cardápio)
+        var abas = document.querySelector('.abas-ficha'), info = document.getElementById('painel-info'), card = document.getElementById('painel-cardapio');
+        var bi = document.getElementById('aba-info'), bc = document.getElementById('aba-cardapio');
+        function mostrar(c) { info.hidden = c; card.hidden = !c; bi.setAttribute('aria-selected', c ? 'false' : 'true'); bc.setAttribute('aria-selected', c ? 'true' : 'false'); }
+        abas.hidden = false;
+        bi.addEventListener('click', function () { mostrar(false); history.replaceState(null, '', location.pathname); });
+        bc.addEventListener('click', function () { mostrar(true); history.replaceState(null, '', '#cardapio'); });
+        mostrar(/^#cardapio/.test(location.hash));
+        if (/^#cardapio/.test(location.hash)) abas.scrollIntoView({ block: 'start' });
+      })();</script>
+      <?php endif ?>
 
       <?php // 19/11: o convite ao dono fica só na caixa "Este comércio é seu?" (antes repetia aqui) ?>
 

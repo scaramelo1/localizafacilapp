@@ -65,6 +65,12 @@ $origem_site = registrar_entrada_site(match (true) {
 // ficha: /<cidade>/c/<nome>-<id>
 if ($n === 3 && $partes[1] === 'c') {
     $p = preg_match('/-(\d{1,9})$/', $partes[2], $m) || preg_match('/^(\d{1,9})$/', $partes[2], $m) ? web_ficha((int)$m[1]) : null;
+    // 22/11 (passo 42): ficha fora do app (teste) só para a equipe, como prévia sem indexar
+    if (!$p && isset($m[1]) && ($p = web_ficha_previa((int)$m[1]))) {
+        $GLOBALS['ficha_previa'] = true;
+        header('X-Robots-Tag: noindex, nofollow');
+        header('Cache-Control: private, no-store');
+    }
     if (!$p) { web_pagina_404(); exit; }
     $certo = url_ficha($p);
     if ($certo !== url(implode('/', $partes))) redirecionar($certo);   // nome ou cidade mudou: endereço certo

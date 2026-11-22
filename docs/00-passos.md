@@ -268,6 +268,13 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     Os 24 comércios que tinham iFood/99 no "site" (vindo do Google): 22 passaram para o campo novo, 2 tiveram o site
     tirado (gestor de pedidos do iFood; só "99app.com"); 33056 "00 Marmitas" ficou como estava (link é da Mr Pincho
     Espetaria). importar-leads.php faz o mesmo sozinho daqui para frente.
+42. 🧪 Cardápio em aba (22/11, TESTE para o usuário aprovar). Mudança 040 (profissionais.cardapio, JSON com seções e itens:
+    nome, desc, preco, destaque), já aplicada. Ficha do site: abas "Informações | 🍔 Cardápio (N itens)", seções em
+    pílulas, preço com pontilhado, selo "Mais pedido", botões de pedir (WhatsApp, iFood, 99Food); #cardapio abre direto.
+    Prévia da equipe: ficha fora do app (pausada) abre só para admin (web_ficha_previa, noindex). Ficha de teste 103616
+    "Lanchonete Exemplo (teste do cardápio)", pausada, São João:
+    https://localizafacilapp.com.br/sao-joao-da-boa-vista/c/lanchonete-exemplo-teste-do-cardapio-103616#cardapio
+    Ainda NÃO tem: tela para o dono/admin montar o cardápio, app, plano. Se o usuário não gostar: apagar a ficha 103616.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

@@ -749,4 +749,26 @@ details.chips-mais .chips { margin: 0 0 4px; }
 /* 22/11 (passo 41): pedir pelo iFood / 99Food na ficha */
 .botao.botao-ifood { background: #ea1d2c; color: #fff; border-color: #ea1d2c; }
 .botao.botao-99food { background: #ffdd00; color: #1a1a1a; border-color: #ffdd00; }
+/* 22/11 (passo 42): prévia da equipe e cardápio em aba */
+.aviso-previa { background: var(--amarelo-claro); border: 2px dashed var(--amarelo); border-radius: 14px; padding: 10px 14px; margin: 0 0 14px; font-size: .95rem; }
+.abas-ficha { display: flex; gap: 6px; margin: 22px 0 6px; background: var(--creme); padding: 5px; border-radius: 999px; position: sticky; top: 84px; z-index: 5; }
+.abas-ficha[hidden] { display: none; }
+.abas-ficha button { flex: 1; border: 0; border-radius: 999px; padding: 11px 14px; font: inherit; font-weight: 900; font-size: 1rem; cursor: pointer; background: transparent; color: var(--texto2); }
+.abas-ficha button small { font-weight: 700; opacity: .8; }
+.abas-ficha button[aria-selected="true"] { background: var(--verde); color: #fff; box-shadow: 0 3px 10px rgba(0,92,56,.25); }
+.cardapio h2 { margin-top: 14px; }
+.cardapio-secoes { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 10px; scrollbar-width: none; }
+.cardapio-secoes a { flex: 0 0 auto; padding: 7px 14px; border-radius: 999px; border: 2px solid var(--borda); background: var(--branco); font-weight: 800; font-size: .92rem; text-decoration: none; color: var(--verde); }
+.cardapio h3 { margin: 22px 0 6px; color: var(--verde); font-size: 1.2rem; scroll-margin-top: 150px; border-bottom: 3px solid var(--amarelo); display: inline-block; padding-bottom: 2px; }
+.cardapio-itens { list-style: none; margin: 0; padding: 0; }
+.cardapio-itens li { padding: 12px 0; border-bottom: 1px dashed var(--borda); }
+.cardapio-linha { display: flex; align-items: baseline; gap: 8px; }
+.cardapio-nome { font-weight: 800; }
+.cardapio-pontos { flex: 1; border-bottom: 2px dotted #c9c2a4; transform: translateY(-4px); min-width: 16px; }
+.cardapio-preco { font-weight: 900; color: var(--verde); white-space: nowrap; }
+.cardapio-desc { margin: 3px 0 0; color: var(--texto2); font-size: .92rem; line-height: 1.45; }
+.cardapio-selo { display: inline-block; font-size: .72rem; font-weight: 800; background: var(--amarelo-claro); color: #7a5b00; border-radius: 999px; padding: 1px 8px; vertical-align: 2px; white-space: nowrap; }
+.cardapio-pedir { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 8px; }
+.cardapio-pedir .botao { flex: 1 1 180px; min-height: 50px; }
+@media (max-width: 760px) { .abas-ficha { top: 74px; } }
 
