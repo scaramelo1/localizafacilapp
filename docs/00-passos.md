@@ -302,6 +302,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
        (pedidos_info tipo 'catalogo'; o dono vê "X pessoas pediram para ver seus produtos").
     App 1.15.0: abas Informações | Catálogo (src/componentes/Catalogo.tsx), Pedir por item, selo e "Tem:" no cartão,
     trancado do catálogo. Sintaxe conferida com esbuild; falta o typecheck e o teste no celular (PC).
+46. ✅ Testes feitos do próprio servidor não contam (22/11): as 40 aparições "busca" de 22/11 eram um teste meu
+    (curl fingindo celular, 02:08) e a busca "Lanchonete Exemplo"; apagadas. e_robo() agora recusa o IP do próprio
+    servidor (SERVER_ADDR, 127.0.0.1): vale para entradas, aberturas, toques, aparições e buscas.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

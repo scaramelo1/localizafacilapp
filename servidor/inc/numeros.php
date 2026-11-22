@@ -34,6 +34,8 @@ function origem_valida(?string $o, string $padrao = 'app'): string {
 /** Robôs de busca, prévias de link e ferramentas não contam. */
 function e_robo(): bool {
     $ua = (string)($_SERVER['HTTP_USER_AGENT'] ?? '');
+    // 22/11 (passo 46): o próprio servidor (testes feitos daqui, mesmo fingindo ser celular) nunca conta
+    if (in_array(ip(), ['127.0.0.1', '::1', (string)($_SERVER['SERVER_ADDR'] ?? '-')], true)) return true;
     if ($ua === '' || preg_match('/bot|crawl|spider|slurp|preview|facebookexternalhit|whatsapp\/|curl|wget|python|httpclient|headless|lighthouse|'
         . 'mediapartners|adsbot|googleother|google-|playstore-google|privacy preserving prefetch/i', $ua)) return true;
     // 21/11: teste automático da Google Play (pre-launch report): o app de verdade (okhttp) rodando em celulares dos
