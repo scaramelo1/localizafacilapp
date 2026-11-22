@@ -338,6 +338,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     /var/lib/guia-novo/avisos-enviados.log (últimos 500).
 52. ✅ Robô com Chrome antigo (22/11): 3 entradas de 22/11 (10:58, 11:16, 11:30; servidores OVH, Chrome 102 no Windows,
     entrada mandada de outro IP) apagadas; e_robo() trata Chrome/Edge abaixo do 120 como robô.
+53. ✅ Limpeza dos números (22/11, pedido do usuário): 20/11 (lançamento) apagado inteiro (robôs de domínio novo, testes
+    e admin; nenhum contato real); 21/11 17:26 (4 pré-carregamentos do Chrome vindos do Google) e 22/11 13:24 (robô Hetzner
+    com Chrome 131) apagados; limite subiu para Chrome/Edge < 140. Cópia antes: /var/lib/guia-novo/backup-numeros-20261122-1818.sql.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
