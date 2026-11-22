@@ -147,6 +147,8 @@ export interface Profissional extends ProfissionalResumo {
   favorito: boolean;
   /** Pagina da ficha no site (para compartilhar). Servidor antigo nao manda. */
   linkSite?: string | null;
+  /** E-mail do comercio (22/11). Servidor antigo nao manda. */
+  email?: string | null;
   /** Oferta da semana no ar (so Destaque). */
   oferta?: Oferta | null;
   minhaAvaliacao: { estrelas: number; comentario: string | null } | null;
@@ -318,7 +320,7 @@ export async function chamar<T>(caminho: string, metodo: 'GET' | 'POST' | 'DELET
 }
 
 /** Conta toques em WhatsApp, ligar etc. (estatística para o profissional). Falha em silêncio. */
-export function registrarContato(id: number, tipo: 'whatsapp' | 'ligar' | 'instagram' | 'mapa' | 'site' | 'compartilhar') {
+export function registrarContato(id: number, tipo: 'whatsapp' | 'ligar' | 'instagram' | 'mapa' | 'site' | 'email' | 'compartilhar') {
   chamar('contato.php', 'POST', { id, tipo, origem: 'app' }).catch(() => {});
 }
 

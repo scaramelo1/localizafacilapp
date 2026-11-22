@@ -54,7 +54,7 @@ export default function TelaProfissional() {
       </View>
     );
 
-  const abrir = (tipo: 'whatsapp' | 'ligar' | 'instagram' | 'mapa' | 'site', link: string) => {
+  const abrir = (tipo: 'whatsapp' | 'ligar' | 'instagram' | 'mapa' | 'site' | 'email', link: string) => {
     registrarContato(p.id, tipo);
     if (tipo === 'whatsapp' || tipo === 'ligar') lembrarContato({ id: p.id, nome: p.nome, jaAvaliou: !!p.minhaAvaliacao }).catch(() => {});
     Linking.openURL(link).catch(() => Alert.alert('Não foi possível abrir', 'Confira se o aplicativo está instalado.'));
@@ -156,6 +156,7 @@ export default function TelaProfissional() {
           {p.telefoneFormatado ? <Linha icone="phone" texto={p.telefoneFormatado} detalhe={p.telefoneCentral ? 'Central de atendimento da rede' : 'Ligar'} onPress={() => abrir('ligar', `tel:${p.telefone}`)} /> : null}
           {p.instagram ? <Linha icone="instagram" texto="Ver Instagram" onPress={() => abrir('instagram', p.instagram!)} /> : null}
           {p.site ? <Linha icone="web" texto={siteCurto(p.site)} onPress={() => abrir('site', p.site!)} /> : null}
+          {p.email ? <Linha icone="email-outline" texto={p.email} onPress={() => abrir('email', `mailto:${p.email}?subject=${encodeURIComponent('Contato pelo Localiza Fácil')}`)} /> : null}
           {p.atendeEmCasa && <Linha icone="home-outline" texto="Vai até você" />}
           {p.horarios?.length ? (
             <Horarios lista={p.horarios} />

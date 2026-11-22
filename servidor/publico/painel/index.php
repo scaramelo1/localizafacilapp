@@ -201,7 +201,7 @@ pagina_inicio('Painel do comércio | Localiza Fácil', 'Painel do dono do comér
   <?php endif ?>
 
   <?php if ($gratis): ?>
-    <div class="quadro"><strong>Seu plano: Grátis.</strong> Você pode corrigir o nome, o telefone, o WhatsApp, o endereço, o site e
+    <div class="quadro"><strong>Seu plano: Grátis.</strong> Você pode corrigir o nome, o telefone, o WhatsApp, o endereço, o site, o e-mail e
       o horário. Para colocar o <strong>logo, fotos, descrição, produtos, Instagram, "atende em casa / faz entrega"</strong> e ver os números, passe para o
       <strong>Básico (<?= h(preco_plano_texto('basico')) ?>)</strong>.
       <br><a class="botao amarelo" href="<?= h(config()['url']) ?>/perfil.php?acao=assumir&amp;plano=basico&amp;id=<?= (int)$p['id'] ?>">Quero o Básico</a>
@@ -229,6 +229,8 @@ pagina_inicio('Painel do comércio | Localiza Fácil', 'Painel do dono do comér
       <?php endif ?>
       <label for="site">Site</label>
       <input id="site" name="site" maxlength="200" inputmode="url" value="<?= $val('site') ?>">
+      <label for="email">E-mail do comércio (aparece na ficha)</label>
+      <input id="email" name="email" type="email" maxlength="160" inputmode="email" placeholder="contato@seucomercio.com.br" value="<?= $val('email') ?>">
       <label for="endereco">Endereço</label>
       <input id="endereco" name="endereco" maxlength="200" value="<?= $val('endereco') ?>">
       <label for="bairro">Bairro</label>

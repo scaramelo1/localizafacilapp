@@ -26,6 +26,7 @@ if (e_post() && $pronto) {
         'cidade' => (string)($_POST['cidade'] ?? ''), 'endereco' => txt('endereco', 200), 'bairro' => txt('bairro', 80),
         'telefone' => telefone_normalizado(txt('telefone_comercio', 20)), 'whatsapp' => telefone_normalizado(txt('whatsapp', 20)),
         'instagram' => ltrim((string)txt('instagram', 60), '@') ?: null,
+        'email' => email_valido(txt('email_comercio', 160)),   // 22/11 (passo 40): aparece na ficha (botão E-mail)
     ];
     [$d['horarios'], $erro_hor] = horarios_do_post((array)($_POST['hor'] ?? []));
     $d['horario'] = horarios_texto(horarios_ler($d['horarios']));
@@ -39,6 +40,7 @@ if (e_post() && $pronto) {
     elseif (!in_array($d['categoria_id'], array_map('intval', array_column($areas, 'id')), true)) $erro = 'Escolha a área do negócio.';
     elseif (!isset(CIDADES[$d['cidade']])) $erro = 'Escolha a cidade.';
     elseif (!$d['telefone'] && !$d['whatsapp']) $erro = 'Coloque o telefone ou o WhatsApp do negócio (com DDD).';
+    elseif (txt('email_comercio', 160) && !$d['email']) $erro = 'E-mail do negócio: confira o endereço (ex.: contato@seunegocio.com.br).';
     elseif (!$nome || !$contato) $erro = 'Preencha o seu nome e um telefone com DDD para a equipe confirmar.';
     elseif (!empty($_POST['site_web'])) $enviado = true;   // campo escondido preenchido = robô: finge que deu certo
     elseif ((int)valor('SELECT COUNT(*) FROM pedidos WHERE ip = ? AND criado_em > NOW() - INTERVAL 1 DAY', [ip()]) >= 10) $erro = 'Muitos pedidos hoje. Tente amanhã.';
@@ -100,6 +102,8 @@ pagina_inicio('Incluir meu negócio | Localiza Fácil', 'Inclua o seu negócio n
       <?= horarios_form(horarios_ler(horarios_do_post((array)($f['hor'] ?? []))[0])) ?>
       <label for="instagram">Instagram (opcional)</label>
       <input id="instagram" name="instagram" maxlength="60" placeholder="@seunegocio" value="<?= h($f['instagram'] ?? '') ?>">
+      <label for="email_comercio">E-mail do negócio (opcional, aparece na ficha)</label>
+      <input id="email_comercio" name="email_comercio" type="email" inputmode="email" maxlength="160" placeholder="contato@seunegocio.com.br" value="<?= h($f['email_comercio'] ?? '') ?>">
       <div hidden><label for="site_web">Não preencha</label><input id="site_web" name="site_web" tabindex="-1" autocomplete="off"></div>
 
       <h2>Você</h2>

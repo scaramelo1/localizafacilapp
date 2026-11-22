@@ -254,6 +254,11 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 39. ✅ Topo do site no celular sem cobrir a marca (21/11, pedido do usuário; com admin logado "Baixar o app" ficava por cima
     de "Localiza Fácil"): até 760 px a marca fica em duas linhas (Localiza / Fácil), "Baixar o app" vira "📲 App" e
     "Administração" vira só ⚙️ (texto inteiro no computador). Tirado "Grátis. Não precisa criar conta para procurar." da inicial.
+40. ✅ E-mail do comércio (22/11, pedido do usuário, opções 1 e 2). Nenhuma das 18.315 fichas tinha e-mail (o Google
+    Maps não fornece). Campo profissionais.email agora: em "Inclua o seu negócio" (opcional), no painel do dono (também
+    no Grátis, passa pela conferência como os outros) e na edição do admin (precisava, senão salvar apagava). Validado
+    com email_valido(). Na ficha: botão "E-mail" no site (mailto, assunto "Contato pelo Localiza Fácil") e linha
+    "E-mail" no app 1.15.0; o toque conta como contato 'email' (mudança 038 no enum de contatos, já aplicada).
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).

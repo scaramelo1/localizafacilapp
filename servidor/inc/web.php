@@ -505,6 +505,7 @@ function web_pagina_ficha(array $p): void {
         <?php if ($p['telefone']): ?><a class="botao" href="tel:<?= h(telefone_discar($p['telefone'])) ?>" data-contato="ligar" rel="nofollow">Ligar <?= h($c['telefoneFormatado']) ?><?= telefone_central($p['telefone']) ? ' (central)' : '' ?></a><?php endif ?>
         <?php if ($c['mapa']): ?><a class="botao contorno" href="<?= h($c['mapa']) ?>" data-contato="mapa" rel="nofollow noopener" target="_blank">Como chegar</a><?php endif ?>
         <?php if ($c['instagram']): ?><a class="botao contorno" href="<?= h($c['instagram']) ?>" data-contato="instagram" rel="nofollow noopener" target="_blank">Instagram</a><?php endif ?>
+        <?php if (!empty($c['email'])): // 22/11 (passo 40) ?><a class="botao contorno" href="mailto:<?= h($c['email']) ?>?subject=<?= h(rawurlencode('Contato pelo Localiza Fácil')) ?>" data-contato="email" rel="nofollow">E-mail</a><?php endif ?>
         <?php if ($p['site']): ?><a class="botao contorno" href="<?= h(preg_match('#^https?://#i', $p['site']) ? $p['site'] : 'https://' . $p['site']) ?>" data-contato="site" rel="nofollow noopener" target="_blank">Site</a><?php endif ?>
         <?php if ($eu): ?><button type="button" class="botao contorno botao-salvar<?= $salvo ? ' salvo' : '' ?>" id="botao-salvar" aria-pressed="<?= $salvo ? 'true' : 'false' ?>"><?= $salvo ? '♥ Salvo' : '♡ Salvar' ?></button>
         <?php else: ?><a class="botao contorno botao-salvar" href="<?= h(link_entrar(url_ficha($p))) ?>" rel="nofollow" title="Entre com o Google para salvar">♡ Salvar</a><?php endif ?>

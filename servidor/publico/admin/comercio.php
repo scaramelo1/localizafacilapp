@@ -213,6 +213,8 @@ admin_inicio('Editar ' . $p['nome'], $admin);
   <input id="instagram" name="instagram" maxlength="60" placeholder="@comercio" value="<?= $val('instagram') ?>">
   <label for="site">Site</label>
   <input id="site" name="site" maxlength="200" inputmode="url" value="<?= $val('site') ?>">
+  <label for="email">E-mail do comércio (aparece na ficha)</label>
+  <input id="email" name="email" type="email" maxlength="160" inputmode="email" value="<?= $val('email') ?>">
   <label for="endereco">Endereço</label>
   <input id="endereco" name="endereco" maxlength="200" value="<?= $val('endereco') ?>">
   <label for="bairro">Bairro</label>
