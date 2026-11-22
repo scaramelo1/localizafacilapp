@@ -793,4 +793,34 @@ details.chips-mais .chips { margin: 0 0 4px; }
 /* 22/11 (passo 45): selo do catálogo no cartão e item achado pela busca */
 .selo-catalogo { display: inline-block; font-size: .75rem; font-weight: 800; background: var(--amarelo-claro); color: #7a5b00; border-radius: 999px; padding: 1px 9px; margin: 2px 4px 0 0; }
 .cc-achou { display: block; font-size: .82rem; color: var(--verde); margin-top: 3px; }
+/* 22/11 (passo 47): carrinho do catálogo (pedido inteiro no WhatsApp) */
+.carrinho-qtd { margin-top: 8px; }
+.cq-add { border: 2px solid var(--verde); background: var(--branco); color: var(--verde); font: inherit; font-weight: 900; font-size: .9rem; border-radius: 999px; padding: 6px 16px; cursor: pointer; }
+.cq-ctrl { display: inline-flex; align-items: center; gap: 12px; background: var(--verde); border-radius: 999px; padding: 3px; }
+.cq-ctrl[hidden] { display: none; }
+.cq-ctrl button { width: 36px; height: 36px; border-radius: 50%; border: 0; background: #fff; color: var(--verde); font-size: 1.3rem; font-weight: 900; cursor: pointer; line-height: 1; }
+.cq-n { color: #fff; font-size: 1.05rem; min-width: 18px; text-align: center; }
+.cardapio-itens li.no-carrinho { background: var(--verde-claro); border-radius: 12px; padding-left: 8px; padding-right: 8px; }
+.carrinho-barra { position: sticky; bottom: 12px; z-index: 20; margin: 14px 0; }
+.carrinho-barra[hidden] { display: none; }
+.carrinho-barra .botao { width: 100%; min-height: 56px; font-size: 1.05rem; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+.carrinho-janela { position: fixed; inset: 0; z-index: 70; background: rgba(0,0,0,.45); display: flex; align-items: flex-end; justify-content: center; }
+.carrinho-janela[hidden] { display: none; }
+.cj-caixa { background: var(--branco); width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; border-radius: 24px 24px 0 0; padding: 18px 18px 24px; box-sizing: border-box; }
+@media (min-width: 640px) { .carrinho-janela { align-items: center; } .cj-caixa { border-radius: 24px; } }
+.cj-topo { display: flex; justify-content: space-between; align-items: center; } .cj-topo h3 { margin: 0; }
+.cj-fechar { border: 0; background: var(--creme); width: 40px; height: 40px; border-radius: 50%; font-size: 1.6rem; cursor: pointer; line-height: 1; }
+.cj-de { margin: 2px 0 10px; }
+.cj-lista { list-style: none; margin: 0; padding: 0; }
+.cj-lista li { display: flex; align-items: center; gap: 8px; padding: 9px 0; border-bottom: 1px dashed var(--borda); font-size: .95rem; }
+.cj-n { font-weight: 900; color: var(--verde); min-width: 30px; } .cj-nome { flex: 1; font-weight: 700; } .cj-preco { font-weight: 800; white-space: nowrap; }
+.cj-bt { display: inline-flex; gap: 4px; } .cj-bt button { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--borda); background: var(--creme); font-weight: 900; cursor: pointer; }
+.cj-total { font-size: 1.15rem; margin: 12px 0 4px; text-align: right; } .cj-total b { color: var(--verde); }
+.cj-campos { border: 0; padding: 0; margin: 10px 0; } .cj-campos legend { font-weight: 900; padding: 0; margin-bottom: 4px; }
+.cj-campos label:not(.marcar) { display: block; font-weight: 800; font-size: .9rem; margin-top: 10px; }
+.cj-campos input:not([type=radio]), .cj-campos select, .cj-campos textarea { width: 100%; box-sizing: border-box; margin-top: 4px; }
+.cj-campos .marcar { display: flex; gap: 8px; align-items: center; margin: 6px 0; font-weight: 700; }
+.cj-enviar { width: 100%; min-height: 56px; font-size: 1.05rem; margin-top: 6px; }
+.cj-limpar { border: 0; background: none; color: #c0392b; font: inherit; font-weight: 800; font-size: .9rem; cursor: pointer; padding: 6px 0; }
+body.sem-rolagem { overflow: hidden; }
 

@@ -616,6 +616,10 @@ function web_pagina_ficha(array $p): void {
         <?php if (count($cardapio) > 1): ?><nav class="cardapio-secoes" aria-label="Seções">
           <?php foreach ($cardapio as $i => $s): ?><a href="#cardapio-<?= $i ?>"><?= h($s['nome']) ?></a><?php endforeach ?></nav><?php endif ?>
         <?php $num_whats = $p['whatsapp'] ?: null;
+        // 22/11 (passo 47): carrinho (comida, mercado, bebidas): escolhe vários itens e manda o pedido inteiro no WhatsApp.
+        // Na prévia da equipe sem WhatsApp, abre o WhatsApp para escolher o contato (dá para testar mandando para si mesmo).
+        $carrinho = !empty($mod['carrinho']) && ($num_whats || $previa);
+        $whats_base = $num_whats ? (string)link_whatsapp($num_whats) : 'https://wa.me/';
         foreach ($cardapio as $i => $s): ?>
           <h3 id="cardapio-<?= $i ?>"><?= h($s['nome']) ?></h3>
           <ul class="cardapio-itens">
@@ -632,12 +636,131 @@ function web_pagina_ficha(array $p): void {
               <?php if (!empty($it['etiquetas'])): ?><p class="cardapio-etiquetas"><?php foreach ((array)$it['etiquetas'] as $e): ?><span><?= h((string)$e) ?></span><?php endforeach ?></p><?php endif ?>
               <?php if (!empty($it['ate'])): ?><p class="cardapio-ate">Até <?= h(catalogo_dia((string)$it['ate'])) ?></p><?php endif ?>
               <?php // "Pedir" deste item: WhatsApp já escrito com o nome e o preço; conta no catálogo e como toque no WhatsApp
-              if ($num_whats && !$esg): ?><a class="cardapio-pedir-item" href="<?= h(link_whatsapp($num_whats, catalogo_msg_item($it, (string)$p['nome']))) ?>" data-item="<?= h($item_id) ?>" rel="nofollow noopener" target="_blank">💬 Pedir</a><?php endif ?>
+              if ($carrinho && !$esg): ?><div class="carrinho-qtd" data-item="<?= h($item_id) ?>" data-nome="<?= h((string)$it['nome']) ?>"
+                  data-preco="<?= isset($it['preco']) && empty($it['a_partir']) ? h((string)(float)$it['preco']) : '' ?>" data-unidade="<?= h((string)($it['unidade'] ?? '')) ?>">
+                  <button type="button" class="cq-add" data-mais>+ Adicionar</button>
+                  <span class="cq-ctrl" hidden><button type="button" data-menos aria-label="Tirar um">−</button><b class="cq-n">0</b><button type="button" data-mais aria-label="Pôr mais um">+</button></span>
+                </div>
+              <?php elseif ($num_whats && !$esg): ?><a class="cardapio-pedir-item" href="<?= h(link_whatsapp($num_whats, catalogo_msg_item($it, (string)$p['nome']))) ?>" data-item="<?= h($item_id) ?>" rel="nofollow noopener" target="_blank">💬 Pedir</a><?php endif ?>
               </div>
             </li><?php endforeach ?>
           </ul>
         <?php endforeach ?>
         <p class="discreto"><?= h($mod['aviso']) ?></p>
+        <?php if ($carrinho): ?>
+        <div class="carrinho-barra" id="carrinho-barra" hidden>
+          <button type="button" class="botao whats" id="carrinho-abrir">🛒 Ver pedido · <span id="cb-qtd">0 itens</span> · <b id="cb-total"></b></button>
+        </div>
+        <div class="carrinho-janela" id="carrinho-janela" role="dialog" aria-modal="true" aria-labelledby="cj-titulo" hidden>
+          <div class="cj-caixa">
+            <div class="cj-topo"><h3 id="cj-titulo">Seu pedido</h3><button type="button" class="cj-fechar" id="cj-fechar" aria-label="Fechar">&times;</button></div>
+            <p class="discreto cj-de"><?= h($p['nome']) ?></p>
+            <ul class="cj-lista" id="cj-lista"></ul>
+            <p class="cj-total">Total: <b id="cj-total"></b></p>
+            <p class="discreto cj-obs-total" id="cj-obs-total" hidden>Alguns itens não têm preço fixo: o comércio confirma o valor.</p>
+            <fieldset class="cj-campos">
+              <legend>Como você quer receber?</legend>
+              <label class="marcar"><input type="radio" name="cj-receber" value="retirar" checked> Vou buscar no local</label>
+              <label class="marcar"><input type="radio" name="cj-receber" value="entrega"> Entregar no meu endereço</label>
+              <label id="cj-end-rot" hidden>Endereço de entrega<input id="cj-endereco" maxlength="200" autocomplete="street-address" placeholder="Rua, número, bairro"></label>
+              <label>Forma de pagamento<select id="cj-pagamento"><option>Pix</option><option>Dinheiro</option><option>Cartão (na entrega ou no local)</option></select></label>
+              <label id="cj-troco-rot" hidden>Troco para quanto? (opcional)<input id="cj-troco" inputmode="decimal" maxlength="10" placeholder="R$ 50,00"></label>
+              <label>Seu nome<input id="cj-nome" maxlength="60" autocomplete="given-name"></label>
+              <label>Observação (opcional)<textarea id="cj-obs" maxlength="300" rows="2" placeholder="Ex.: sem cebola, ponto da carne..."></textarea></label>
+            </fieldset>
+            <button type="button" class="botao whats cj-enviar" id="cj-enviar">Enviar pedido pelo WhatsApp</button>
+            <p class="discreto">O pedido vai para o WhatsApp <?= $num_whats ? 'de ' . h($p['nome']) : 'que você escolher (prévia: a ficha de teste não tem WhatsApp)' ?>. O comércio confirma o valor, a entrega e o tempo.</p>
+            <button type="button" class="cj-limpar" id="cj-limpar">Esvaziar o pedido</button>
+          </div>
+        </div>
+        <script>(function () {   // 22/11 (passo 47): carrinho do catálogo -> pedido inteiro no WhatsApp
+          var pid = <?= (int)$p['id'] ?>, base = <?= json_encode($whats_base, JSON_UNESCAPED_SLASHES) ?>, comercio = <?= json_encode((string)$p['nome'], JSON_UNESCAPED_UNICODE) ?>;
+          var chave = 'lf_carrinho_' + pid, itens = {};
+          try { itens = JSON.parse(localStorage.getItem(chave) || '{}') || {}; } catch (e) {}
+          var $ = function (id) { return document.getElementById(id); };
+          var reais = function (v) { return 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'); };
+          function guardar() { try { localStorage.setItem(chave, JSON.stringify(itens)); } catch (e) {} }
+          function controles() { return document.querySelectorAll('.carrinho-qtd'); }
+          function dados(el) { return { id: el.dataset.item, nome: el.dataset.nome, preco: el.dataset.preco === '' ? null : parseFloat(el.dataset.preco), un: el.dataset.unidade }; }
+          // tira do carrinho guardado o que não existe mais (item apagado ou esgotado)
+          var existe = {}; controles().forEach(function (el) { existe[el.dataset.item] = 1; });
+          Object.keys(itens).forEach(function (k) { if (!existe[k]) delete itens[k]; });
+          function contas() {
+            var q = 0, t = 0, semPreco = false;
+            Object.keys(itens).forEach(function (k) { var it = itens[k]; q += it.n; if (it.preco === null) semPreco = true; else t += it.n * it.preco; });
+            return { q: q, t: t, semPreco: semPreco };
+          }
+          function desenhar() {
+            controles().forEach(function (el) {
+              var n = (itens[el.dataset.item] || {}).n || 0;
+              el.querySelector('.cq-add').hidden = n > 0; el.querySelector('.cq-ctrl').hidden = n === 0; el.querySelector('.cq-n').textContent = n;
+              el.closest('li').classList.toggle('no-carrinho', n > 0);
+            });
+            var c = contas();
+            $('carrinho-barra').hidden = c.q === 0;
+            $('cb-qtd').textContent = c.q + (c.q === 1 ? ' item' : ' itens');
+            $('cb-total').textContent = c.t > 0 ? reais(c.t) + (c.semPreco ? '+' : '') : '';
+            $('cj-total').textContent = reais(c.t) + (c.semPreco ? ' + itens a confirmar' : '');
+            $('cj-obs-total').hidden = !c.semPreco;
+            var ul = $('cj-lista'); ul.innerHTML = '';
+            Object.keys(itens).forEach(function (k) {
+              var it = itens[k], li = document.createElement('li');
+              li.innerHTML = '<span class="cj-n"></span><span class="cj-nome"></span><span class="cj-preco"></span>'
+                + '<span class="cj-bt"><button type="button" data-menos aria-label="Tirar um">−</button><button type="button" data-mais aria-label="Pôr mais um">+</button></span>';
+              li.dataset.item = k;
+              li.querySelector('.cj-n').textContent = it.n + 'x';
+              li.querySelector('.cj-nome').textContent = it.nome;
+              li.querySelector('.cj-preco').textContent = it.preco === null ? 'a confirmar' : reais(it.n * it.preco);
+              ul.appendChild(li);
+            });
+            if (c.q === 0 && !$('carrinho-janela').hidden) fechar();
+          }
+          function mudar(id, d, el) {
+            var it = itens[id];
+            if (!it && d > 0 && el) { var x = dados(el); it = itens[id] = { nome: x.nome, preco: x.preco, un: x.un, n: 0 }; }
+            if (!it) return;
+            it.n = Math.max(0, Math.min(99, it.n + d));
+            if (it.n === 0) delete itens[id];
+            guardar(); desenhar();
+          }
+          document.getElementById('painel-cardapio').addEventListener('click', function (ev) {
+            var b = ev.target.closest('[data-mais],[data-menos]'); if (!b) return;
+            var el = b.closest('.carrinho-qtd') || b.closest('#cj-lista li'); if (!el) return;
+            var id = el.dataset.item, alvo = document.querySelector('.carrinho-qtd[data-item="' + id + '"]');
+            mudar(id, b.hasAttribute('data-mais') ? 1 : -1, alvo);
+          });
+          function abrir() { $('carrinho-janela').hidden = false; document.body.classList.add('sem-rolagem'); }
+          function fechar() { $('carrinho-janela').hidden = true; document.body.classList.remove('sem-rolagem'); }
+          $('carrinho-abrir').addEventListener('click', abrir);
+          $('cj-fechar').addEventListener('click', fechar);
+          $('carrinho-janela').addEventListener('click', function (ev) { if (ev.target.id === 'carrinho-janela') fechar(); });
+          document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') fechar(); });
+          $('cj-limpar').addEventListener('click', function () { if (confirm('Esvaziar o pedido?')) { itens = {}; guardar(); desenhar(); } });
+          document.querySelectorAll('input[name="cj-receber"]').forEach(function (r) { r.addEventListener('change', function () { $('cj-end-rot').hidden = !document.querySelector('input[name="cj-receber"][value="entrega"]').checked; }); });
+          $('cj-pagamento').addEventListener('change', function () { $('cj-troco-rot').hidden = this.value !== 'Dinheiro'; });
+          // nome e endereço ficam guardados para o próximo pedido (só neste celular)
+          try { var eu = JSON.parse(localStorage.getItem('lf_eu') || '{}'); if (eu.nome) $('cj-nome').value = eu.nome; if (eu.end) $('cj-endereco').value = eu.end; } catch (e) {}
+          $('cj-enviar').addEventListener('click', function () {
+            var c = contas(); if (!c.q) return;
+            var entrega = document.querySelector('input[name="cj-receber"][value="entrega"]').checked;
+            var end = $('cj-endereco').value.trim(), nome = $('cj-nome').value.trim();
+            if (entrega && !end) { $('cj-endereco').focus(); alert('Coloque o endereço de entrega.'); return; }
+            var l = ['Olá! Quero fazer um pedido pelo *Localiza Fácil*:', ''];
+            Object.keys(itens).forEach(function (k) { var it = itens[k]; l.push('• ' + it.n + 'x ' + it.nome + (it.preco === null ? ' (preço a confirmar)' : ' - ' + reais(it.n * it.preco))); });
+            l.push('', '*Total: ' + reais(c.t) + (c.semPreco ? ' + itens a confirmar' : '') + '*' + (entrega ? ' (sem a taxa de entrega)' : ''));
+            l.push(entrega ? '🛵 Entregar em: ' + end : '🏪 Vou buscar no local');
+            var pag = $('cj-pagamento').value, troco = $('cj-troco').value.trim();
+            l.push('💳 Pagamento: ' + pag + (pag === 'Dinheiro' && troco ? ' (troco para ' + troco + ')' : ''));
+            if (nome) l.push('👤 Nome: ' + nome);
+            var obs = $('cj-obs').value.trim(); if (obs) l.push('📝 Obs.: ' + obs);
+            try { localStorage.setItem('lf_eu', JSON.stringify({ nome: nome, end: end })); } catch (e) {}
+            try { fetch(<?= json_encode(url('api/item.php')) ?>, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: pid, itens: Object.keys(itens), origem: 'web' }) }); } catch (e) {}
+            window.open(base + '?text=' + encodeURIComponent(l.join('\n')), '_blank', 'noopener');
+          });
+          desenhar();
+        })();</script>
+        <?php endif ?>
         <div class="cardapio-pedir">
           <?php if ($c['whatsapp']): ?><a class="botao whats" href="<?= h($c['whatsapp']) ?>" data-contato="whatsapp" rel="nofollow noopener" target="_blank"><?= h($mod['botao']) ?></a><?php endif ?>
           <?php if (!empty($c['ifood'])): ?><a class="botao botao-ifood" href="<?= h($c['ifood']) ?>" data-contato="ifood" rel="nofollow noopener" target="_blank">Pedir no iFood</a><?php endif ?>
@@ -650,7 +773,7 @@ function web_pagina_ficha(array $p): void {
         function mostrar(c) { info.hidden = c; card.hidden = !c; bi.setAttribute('aria-selected', c ? 'false' : 'true'); bc.setAttribute('aria-selected', c ? 'true' : 'false'); }
         abas.hidden = false;
         card.addEventListener('click', function (ev) {   // 22/11 (passo 45): "Pedir" de um item
-          var a = ev.target.closest('[data-item]'); if (!a) return;
+          var a = ev.target.closest('a[data-item]'); if (!a) return;   // só o link "Pedir" (o carrinho conta no envio)
           try { fetch(<?= json_encode(url('api/item.php')) ?>, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: <?= (int)$p['id'] ?>, item: a.dataset.item, origem: 'web' }) }); } catch (e) {}
         });

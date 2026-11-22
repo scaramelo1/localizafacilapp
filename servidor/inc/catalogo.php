@@ -11,16 +11,16 @@ declare(strict_types=1);
 require_once __DIR__ . '/base.php';
 
 const CATALOGO_MODELOS = [
-    'comida' => ['aba' => '🍔 Cardápio', 'curto' => 'Cardápio', 'titulo' => 'Cardápio', 'botao' => 'Pedir pelo WhatsApp',
+    'comida' => ['carrinho' => true, 'aba' => '🍔 Cardápio', 'curto' => 'Cardápio', 'titulo' => 'Cardápio', 'botao' => 'Pedir pelo WhatsApp',
         'aviso' => 'Preços informados pelo comércio e podem mudar. Confirme na hora de pedir.',
         'secoes' => ['Lanches', 'Porções', 'Bebidas', 'Sobremesas'], 'etiquetas' => '', 'unidade' => false, 'validade' => false],
     'roupas' => ['aba' => '👕 Produtos', 'curto' => 'Produtos', 'titulo' => 'Produtos e coleção', 'botao' => 'Perguntar se tem pelo WhatsApp',
         'aviso' => 'Tamanhos e cores sujeitos à disponibilidade. Pergunte pelo WhatsApp antes de ir até a loja.',
         'secoes' => ['Feminino', 'Masculino', 'Infantil', 'Acessórios'], 'etiquetas' => 'Tamanhos e cores (separe por vírgula)', 'unidade' => false, 'validade' => false],
-    'mercado' => ['aba' => '🛒 Ofertas', 'curto' => 'Ofertas', 'titulo' => 'Ofertas', 'botao' => 'Fazer pedido pelo WhatsApp',
+    'mercado' => ['carrinho' => true, 'aba' => '🛒 Ofertas', 'curto' => 'Ofertas', 'titulo' => 'Ofertas', 'botao' => 'Fazer pedido pelo WhatsApp',
         'aviso' => 'Ofertas enquanto durar o estoque. Preços informados pelo mercado.',
         'secoes' => ['Açougue', 'Hortifrúti', 'Mercearia', 'Bebidas', 'Limpeza'], 'etiquetas' => '', 'unidade' => true, 'validade' => true],
-    'bebidas' => ['aba' => '🍺 Bebidas', 'curto' => 'Bebidas', 'titulo' => 'Bebidas e preços', 'botao' => 'Pedir pelo WhatsApp',
+    'bebidas' => ['carrinho' => true, 'aba' => '🍺 Bebidas', 'curto' => 'Bebidas', 'titulo' => 'Bebidas e preços', 'botao' => 'Pedir pelo WhatsApp',
         'aviso' => 'Venda proibida para menores de 18 anos. Beba com moderação. Preços informados pelo comércio.',
         'secoes' => ['Cervejas', 'Destilados', 'Vinhos', 'Sem álcool', 'Gelo e carvão'], 'etiquetas' => 'Detalhes (ex.: Gelada, Puro malte)', 'unidade' => true, 'validade' => false],
     'pecas' => ['aba' => '🔧 Peças', 'curto' => 'Peças', 'titulo' => 'Peças e serviços', 'botao' => 'Consultar peça pelo WhatsApp',
@@ -36,6 +36,7 @@ const CATALOGO_MODELOS = [
         'aviso' => 'Preços e disponibilidade informados pelo comércio e podem mudar.',
         'secoes' => ['Produtos', 'Serviços'], 'etiquetas' => 'Detalhes (separe por vírgula)', 'unidade' => false, 'validade' => false],
 ];
+// 'carrinho' => true (comida, mercado, bebidas): escolhe vários itens e manda o pedido inteiro no WhatsApp (passo 47)
 const CATALOGO_MAX_ITENS = 150;
 const CATALOGO_MAX_SECOES = 20;
 const CATALOGO_MAX_FOTOS = 60;

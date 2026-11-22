@@ -305,6 +305,14 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
 46. ✅ Testes feitos do próprio servidor não contam (22/11): as 40 aparições "busca" de 22/11 eram um teste meu
     (curl fingindo celular, 02:08) e a busca "Lanchonete Exemplo"; apagadas. e_robo() agora recusa o IP do próprio
     servidor (SERVER_ADDR, 127.0.0.1): vale para entradas, aberturas, toques, aparições e buscas.
+47. 🧪 Pedido de vários itens pelo WhatsApp, "tipo iFood" (22/11, TESTE na ficha 103616). Só no site por enquanto e só
+    nos segmentos com 'carrinho' (comida, mercado, bebidas). Cada item: "+ Adicionar" e depois − n +; barra fixa
+    "🛒 Ver pedido · N itens · R$ X"; janela com os itens (muda quantidade), total, retirar ou entregar (endereço
+    obrigatório), pagamento (Pix, dinheiro com troco, cartão), nome e observação; "Enviar pedido pelo WhatsApp" abre o
+    WhatsApp do comércio com a lista, o total (sem a taxa de entrega) e os dados. Carrinho guardado no celular por
+    ficha; nome e endereço guardados para o próximo pedido. Item sem preço fixo ("a partir de") vai como "a confirmar".
+    api/item.php recebe a lista inteira (cada item conta; 1 toque no WhatsApp). Na prévia sem WhatsApp abre
+    wa.me/ para escolher o contato. Testado com jsdom (fluxo completo, mensagem, contagem). Falta: app e aprovação.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
