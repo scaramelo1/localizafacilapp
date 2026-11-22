@@ -8,7 +8,7 @@ pagina_inicio('Termos de uso | Localiza Fácil', 'Regras de uso do app Localiza 
 ?>
 <main class="documento">
   <h1>Termos de uso</h1>
-  <p class="atualizado">Última atualização: 10 de novembro de 2026</p>
+  <p class="atualizado">Última atualização: 22 de novembro de 2026</p>
 
   <div class="quadro">
     <strong>Resumo:</strong> o Localiza Fácil é uma vitrine de profissionais e comércios de <?= h(texto_cidades()) ?>.
@@ -67,6 +67,7 @@ pagina_inicio('Termos de uso | Localiza Fácil', 'Regras de uso do app Localiza 
     do topo da tela inicial. Avaliações não podem ser compradas, trocadas nem apagadas a pedido.</li>
     <li>O selo "Verificado pelo Localiza Fácil", responder as avaliações e ver os números da página são recursos do plano Destaque.
     O selo aparece depois que a equipe confere o comércio; não vem automaticamente com o pagamento.</li>
+    <li>Quem tem o plano Destaque em dia pode montar um <strong>cardápio ou catálogo</strong> na página (itens, preços e fotos). Em lanchonetes, mercados e adegas, o cliente pode juntar vários itens num pedido, que é enviado pelo WhatsApp do próprio comércio: o Localiza Fácil não recebe pagamentos nem participa da venda, e preços, entrega e disponibilidade são de responsabilidade do comércio. Com o Destaque vencido, o catálogo deixa de aparecer, mas fica guardado.</li>
     <li>Quem tem o plano Destaque em dia pode colocar uma <strong>Oferta da semana</strong>, paga à parte por oferta (pagamento
     único pelo Mercado Pago, <?= h(oferta_preco_texto()) ?>). A oferta aparece na página do comércio e na página da cidade pelos dias
     escolhidos (no máximo <?= OFERTA_MAX_DIAS ?>), contados a partir da aprovação da equipe. Se a equipe pedir um ajuste, o dono corrige e

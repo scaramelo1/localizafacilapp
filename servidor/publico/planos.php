@@ -36,6 +36,9 @@ $planos = [
         'Ver quantas pessoas abriram sua página e chamaram no WhatsApp',
         'Aparece em "Em destaque" no topo da tela inicial',
         'Aparece na frente dos outros na sua área e na busca',
+        'Cardápio ou catálogo na sua página (com preços e fotos), numa aba própria',
+        'Lanchonetes, mercados e adegas: o cliente monta o pedido com vários itens e manda tudo de uma vez no seu WhatsApp',
+        'Seus itens aparecem quando alguém procura por eles na busca',
         'Pode colocar Ofertas da semana na ficha e na página da cidade (' . oferta_preco_texto() . ' por oferta, até ' . OFERTA_MAX_DIAS . ' dias)',
     ]],
     'site' => ['Destaque + Site', 'O Destaque e um site só seu, feito por nós', [

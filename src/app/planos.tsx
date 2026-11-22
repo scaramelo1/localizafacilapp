@@ -46,6 +46,9 @@ const PLANOS: { chave: string; nome: string; sub: string; icone: NomeIcone; iten
       'Ver quantas pessoas abriram sua página e chamaram no WhatsApp',
       'Aparece no topo da tela inicial',
       'Na frente dos outros na área e na busca',
+      'Cardápio ou catálogo na sua página, com preços e fotos',
+      'Comida, mercado e bebidas: pedido de vários itens direto no seu WhatsApp',
+      'Seus itens aparecem na busca',
     ],
   },
   {

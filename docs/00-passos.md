@@ -327,6 +327,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     registrarPedido() conta todos os itens. Prévia da equipe também no app: api/profissional.php abre ficha fora do app
     para conta de admin (catálogo como Destaque). Administração do app: "Abrir ficha pelo número" (ex.: 103616).
     Testes: sintaxe (esbuild), lógica do pedido em node, API como visitante (404) e admin (catálogo com carrinho).
+50. ✅ Catálogo/cardápio no plano Destaque (22/11): planos.php e app (planos.tsx) listam cardápio/catálogo com preços e
+    fotos, pedido de vários itens no WhatsApp (comida, mercado, bebidas) e itens na busca; termos.php ganhou o item do
+    catálogo (venda é do comércio; Destaque vencido = catálogo some, mas fica guardado). E-mail modelo para lanchonetes
+    (enviar por Admin > E-mails > Um e-mail só).
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
