@@ -506,6 +506,9 @@ function recalcular_nota(int $profissional_id): void {
         nota_media = COALESCE((SELECT AVG(estrelas) FROM avaliacoes WHERE profissional_id = ? AND status = 'publicada'), 0),
         total_avaliacoes = (SELECT COUNT(*) FROM avaliacoes WHERE profissional_id = ? AND status = 'publicada')
         WHERE id = ?", [$profissional_id, $profissional_id, $profissional_id]);
+    // 21/11 (passo 34): as páginas de cidade e área do site ficam prontas por até 1 h; sem isto a estrela nova só
+    // aparecia nas listas do site depois que a cópia vencia. Avaliação é rara: refazer as páginas não pesa.
+    web_cache_limpar();
 }
 
 // contar_contato(), contar_visita() e contar_aparicoes() ficam em inc/numeros.php (passo 20)

@@ -227,6 +227,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     recebem aviso no celular, que abre a ficha no app. Avaliação editada só avisa se mudou nota ou comentário, e a
     mesma pessoa na mesma ficha só avisa de novo depois de 10 min (dados_dir/avaliacoes-avisadas.json). O dono
     avaliando a própria ficha não recebe. Ficha sem dono: o aviso dos admins diz "comércio sem dono cadastrado".
+34. ✅ Estrela nova aparecendo nas listas do site na hora (21/11, "avaliação nova não aparece na pesquisa"). O banco e a
+    busca (app e site) já estavam certos; as páginas de cidade e área do site ficam prontas por até 1 h (web_cache) e
+    a avaliação não refazia. recalcular_nota() agora chama web_cache_limpar(). Achado junto: a Studio Movimento Fit
+    está duplicada (4557 com foto e avaliação; 45805 sem foto nem telefone, importada em 11/11), as duas aparecem na busca.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
