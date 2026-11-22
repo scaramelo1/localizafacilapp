@@ -508,9 +508,22 @@ function web_pagina_ficha(array $p): void {
         <?php if ($p['site']): ?><a class="botao contorno" href="<?= h(preg_match('#^https?://#i', $p['site']) ? $p['site'] : 'https://' . $p['site']) ?>" data-contato="site" rel="nofollow noopener" target="_blank">Site</a><?php endif ?>
         <?php if ($eu): ?><button type="button" class="botao contorno botao-salvar<?= $salvo ? ' salvo' : '' ?>" id="botao-salvar" aria-pressed="<?= $salvo ? 'true' : 'false' ?>"><?= $salvo ? '♥ Salvo' : '♡ Salvar' ?></button>
         <?php else: ?><a class="botao contorno botao-salvar" href="<?= h(link_entrar(url_ficha($p))) ?>" rel="nofollow" title="Entre com o Google para salvar">♡ Salvar</a><?php endif ?>
-        <?php // 19/11: compartilhar no WhatsApp ("Olha esse lugar: ..." com o link da ficha); conta como 'compartilhar'
+        <?php // 19/11: "Olha esse lugar: ..." com o link da ficha; conta como 'compartilhar'
+          // 21/11 (passo 35): um botão "Compartilhar" só. No celular abre o menu do próprio celular com a imagem da ficha
+          // no formato Stories (story.php), então aparecem WhatsApp (conversa ou status), Instagram (Direct ou Stories) e
+          // os outros apps. No computador (ou se o celular não deixar) abre o menu abaixo.
           $msg = 'Olha esse lugar: ' . $nome . ($tipo ? " ($tipo)" : '') . ", em $nome_cidade\n$url"; ?>
-        <a class="botao contorno botao-compartilhar" href="https://wa.me/?text=<?= h(rawurlencode($msg)) ?>" data-contato="compartilhar" rel="nofollow noopener" target="_blank">Compartilhar no WhatsApp</a>
+        <div class="compartilhar">
+          <button type="button" class="botao contorno botao-compartilhar" id="botao-compartilhar" aria-haspopup="true" aria-expanded="false" aria-controls="compartilhar-menu">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M18 16.1c-.8 0-1.5.3-2 .8l-7.1-4.2c.1-.2.1-.5.1-.7s0-.5-.1-.7L16 7.2c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.8C7.5 9.3 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.8l7.1 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 2.9 2.9s2.9-1.3 2.9-2.9-1.2-2.9-2.8-2.9z"/></svg>
+            Compartilhar</button>
+          <div class="compartilhar-menu" id="compartilhar-menu" hidden>
+            <a href="https://wa.me/?text=<?= h(rawurlencode($msg)) ?>" target="_blank" rel="nofollow noopener" data-comp="whatsapp"><span aria-hidden="true">💬</span> WhatsApp</a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=<?= h(rawurlencode($url)) ?>" target="_blank" rel="nofollow noopener" data-comp="facebook"><span aria-hidden="true">👍</span> Facebook</a>
+            <a href="<?= h(url_publica('story.php?id=' . (int)$p['id'])) ?>" download="localiza-facil-<?= (int)$p['id'] ?>.jpg" rel="nofollow" data-comp="imagem"><span aria-hidden="true">🖼️</span> Imagem para Stories e Status</a>
+            <button type="button" data-comp="copiar"><span aria-hidden="true">🔗</span> <span>Copiar link</span></button>
+          </div>
+        </div>
       </div>
 
       <?php if ($oferta = oferta_no_ar((int)$p['id'])) echo oferta_quadro_ficha($oferta);   // 19/11: Oferta da semana (só Destaque) ?>
@@ -771,6 +784,62 @@ function afMarcarAvaliar(fechar) {
   } catch (e) {}
 }
 <?php if ($minha): ?>afMarcarAvaliar(true);<?php endif ?>
+// 21/11 (passo 35): botão Compartilhar (menu do celular com a imagem da ficha; senão, o menu do site)
+(function () {
+  var b = document.getElementById('botao-compartilhar'), menu = document.getElementById('compartilhar-menu');
+  if (!b || !menu) return;
+  var url = <?= json_encode($url, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>, texto = <?= json_encode($msg, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+  var titulo = <?= json_encode((string)$p['nome'], JSON_UNESCAPED_UNICODE) ?>, imagem = <?= json_encode(url_publica('story.php?id=' . (int)$p['id']), JSON_UNESCAPED_SLASHES) ?>;
+  var buscando = null;
+  // menu do sistema só no celular/tablet (toque); no computador o menu do site é mais prático
+  var celular = !!navigator.share && !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
+  function contar() {
+    try { fetch(<?= json_encode(url('api/contato.php')) ?>, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: <?= (int)$p['id'] ?>, tipo: 'compartilhar', origem: 'web' }) }); } catch (e) {}
+  }
+  function pegarImagem() {
+    if (!buscando) buscando = fetch(imagem).then(function (r) { return r.ok ? r.blob() : null; })
+      .then(function (bl) { return bl ? new File([bl], 'localiza-facil.jpg', { type: 'image/jpeg' }) : null; })
+      .catch(function () { return null; });
+    return buscando;
+  }
+  var podeArquivo = false;
+  try { podeArquivo = !!(navigator.canShare && navigator.canShare({ files: [new File([''], 'a.jpg', { type: 'image/jpeg' })] })); } catch (e) {}
+  // celular: busca a imagem quando o botão aparece na tela, para o menu abrir na hora do toque
+  if (celular && podeArquivo && 'IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { pegarImagem(); obs.disconnect(); } });
+    obs.observe(b);
+  }
+  function abrirMenu(abrir) {
+    menu.hidden = !abrir;
+    b.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+  }
+  b.addEventListener('click', function () {
+    if (!menu.hidden) { abrirMenu(false); return; }
+    if (!celular) { abrirMenu(true); return; }
+    (podeArquivo ? pegarImagem() : Promise.resolve(null)).then(function (f) {
+      var d = f && navigator.canShare({ files: [f] }) ? { files: [f], title: titulo, text: texto } : { title: titulo, text: texto.replace('\n' + url, ''), url: url };
+      return navigator.share(d);
+    }).then(contar).catch(function (e) {
+      if (!e || e.name !== 'AbortError') abrirMenu(true);   // AbortError = a pessoa fechou o menu
+    });
+  });
+  menu.addEventListener('click', function (ev) {
+    var a = ev.target.closest('[data-comp]');
+    if (!a) return;
+    contar();
+    if (a.dataset.comp === 'copiar') {
+      var rot = a.querySelector('span:last-child');
+      (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () { rot.textContent = 'Link copiado!'; },
+        function () { window.prompt('Copie o link:', url); });
+      setTimeout(function () { rot.textContent = 'Copiar link'; }, 2500);
+      return;
+    }
+    setTimeout(function () { abrirMenu(false); }, 300);
+  });
+  document.addEventListener('click', function (ev) { if (!menu.hidden && !ev.target.closest('.compartilhar')) abrirMenu(false); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') abrirMenu(false); });
+})();
 document.querySelectorAll('[data-contato]').forEach(function (a) {
   a.addEventListener('click', function () {
     if ((a.dataset.contato === 'whatsapp' || a.dataset.contato === 'ligar') && !<?= $minha ? 'true' : 'false' ?>) afMarcarAvaliar(false);

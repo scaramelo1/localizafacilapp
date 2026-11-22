@@ -427,7 +427,7 @@ a.area:hover { border-color: var(--verde); }
   .ficha-colunas { grid-template-columns: 1fr; }
   .ficha-topo { align-items: flex-start; }
   .ficha-logo { width: 72px; height: 72px; font-size: 2rem; }
-  .ficha-botoes .botao { flex: 1 1 140px; }
+  .ficha-botoes .botao, .ficha-botoes .compartilhar { flex: 1 1 140px; }
   .cartoes { grid-template-columns: 1fr; }
 }
 
@@ -551,7 +551,16 @@ html.fj-aberta, html.fj-aberta body { overflow: hidden; }
 @media (max-width: 640px) { .fj-seta { width: 40px; height: 40px; font-size: 32px; background: rgba(0, 0, 0, .35); } .fj-item { padding: 56px 0; } .fj-item img { border-radius: 0; } }
 
 /* ---------- 19/11: compartilhar, Oferta da semana, "Aberto agora" e atalhos do painel ---------- */
-.botao.botao-compartilhar { border-color: var(--whats); color: var(--whats); }
+.botao.botao-compartilhar { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+/* 21/11 (passo 35): menu do Compartilhar (computador, ou celular que não abre o menu do sistema) */
+.compartilhar { position: relative; display: flex; }
+.compartilhar .botao { flex: 1; }
+.compartilhar-menu { position: absolute; z-index: 30; left: 0; right: 0; top: calc(100% + 6px); min-width: 240px; background: var(--branco);
+  border: 2px solid var(--borda); border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.15); padding: 6px; display: grid; gap: 2px; }
+.compartilhar-menu[hidden] { display: none; }
+.compartilhar-menu a, .compartilhar-menu button { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; border: 0;
+  background: none; font: inherit; font-weight: 800; font-size: .95rem; color: var(--texto); text-decoration: none; text-align: left; cursor: pointer; }
+.compartilhar-menu a:hover, .compartilhar-menu button:hover, .compartilhar-menu a:focus-visible, .compartilhar-menu button:focus-visible { background: var(--verde-claro); }
 .linha-botoes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
 .linha-botoes .botao { margin: 0; }
 

@@ -231,6 +231,13 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     busca (app e site) já estavam certos; as páginas de cidade e área do site ficam prontas por até 1 h (web_cache) e
     a avaliação não refazia. recalcular_nota() agora chama web_cache_limpar(). Achado junto: a Studio Movimento Fit
     está duplicada (4557 com foto e avaliação; 45805 sem foto nem telefone, importada em 11/11), as duas aparecem na busca.
+35. ✅ Botão "Compartilhar" no site no lugar de "Compartilhar no WhatsApp" (21/11, pedido do usuário). No celular abre o
+    menu do próprio celular com a imagem da ficha no formato Stories (publico/story.php + servidor/story-imagem.py,
+    1080x1920 JPG com foto, nome, tipo, cidade, estrelas e o site; guardada em dados_dir/story/ e refeita quando a ficha
+    muda), então aparecem WhatsApp (conversa ou status), Instagram (Direct ou Stories) e os outros apps; a legenda leva
+    "Olha esse lugar" + link. No computador (ou se o celular recusar) abre um menu: WhatsApp, Facebook, imagem para
+    Stories e Status, copiar link. Conta como 'compartilhar' só quando compartilha ou escolhe uma opção.
+    App: já abria o menu do celular, mas só com texto (Stories do Instagram precisa de imagem): falta versão nova.
 
 ## Nunca fazer
 - Subir milhares de fichas de uma vez para o Google (usar as ondas).
