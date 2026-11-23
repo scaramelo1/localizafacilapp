@@ -28,7 +28,7 @@ if (e_post()) {
         'assunto' => (string)txt('assunto', 200),
         'texto' => trim(str_replace("\r", '', (string)($_POST['texto'] ?? ''))),
     ];
-    $lista = email_destinatarios($f['publico'], $f['publico'] === 'donos' && $f['cidade'] ? $f['cidade'] : null, $f['um'], $f['escolhidos']);
+    $lista = email_destinatarios($f['publico'], in_array($f['publico'], ['donos', 'lojas'], true) && $f['cidade'] ? $f['cidade'] : null, $f['um'], $f['escolhidos']);
     $pronto_texto = $f['assunto'] !== '' && mb_strlen($f['texto']) >= 10 && $f['texto'] !== EMAIL_MODELO;
 
     if ($acao === 'processar') {
@@ -41,7 +41,9 @@ if (e_post()) {
         flash('Escreva o assunto e a mensagem antes de mandar.', 'erro');
     } elseif ($acao === 'teste') {
         $nome_teste = $lista ? (reset($lista) ?: $admin['nome'] ?? null) : ($admin['nome'] ?? null);
-        $id = email_enfileirar((string)$admin['email'], $nome_teste, '[Teste] ' . $f['assunto'], $f['texto'], 'teste', ['admin_id' => (int)$admin['id']]);
+        // 23/11 (passo 79): no teste para lojas, o {comercio}/{link} da 1ª loja da lista (para ver como chega)
+        [$as_t, $tx_t] = $f['publico'] === 'lojas' && $lista ? [email_trocar_loja($f['assunto'], (string)array_key_first($lista)), email_trocar_loja($f['texto'], (string)array_key_first($lista))] : [$f['assunto'], $f['texto']];
+        $id = email_enfileirar((string)$admin['email'], $nome_teste, '[Teste] ' . $as_t, $tx_t, 'teste', ['admin_id' => (int)$admin['id']]);
         if ($id) { email_processar(5); }
         $st = $id ? (string)valor('SELECT status FROM emails WHERE id = ?', [$id]) : '';
         flash($st === 'enviado' ? 'Teste enviado para ' . $admin['email'] . '. Confira a caixa de entrada (e o spam).'
@@ -50,13 +52,15 @@ if (e_post()) {
         if (!$lista) {
             flash('Ninguém para receber com essa escolha.', 'erro');
         } else {
-            $publico = EMAIL_PUBLICOS[$f['publico']] . ($f['publico'] === 'donos' && $f['cidade'] ? ' · ' . nome_cidade($f['cidade']) : '')
+            $publico = EMAIL_PUBLICOS[$f['publico']] . (in_array($f['publico'], ['donos', 'lojas'], true) && $f['cidade'] ? ' · ' . nome_cidade($f['cidade']) : '')
                 . ($f['publico'] === 'um' ? ' · ' . array_key_first($lista) : '');
             if ($f['publico'] === 'escolhidos') $publico = count($lista) === 1 ? array_key_first($lista) : count($lista) . ' marcados na lista';
             $lote = inserir('emails_lotes', ['assunto' => $f['assunto'], 'texto' => $f['texto'], 'publico' => mb_substr($publico, 0, 120),
                 'total' => count($lista), 'admin_id' => (int)$admin['id']]);
             foreach ($lista as $para => $nome) {
-                email_enfileirar($para, $nome, $f['assunto'], $f['texto'], 'equipe', ['lote_id' => $lote, 'admin_id' => (int)$admin['id']]);
+                $loja = $f['publico'] === 'lojas';   // 23/11 (passo 79): {comercio}, {link} e {planos} de cada loja
+                email_enfileirar($para, $nome, $loja ? email_trocar_loja($f['assunto'], $para) : $f['assunto'], $loja ? email_trocar_loja($f['texto'], $para) : $f['texto'],
+                    'equipe', ['lote_id' => $lote, 'admin_id' => (int)$admin['id']]);
             }
             registrar((int)$admin['id'], 'mandou_emails', null, count($lista) . ' · ' . $f['assunto']);
             $livres = max(0, email_limite_dia() - email_enviados_24h());
@@ -132,7 +136,9 @@ admin_inicio('E-mails', $admin);
   <label for="texto">Mensagem</label>
   <textarea id="texto" name="texto" rows="12"><?= h($f['texto']) ?></textarea>
   <p class="discreto">Texto simples: deixe uma linha em branco entre os parágrafos; links começando com https:// viram link.
-    <code>{nome}</code> vira o primeiro nome da pessoa (some quando não há nome). O rodapé com "Não quero mais receber" entra sozinho.</p>
+    <code>{nome}</code> vira o primeiro nome da pessoa (some quando não há nome). O rodapé com "Não quero mais receber" entra sozinho.<br>
+    Para <b>Lojas com e-mail no site</b>: <code>{comercio}</code> vira o nome da loja, <code>{link}</code> o endereço da ficha dela e
+    <code>{planos}</code> a página para assumir a ficha / ver os planos.</p>
   <?php if ($contagem !== null): ?><div class="aviso ok"><b><?= $contagem ?></b> pessoa(s) vão receber com essa escolha.</div><?php endif ?>
   <p>
     <button class="botao" name="acao" value="contar" formnovalidate>Ver quantos vão receber</button>
@@ -144,7 +150,7 @@ admin_inicio('E-mails', $admin);
 (function () {
   var p = document.getElementById('publico');
   function mostrar() {
-    document.getElementById('campo-cidade').hidden = p.value !== 'donos';
+    document.getElementById('campo-cidade').hidden = p.value !== 'donos' && p.value !== 'lojas';
     document.getElementById('campo-um').hidden = p.value !== 'um';
     document.getElementById('campo-marcados').hidden = p.value !== 'escolhidos';
   }

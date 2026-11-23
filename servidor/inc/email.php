@@ -262,11 +262,34 @@ function email_processar(int $max = EMAIL_POR_RODADA): array {
 const EMAIL_PUBLICOS = [
     'donos' => 'Donos de comércio (quem pediu ou pagou plano)',
     'contas' => 'Contas do app (entraram com o Google)',
+    'lojas' => 'Lojas com e-mail no site (e-mail de contato da ficha)',
     'um' => 'Um e-mail só',
     'escolhidos' => 'Os marcados na lista de e-mails cadastrados',
 ];
 
 /** Lista [email => nome] do público escolhido, sem repetir e sem quem pediu para não receber. */
+/** [email => ficha (id, nome, cidade)] das lojas ativas com e-mail de contato (a 1ª ficha de cada e-mail). */
+function email_lojas(?string $cidade = null): array {
+    static $cache = [];
+    $k = (string)$cidade;
+    if (isset($cache[$k])) return $cache[$k];
+    $r = [];
+    foreach (linhas("SELECT id, nome, cidade, email_contato FROM profissionais WHERE status = 'ativo' AND COALESCE(email_contato, '') <> ''"
+        . ($cidade ? ' AND cidade = ?' : '') . ' ORDER BY popularidade DESC, id', $cidade ? [$cidade] : []) as $p) {
+        $e = email_valido($p['email_contato']);
+        if ($e && !isset($r[$e])) $r[$e] = $p;
+    }
+    return $cache[$k] = $r;
+}
+/** {comercio}, {link} (a ficha) e {planos} (assumir/planos) da loja dona deste e-mail. */
+function email_trocar_loja(string $s, string $email): string {
+    $p = email_lojas()[$email] ?? null;
+    if (!$p) return $s;
+    require_once __DIR__ . '/guia.php';
+    return strtr($s, ['{comercio}' => nome_curto((string)$p['nome']),
+        '{link}' => url_publica(caminho_ficha((int)$p['id'], (string)$p['nome'], (string)$p['cidade'])),
+        '{planos}' => url_publica('planos.php?id=' . (int)$p['id'])]);
+}
 function email_destinatarios(string $publico, ?string $cidade, ?string $um = null, array $escolhidos = []): array {
     $lista = [];
     if ($publico === 'escolhidos') {
@@ -279,6 +302,11 @@ function email_destinatarios(string $publico, ?string $cidade, ?string $um = nul
             LEFT JOIN usuarios u ON u.id = pe.usuario_id LEFT JOIN profissionais p ON p.id = pe.profissional_id
             WHERE pe.status <> 'recusado' AND pe.tipo IN ('assumir', 'incluir')" . ($cidade ? ' AND p.cidade = ?' : '') . ' ORDER BY pe.id DESC';
         $linhas = linhas($sql, $cidade ? [$cidade] : []);
+    } elseif ($publico === 'lojas') {
+        // 23/11 (passo 79): e-mail de contato que veio do site da loja (robô Dados pelo site, aprovado). Uma vez por
+        // e-mail (rede com o mesmo e-mail em 2 fichas recebe 1). O "nome" fica vazio: o texto usa {comercio} e {link}.
+        foreach (email_lojas($cidade) as $e => $p) $lista[$e] = null;
+        $linhas = [];
     } elseif ($publico === 'contas') {
         $linhas = linhas('SELECT email, nome FROM usuarios WHERE ativo = 1 ORDER BY id DESC');
     } elseif ($publico === 'um') {

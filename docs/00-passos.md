@@ -548,3 +548,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
        (nome = endereço ou bairro) só pausam se marcar; 359 sem sugestão.
        APLICADO pelo usuário em 23/11 15h44: 300 tipos trocados (antes em backups/tipos-antes-20261123-154453.json) e as
        33 "não são comércio" pausadas. Genéricos: 692 -> 359. Nota: qualidade dos dados 6 -> 6,5; total 75,5 -> 76.
+79. ✅ E-mail para as lojas (23/11, pedido do usuário). Admin > E-mails ganhou o público "Lojas com e-mail no site"
+    (profissionais.email_contato das fichas ativas, 1 por e-mail; 957 hoje: SJBV 239, Poços 453, Vargem 97, Aguaí 57,
+    Santa Rita 122), com filtro por cidade. No texto: {comercio} (nome da loja), {link} (ficha) e {planos} (planos.php?id=).
+    O teste mostra a 1ª loja da lista. Sai pela fila de sempre (Gmail, 20/min, limite 450/24 h) com o rodapé "Não quero
+    mais receber". Recomendado: uma cidade por dia, começando pela menor (Aguaí), e olhar respostas/devolvidos antes da
+    próxima, para o Gmail não bloquear a conta.
