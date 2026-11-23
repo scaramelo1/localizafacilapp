@@ -9,10 +9,13 @@ const DS_CAMPOS = ['whatsapp' => 'WhatsApp', 'telefone' => 'Telefone', 'instagra
     'email' => 'E-mail de contato', 'servicos' => 'O que faz ou vende', 'endereco' => 'Endereço'];
 // link perto destas palavras é de quem FEZ o site (agência), não do comércio
 const DS_AGENCIA = '/(desenvolvid[oa]|criad[oa] por|feito por|produzid[oa] por|site por|design por|ag[eê]ncia|powered by|made by|developed by|by\s*:)/iu';
-const DS_IG_NAO = ['p', 'reel', 'reels', 'explore', 'accounts', 'stories', 'tv', 'direct', 'about', 'developer', 'legal', 'sharer', 'share', 'web', 'privacy', 'terms'];
+const DS_IG_NAO = ['p', 'reel', 'reels', 'explore', 'accounts', 'stories', 'tv', 'direct', 'about', 'developer', 'legal', 'sharer', 'share', 'web', 'privacy', 'terms',
+    'wix', 'wixbrasil', 'wordpress', 'hostgator', 'godaddy', 'squarespace', 'instagram'];
 const DS_FB_NAO = ['sharer', 'sharer.php', 'share', 'share.php', 'plugins', 'tr', 'dialog', 'login', 'login.php', 'events', 'watch', 'hashtag',
-    'policies', 'help', 'privacy', 'ads', 'business', 'groups', 'marketplace', 'gaming', 'legal', 'terms', 'photo.php', 'photo', 'story.php', 'permalink.php', 'l.php'];
-const DS_EMAIL_NAO = '/(@(.*\.)?(wix|wixpress|sentry|sentry-next|example|exemplo|domain|dominio|seudominio|seusite|email\.com$|godaddy|hostgator|locaweb|wordpress|w3|schema|cloudflare|googlemail\.test|test)\b|\.(png|jpe?g|gif|webp|svg|css|js)$|^(seu|your|nome|name|email|exemplo|example|user|usuario)@)/i';
+    'policies', 'help', 'privacy', 'ads', 'business', 'groups', 'marketplace', 'gaming', 'legal', 'terms', 'photo.php', 'photo', 'story.php', 'permalink.php', 'l.php',
+    // 23/11: perfis do criador de site / genéricos que vinham no rodapé de muitos sites
+    'people', 'wix', 'wixportugues', 'wixbrasil', 'wordpress', 'hostgator', 'godaddy', 'squarespace', 'weebly', 'facebook', 'home.php', 'index.php'];
+const DS_EMAIL_NAO = '/(@(.*\.)?(wix|wixpress|sentry|sentry-next|example|exemplo|domain|dominio|seudominio|seusite|email\.com$|godaddy|hostgator|locaweb|wordpress|w3|schema|cloudflare|googlemail\.test|test)\b|\.(png|jpe?g|gif|webp|svg|css|js)$|^(seu|your|nome|name|email|exemplo|example|user|usuario|dpo|lgpd|privacidade|privacy|encarregado|noreply|no-reply|naoresponda|nao-responda)@)/i';   // 23/11: dpo/lgpd = encarregado de dados, não é contato
 
 /** Telefone brasileiro só com DDD + número (10 ou 11 dígitos, como na ficha), ou null. */
 function ds_fone(string $n): ?string {
@@ -24,6 +27,7 @@ function ds_fone(string $n): ?string {
     if ((int)substr($d, 0, 2) < 11 || $d[2] === '0' || $d[2] === '1') return null;
     if (strlen($d) === 11 && $d[2] !== '9') return null;
     if (preg_match('/^(\d)\1+$/', substr($d, 2))) return null;   // 99999-9999
+    if (str_contains('01234567890123456789', $d) || str_contains('98765432109876543210', $d)) return null;   // 1234567890 (exemplo do criador de site)
     return $d;
 }
 
