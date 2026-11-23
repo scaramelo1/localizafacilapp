@@ -546,3 +546,5 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
        genérico; 300 com sugestão pelo nome (só tipos já usados, com a área mais comum), revisão do usuário antes de
        aplicar (tipo/área antigos guardados em /var/lib/guia-novo/backups/tipos-antes-*.json); 33 "não são comércio"
        (nome = endereço ou bairro) só pausam se marcar; 359 sem sugestão.
+       APLICADO pelo usuário em 23/11 15h44: 300 tipos trocados (antes em backups/tipos-antes-20261123-154453.json) e as
+       33 "não são comércio" pausadas. Genéricos: 692 -> 359. Nota: qualidade dos dados 6 -> 6,5; total 75,5 -> 76.
