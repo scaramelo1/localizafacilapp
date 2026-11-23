@@ -494,6 +494,7 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     servidor/aprovar-dados-site.php (prévia; --aplicar): 4.961 dados aprovados em 2.110 fichas (Instagram 1.637, Facebook
     1.291, e-mail 1.015, WhatsApp 578, o que faz ou vende 432, telefone 7, endereço 1); 393 recusados (central da rede em
     3+ fichas, 0800, DDD diferente, perfil de agência/plataforma repetido em fichas de outros comércios, lixo); 409
-    "diferentes" (a ficha já tinha outro número/perfil) continuam pendentes em /admin/dados-site.php. Instagram/Facebook/
+    "diferentes" (a ficha já tinha outro número/perfil) ficaram pendentes e depois foram RECUSADOS a pedido do usuário
+    (368 fichas, 396 dados: "não dá para afirmar que é isso mesmo"); as fichas ficaram com o que já tinham. Instagram/Facebook/
     serviços só aparecem com o Básico (passo 72). O robô agora descarta facebook.com/people, wix, 1234567890, dpo@/lgpd@.
     Cópia antes: /var/lib/guia-novo/backups/antes-aprovar-dados-site-20261123-145042.sql.gz.
