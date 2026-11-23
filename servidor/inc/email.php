@@ -116,7 +116,7 @@ function email_html(array $e): string {
     $site = url_publica();
     $logo = url_publica('assets/logo.png');
     $rodape = $e['tipo'] === 'equipe'
-        ? 'Você recebeu este e-mail porque tem cadastro no Localiza Fácil. <a href="' . h(email_link_descadastro($e['para'])) . '" style="color:#5B675F">Não quero mais receber</a>.'
+        ? 'Você recebeu este e-mail porque tem cadastro no Localiza Fácil ou porque o seu comércio aparece no guia. <a href="' . h(email_link_descadastro($e['para'])) . '" style="color:#5B675F">Não quero mais receber</a>.'
         : 'Localiza Fácil App · O comércio da sua cidade, pertinho de você.';
     return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>'
         . '<body style="margin:0;background:#F4F6F1;font-family:Arial,Helvetica,sans-serif;color:#123222">'
