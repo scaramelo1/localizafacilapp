@@ -421,3 +421,27 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     (sobre-do-site.php --todas / horario-do-site.php --todas) lê o site de novo e, se achar, volta como pendente.
     Sem recarregar a página. A aba Recusados do Horário mostra também o motivo da recusa.
     REGRA (pedido do usuário): toda cidade nova que entrar passa pelos dois robôs (Sobre e Horário) e pela revisão.
+64. ✅ Reavaliação do site (23/11, pedido do usuário). Notas: inicial 8; cidade 7,5; categoria 7,5; ficha com Sobre+horário 7,
+    ficha vazia 4,5, ficha com endereço quebrado 3; velocidade 8,5; qualidade dos dados 5. Das 421 fichas no Google: 114 com
+    Sobre, 51 com horário. Sugestões: 1 endereços quebrados, 2 ondas pelas fichas com Sobre/horário, 3 fichas repetidas,
+    4 descrição do Google longa, 5 menos texto repetido na ficha, 6 robôs de novo, 7 AdSense só em ficha com conteúdo,
+    8 cidade com ItemList e perguntas, 9 fotos/confirmação pelos donos. Feitos: 1, 3, 4 e 5 (passos 65–68).
+65. ✅ Endereços inválidos (item 1). endereco_invalido() em inc/limpeza.php: WhatsApp no lugar da rua ("Zap ( 18", "Zap ( 35"),
+    código do Maps ("5369+FV"), pedaço ("R.", "Rua Dr", "Estr."), número solto ("38", "Loja 2", "(19) 3634-4500");
+    rodovia/km e "R. B, 45" valem. servidor/limpar-enderecos.php (prévia; --aplicar grava): 130 fichas sem dono limpas
+    (13 estavam no Google); desfazer: /var/lib/guia-novo/backups/limpar-enderecos-20261123-055201.sql. A ficha mostra
+    "Endereço não informado" + bairro, sem "Também na Zap (" e sem rua para o Google. O importador (importar-leads.php)
+    já recusa esses endereços; a ficha também ignora endereço inválido do dono (1 caso).
+66. ✅ Descrição para o Google até 160 letras (item 4; antes chegava a 292 com o Sobre). O Sobre ocupa o que sobra; se
+    sobram menos de 60 letras, sai o endereço, depois o "Veja o horário" e por fim o telefone (web_pagina_ficha).
+67. ✅ Fichas repetidas (item 3). Mudança 044 (tabela fichas_iguais), já aplicada. inc/duplicadas.php acha grupos na mesma
+    cidade com mesmo telefone/WhatsApp OU ponto exato do mapa a ~40 m E nome parecido (tira palavras genéricas e o nome da
+    cidade). Admin > Comércios > "👯 Fichas repetidas" (/admin/duplicadas.php): abas "Mesmo endereço" (193 grupos, quase
+    sempre repetida) e "Endereços diferentes" (172, quase sempre filiais: "Não são a mesma"), filtro por cidade. Juntar:
+    a que fica recebe o que só a outra tinha (WhatsApp, site, horário, Sobre, ponto do mapa), favoritos e avaliações passam,
+    a outra é pausada (sai do app, do sitemap e do Google) e o link dela leva (301) para a que ficou. Ficha com dono nunca
+    sai. Aba Juntadas tem "↩️ Desfazer". Testado com #135/#2298 (juntou, 301, desfez igual ao antes).
+68. ✅ Menos texto repetido na ficha (item 5). "Faltam nesta ficha" virou uma linha fechada ("🔒 Faltam: ... · 🙋 Pedir ao
+    comércio") que abre os botões de cada item (<details>; abre sozinho ao voltar do login com ?avisar=). Sem avaliações,
+    some o título "Avaliações de quem usa" e o "Ainda sem avaliações": fica só "Avaliar este comércio" com 1 frase.
+    site.css v=67.

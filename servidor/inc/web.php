@@ -354,10 +354,12 @@ function web_faltam(array $faltam): string {
     }
     $lista = array_map(fn($r) => $r === 'WhatsApp' ? $r : mb_strtolower($r), array_values($faltam));
     $txt = count($lista) > 1 ? implode(', ', array_slice($lista, 0, -1)) . ' e ' . end($lista) : $lista[0];
-    return '<section class="faltam" aria-label="Informações que faltam"><p class="faltam-titulo"><span aria-hidden="true">🔒</span> '
-        . 'Faltam nesta ficha: ' . h($txt) . '</p>'
-        . '<p class="faltam-texto">Toque em <b>Pedir</b> e a gente avisa o comércio.</p>'
-        . '<ul class="faltam-lista">' . $itens . '</ul></section>';
+    // 23/11 (avaliação do site, item 5): uma linha só ("Faltam: ... · Pedir ao comércio"); os botões de cada item
+    // abrem ao tocar (antes eram 4 quadros "Pedir" iguais em toda ficha vazia, mais texto repetido que conteúdo)
+    return '<details class="faltam"><summary><span class="faltam-titulo"><span aria-hidden="true">🔒</span> Faltam: ' . h($txt) . '</span>'
+        . '<span class="faltam-abrir">🙋 Pedir ao comércio</span></summary>'
+        . '<p class="faltam-texto">Escolha o que você quer saber e a gente avisa o comércio.</p>'
+        . '<ul class="faltam-lista">' . $itens . '</ul></details>';
 }
 function web_avisos_ligados(): bool {
     static $ok = null;
@@ -548,6 +550,8 @@ function web_pagina_lista(string $cidade, array $area, ?string $tipo, ?string $b
 
 /** Ficha do comércio. */
 function web_pagina_ficha(array $p): void {
+    require_once __DIR__ . '/limpeza.php';
+    if (endereco_invalido($p['endereco'] ?? null)) $p['endereco'] = null;   // 23/11: "Zap ( 18" não vira endereço nem "Também na Zap ("
     $cidade = $p['cidade'];
     [$nome_cidade, , $uf] = CIDADES[$cidade];
     $c = prof_completo($p, null);
@@ -599,13 +603,29 @@ function web_pagina_ficha(array $p): void {
         $p['telefone'] && telefone_discar((string)$p['telefone']) !== telefone_discar((string)$p['whatsapp']) ? 'telefone ' . telefone_formatado((string)$p['telefone']) : null,
     ]);
     $tem_hor = $h || $p['horario'];
-    $descricao = $nome . ($tipo ? ', ' . mb_strtolower($tipo) : '') . ($p['bairro'] && !preg_match('/^centro$/iu', (string)$p['bairro']) ? ' no bairro ' . $p['bairro'] . ',' : (preg_match('/^centro$/iu', (string)$p['bairro']) ? ' no Centro de' : ' em'))
-        . ' ' . $nome_cidade . ' (' . $uf . '). '
-        . ($tem_rua ? $p['endereco'] . '. ' : ($p['atende_em_casa'] || $p['endereco'] ? 'Atende a domicílio. ' : ''))
-        . ($contato ? ucfirst(implode(' e ', $contato)) . '. ' : '')
-        . ($tem_hor ? 'Veja o horário de hoje. ' : '')
-        . web_corte_palavra(trim(preg_replace('/\s+/u', ' ', (string)($p['descricao'] ?: ($p['sobre_site'] ?? '')))), 150);
-    $descricao = trim($descricao);
+    $base = $nome . ($tipo ? ', ' . mb_strtolower($tipo) : '') . ($p['bairro'] && !preg_match('/^centro$/iu', (string)$p['bairro']) ? ' no bairro ' . $p['bairro'] . ',' : (preg_match('/^centro$/iu', (string)$p['bairro']) ? ' no Centro de' : ' em'))
+        . ' ' . $nome_cidade . ' (' . $uf . '). ';
+    $partes = array_filter([
+        $tem_rua ? $p['endereco'] . '. ' : ($p['atende_em_casa'] || $p['endereco'] ? 'Atende a domicílio. ' : ''),
+        $contato ? ucfirst(implode(' e ', $contato)) . '. ' : '',
+        $tem_hor ? 'Veja o horário de hoje. ' : '',
+    ]);
+    // 23/11 (avaliação do site, item 4): a descrição inteira cabe no Google (~160 letras; antes chegava a 290 com o Sobre).
+    // O Sobre ocupa o que sobra; se sobrar pouco (< 60), sai o endereço (já está na página), depois o horário e por fim o telefone.
+    $sobre = trim(preg_replace('/\s+/u', ' ', (string)($p['descricao'] ?: ($p['sobre_site'] ?? ''))));
+    $max = 158;
+    $montar = fn(array $ps) => $base . implode('', $ps);
+    if ($sobre !== '') {
+        foreach ([[], [0], [0, 2], [0, 2, 1]] as $tirar) {
+            $ps = array_diff_key($partes, array_flip($tirar));
+            if ($max - mb_strlen($montar($ps)) >= 60 || count($tirar) === 3) break;
+        }
+        $resto = $max - mb_strlen($montar($ps));
+        $descricao = $montar($ps) . ($resto >= 30 ? web_corte_palavra($sobre, $resto - 1) : '');
+    } else {
+        $descricao = $montar($partes);
+    }
+    $descricao = trim(mb_strlen(trim($descricao)) > 160 ? web_corte_palavra(trim($descricao), 159) : $descricao);
     pagina_inicio(web_titulo_ficha((string)$nome, (string)$tipo, (string)$nome_cidade), mb_substr($descricao, 0, 300), 'web',
         ['canonica' => $url, 'imagem' => $imagem, 'head' => web_json_ld($ld, $ld_trilha), 'noindex' => !ficha_no_google($p),
             'anuncios' => $p['importado'] && !$p['destaque_pago']]);   // 17/11 (pedido do usuário): anúncio também no Básico; só o Destaque fica sem
@@ -962,9 +982,9 @@ function web_pagina_ficha(array $p): void {
       </section>
       <?php endif ?>
 
-      <h2>Avaliações de quem usa o Localiza Fácil</h2>
-      <?php if (!$c['comentarios']): ?><p class="discreto">Ainda sem avaliações. Seja o primeiro a avaliar!</p><?php endif ?>
+      <?php // 23/11 (avaliação do site, item 5): sem avaliações, só o "Avaliar" (sem o título e o "Ainda sem avaliações" repetidos em toda ficha) ?>
       <?php if ($c['comentarios']): ?>
+        <h2>Avaliações de quem usa o Localiza Fácil</h2>
         <ul class="avaliacoes">
           <?php foreach ($c['comentarios'] as $a): ?>
             <li><p><b><?= h($a['autor']) ?></b> <span class="estrelas" aria-label="<?= $a['estrelas'] ?> de 5 estrelas"><?= str_repeat('★', $a['estrelas']) . str_repeat('☆', 5 - $a['estrelas']) ?></span> <small><?= h($a['data']) ?></small></p>
@@ -974,9 +994,10 @@ function web_pagina_ficha(array $p): void {
         </ul>
       <?php endif ?>
       <section class="avaliar" id="avaliar">
-        <h3><?= $minha ? 'Sua avaliação' : 'Avaliar este comércio' ?></h3>
+        <?php $tag_av = $c['comentarios'] ? 'h3' : 'h2'; ?>
+        <<?= $tag_av ?>><?= $minha ? 'Sua avaliação' : 'Avaliar este comércio' ?></<?= $tag_av ?>>
         <?php if (!$eu): ?>
-          <p>Entre com o Google para dar estrelas e comentar.</p>
+          <p><?= $c['comentarios'] ? 'Entre com o Google para dar estrelas e comentar.' : 'Seja o primeiro: entre com o Google e dê suas estrelas.' ?></p>
           <?= botao_google(url_ficha($p) . '#avaliar') ?>
         <?php else: ?>
           <form id="form-avaliar">
@@ -1119,6 +1140,7 @@ document.querySelectorAll('[data-quero]').forEach(function (b) {
   var m = location.search.match(/[?&]avisar=(horario|fotos|sobre|whatsapp)/);
   if (!m || !logado) return;
   var b = document.querySelector('[data-quero="' + m[1] + '"]');
+  var bloco = b && b.closest('details'); if (bloco) bloco.open = true;   // 23/11: o bloco "Faltam" fica fechado
   if (b) { b.hidden = true; var nt = b.parentNode.querySelector('.trancado-nota'); if (nt) nt.hidden = true; b.parentNode.querySelector('.quero-ok').hidden = false; pedirAviso(m[1], b.parentNode); b.parentNode.scrollIntoView({ block: 'center' }); }
   history.replaceState(null, '', location.pathname + location.hash);
 })();

@@ -71,6 +71,11 @@ if ($n === 3 && $partes[1] === 'c') {
         header('X-Robots-Tag: noindex, nofollow');
         header('Cache-Control: private, no-store');
     }
+    // 23/11 (avaliação do site, item 3): ficha repetida que foi juntada em outra leva para a que ficou (301)
+    if (!$p && isset($m[1])) {
+        require_once __DIR__ . '/../inc/duplicadas.php';
+        if (($para = dup_destino((int)$m[1])) && ($destino = web_ficha($para))) redirecionar(url_ficha($destino));
+    }
     if (!$p) { web_pagina_404(); exit; }
     $certo = url_ficha($p);
     if ($certo !== url(implode('/', $partes))) redirecionar($certo);   // nome ou cidade mudou: endereço certo

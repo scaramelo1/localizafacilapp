@@ -169,6 +169,7 @@ function endereco_e_bairro(string $e): array {
     foreach (array_map('trim', explode(' - ', $e)) as $parte) {
         if ($parte === '') continue;
         $rua = preg_match('/^(r|rua|av|avenida|al|alameda|pra[çc]a|p[çc]a|rod|rodovia|estr|estrada|tv|travessa|largo|via)[\s.:]/iu', $parte);
+        if (endereco_invalido($parte)) continue;   // 23/11: "Zap ( 18", código do Maps, "R." sozinho
         if ($rua || preg_match('/\d/', $parte)) $endereco ??= $parte;
         elseif (!$bairro && mb_strlen($parte) >= 3 && mb_strlen($parte) <= 60) $bairro = $parte;
     }

@@ -301,3 +301,22 @@ function limpar_nome(string $nome): string {
     }
     return implode('', $partes);
 }
+
+/**
+ * 23/11 (avaliação do site, item 1): endereço que não é endereço. No Google Maps, alguns comércios escreveram o WhatsApp
+ * no lugar da rua ("Zap ( 18", "Zap ( 35"), e outros têm só o código do Maps ("5369+FV"), um pedaço ("R.", "Rua Dr",
+ * "Estr.") ou um número solto ("38", "Loja 2", "(19) 3634-4500"). Na ficha isso virava "Endereço: Zap ( 18" e
+ * "Também na Zap (" com vizinhos "nº 18", e ia assim para o Google. Rodovia ("SP-344, Km 226") é endereço.
+ */
+function endereco_invalido(?string $e): bool {
+    $e = trim((string)$e);
+    if ($e === '') return false;   // vazio já é "não informado"
+    if (preg_match('/^(zap|whats|wpp|tel|fone|cel|contato|\(?\d{2}\)?\s*\d{4})/iu', $e)) return true;   // telefone no lugar da rua
+    if (preg_match('/^[23456789CFGHJMPQRVWX]{4,8}\+[23456789CFGHJMPQRVWX]{0,3}\b/u', $e)) return true;   // código do Maps (plus code)
+    if (preg_match('/\b(sp|mg|br|rj|pr|go)[\s,-]*\d{2,3}\b|\bkm\s*\d/iu', $e)) return false;   // rodovia ("212, SP-344, S/N", "Km 221,5")
+    // tira o tipo de rua: "R. 9, 103" (rua com número no nome) vale; senão, sobrou palavra de 3+ letras? ("Rua Dr", "R.", "38" não)
+    $resto = preg_replace('/^(r|rua|av|avenida|al|alameda|pra[çc]a|p[çc]a|rod|rodovia|estr|estrada|tv|travessa|largo|via)\b[\s.:]*/iu', '', $e, 1, $tinha_tipo);
+    if ($tinha_tipo && preg_match('/^[\p{L}\d]{1,4}\s*,\s*(n[º°o.]*\s*)?\d/iu', $resto)) return false;   // "R. B, 45", "Rua 2, N 13"
+    if (!preg_match('/\p{L}{3,}/u', $resto)) return true;
+    return (bool)preg_match('/^loja\s*\d+$/iu', $e);   // "Loja 2"
+}
