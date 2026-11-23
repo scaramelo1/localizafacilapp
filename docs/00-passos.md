@@ -454,7 +454,7 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     também em Saúde, Farmácia e Drogaria; a dos mercados também na área Mercados. Tudo só com o horário das fichas
     (nunca o horário do Google Maps). Hoje: só a Drogaria São Paulo (Poços) é 24 h; os 9 horários da Drogal são iguais
     (7h–23h, do site geral da rede).
-70. ⏳ Robô "Dados pelo site" (23/11, pedido do usuário). servidor/dados-do-site.php lê o site próprio do comércio UMA vez
+70. ✅ Robô "Dados pelo site" (23/11, pedido do usuário). servidor/dados-do-site.php lê o site próprio do comércio UMA vez
     (inicial + até 2 páginas de contato) e acha tudo menos fotos: WhatsApp (links wa.me), telefone (tel: e schema.org),
     Instagram, Facebook, e-mail de contato (mailto:, schema.org, ou escrito na página com o domínio do site), o que faz ou
     vende (schema.org ou lista debaixo de um título "Serviços"/"Especialidades"...) e endereço (schema.org, só se a ficha
@@ -489,3 +489,11 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     Família) e 13 pares marcados "Não são a mesma" (Pousada x Restaurante Vitória, Seixas, Helen Silva, Sex shop x Sexóloga,
     Ótica Real loja 1 x 2, lava-rápidos, Casa Mascarin...). Ficaram 6 em dúvida para o usuário decidir. Fichas ativas: 18.137.
     Cópia antes: /var/lib/guia-novo/backups/antes-repetidas-lote2-20261123-143720.sql.gz.
+74. ✅ Dados do site aprovados em lote (23/11, pedido do usuário: "pode aprovar, depois o dono muda; só vou analisar os
+    horários"). O robô do passo 70 leu tudo (2.282 sites com dados, 665 sem nada novo, 908 não abriram).
+    servidor/aprovar-dados-site.php (prévia; --aplicar): 4.961 dados aprovados em 2.110 fichas (Instagram 1.637, Facebook
+    1.291, e-mail 1.015, WhatsApp 578, o que faz ou vende 432, telefone 7, endereço 1); 393 recusados (central da rede em
+    3+ fichas, 0800, DDD diferente, perfil de agência/plataforma repetido em fichas de outros comércios, lixo); 409
+    "diferentes" (a ficha já tinha outro número/perfil) continuam pendentes em /admin/dados-site.php. Instagram/Facebook/
+    serviços só aparecem com o Básico (passo 72). O robô agora descarta facebook.com/people, wix, 1234567890, dpo@/lgpd@.
+    Cópia antes: /var/lib/guia-novo/backups/antes-aprovar-dados-site-20261123-145042.sql.gz.
