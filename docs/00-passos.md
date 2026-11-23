@@ -468,3 +468,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     para corrigir o texto; desmarcado vai para Recusados (com Dispensar); Aprovados têm Desfazer por linha. Endereço novo
     refaz o ponto do mapa (menos o exato do Google). Teste: 15 fichas -> 34 dados. Falta: o usuário rodar em todas
     (~5.100 fichas com site, várias horas) e revisar. Cidade nova: --cidade=<slug>.
+71. ✅ Fichas repetidas juntadas em lote (23/11, pedido do usuário). servidor/juntar-repetidas.php (prévia; --aplicar junta):
+    junta sozinho só quando as TRÊS coisas batem: mesmo endereço (rua + número), mesmo telefone/WhatsApp e nome quase idêntico
+    (mesmas palavras próprias ou 85%+ iguais), e o tipo no nome não pode ser diferente ("Seixas Contabilidade" x "Seixas
+    Advocacia", "Helen Silva Advocacia" x "Corretora", "Pousada Vitória" x "Vitória Restaurante" ficaram separadas). Fica a
+    melhor (dup_pontos); a outra passa o que só ela tinha, é pausada e o link dela leva (301) para a que ficou. 70 fichas
+    juntadas (quase todas em Poços); fichas ativas 18.279 -> 18.209. Cópia antes:
+    /var/lib/guia-novo/backups/antes-juntar-repetidas-20261123-093144.sql.gz; desfazer uma a uma em /admin/duplicadas.php > Juntadas.
