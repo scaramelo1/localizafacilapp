@@ -43,6 +43,11 @@ if (e_post()) {
         q("UPDATE horario_site SET situacao = 'recusado', decidido_em = NOW(), decidido_por = ? WHERE profissional_id = ?", [$admin['id'], $id]);
         registrar((int)$admin['id'], 'horario_site_recusado', $id);
         hs_resposta("$nome: recusado.", 'ok', $voltar, 'recusado');
+    } elseif ($acao === 'dispensar') {
+        // 23/11 (pedido do usuário): sai dos Recusados e volta para a fila: a próxima leitura do robô lê o site de novo
+        q('DELETE FROM horario_site WHERE profissional_id = ?', [$id]);
+        registrar((int)$admin['id'], 'horario_site_dispensado', $id);
+        hs_resposta("$nome: dispensado. Volta para a próxima leitura do robô.", 'ok', $voltar, 'dispensado');
     } elseif ($acao === 'desfazer') {
         // tira da ficha só se o horário dela ainda é o que veio do site
         if ((string)$s['horarios_ficha'] === (string)$s['horarios']) q('UPDATE profissionais SET horarios = NULL, horario = NULL WHERE id = ?', [$id]);
@@ -89,13 +94,16 @@ admin_inicio('Horário pelo site do comércio', $admin);
       <form method="post"><?= campo_csrf() ?><input type="hidden" name="id" value="<?= (int)$s['profissional_id'] ?>"><input type="hidden" name="pagina" value="<?= $pagina ?>">
         <button class="botao contorno pequeno" name="acao" value="desfazer">Tirar da ficha</button></form>
     <?php else: ?>
+      <?php if ($aba === 'recusado' && $s['motivo']): ?><p class="discreto" style="margin:0 0 6px">Recusado porque: <?= h((string)$s['motivo']) ?></p><?php endif ?>
       <p style="margin:0 0 8px">No site: <q style="background:#fff8d6;padding:2px 6px;border-radius:6px"><?= h((string)$s['trecho']) ?></q></p>
       <?php if ($tem_ficha): ?><p class="aviso erro" style="margin:0 0 8px">A ficha já tem horário (<?= h((string)horarios_texto(horarios_ler($s['horarios_ficha']))) ?>). Aprovar não troca, a não ser que marque abaixo.</p><?php endif ?>
       <form method="post"><?= campo_csrf() ?><input type="hidden" name="id" value="<?= (int)$s['profissional_id'] ?>"><input type="hidden" name="pagina" value="<?= $pagina ?>">
         <?= horarios_form($h) ?>
         <?php if ($tem_ficha): ?><label class="marcar"><input type="checkbox" name="trocar" value="1"> Trocar o horário da ficha por este</label><?php endif ?>
         <p style="margin:6px 0 0"><button class="botao pequeno" name="acao" value="aprovar">✅ Aprovar</button>
-          <?php if ($aba === 'pendente'): ?><button class="botao contorno pequeno" name="acao" value="recusar">Recusar</button><?php endif ?></p>
+          <?php if ($aba === 'pendente'): ?><button class="botao contorno pequeno" name="acao" value="recusar">Recusar</button><?php endif ?>
+          <?php if ($aba === 'recusado'): ?><button class="botao contorno pequeno" name="acao" value="dispensar" title="Tira dos recusados; o robô lê este site de novo na próxima vez">↩️ Dispensar</button>
+            <span class="discreto">Dispensar: o robô lê o site de novo na próxima vez.</span><?php endif ?></p>
       </form>
     <?php endif ?>
   </div>

@@ -416,3 +416,8 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     Boulevard), outra cidade, só da manhã ou estranho, "24h" de advogado/imobiliária, visita de hospital, restaurante de
     hotel, e horário dia a dia muito diferente (Estética Nathalia, Physical). Fichas com horário: 5 -> 425 (filtro "Aberto
     agora" e selo nas listas). Cópia antes: /var/lib/guia-novo/backups/antes-horarios-20261123.sql.gz.
+63. ✅ "↩️ Dispensar" nos Recusados (23/11, pedido do usuário), em /admin/sobre-site.php e /admin/horario-site.php: apaga
+    a linha (sobre_site / horario_site), o item sai dos Recusados e volta para a fila: a próxima leitura do robô
+    (sobre-do-site.php --todas / horario-do-site.php --todas) lê o site de novo e, se achar, volta como pendente.
+    Sem recarregar a página. A aba Recusados do Horário mostra também o motivo da recusa.
+    REGRA (pedido do usuário): toda cidade nova que entrar passa pelos dois robôs (Sobre e Horário) e pela revisão.

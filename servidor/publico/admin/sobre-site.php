@@ -42,6 +42,11 @@ if (e_post()) {
         q('UPDATE profissionais SET sobre_site = NULL, sobre_site_url = NULL WHERE id = ?', [$id]);
         registrar((int)$admin['id'], 'sobre_site_recusado', $id);
         sobre_resposta($acao === 'desfazer' ? "$nome: tirado da ficha." : "$nome: recusado.", 'ok', $voltar, 'recusado');
+    } elseif ($acao === 'dispensar') {
+        // 23/11 (pedido do usuário): sai dos Recusados e volta para a fila: a próxima leitura do robô lê o site de novo
+        q('DELETE FROM sobre_site WHERE profissional_id = ?', [$id]);
+        registrar((int)$admin['id'], 'sobre_site_dispensado', $id);
+        sobre_resposta("$nome: dispensado. Volta para a próxima leitura do robô.", 'ok', $voltar, 'dispensado');
     } elseif ($acao === 'tirar_site') {
         $p = linha('SELECT site FROM profissionais WHERE id = ?', [$id]);
         q('UPDATE profissionais SET site = NULL WHERE id = ?', [$id]);
@@ -96,7 +101,8 @@ admin_inicio('Sobre pelo site do comércio', $admin);
       <form method="post"><?= campo_csrf() ?><input type="hidden" name="id" value="<?= (int)$s['profissional_id'] ?>"><input type="hidden" name="pagina" value="<?= $pagina ?>">
         <textarea name="texto" rows="3" maxlength="600" style="width:100%"><?= h((string)$s['texto']) ?></textarea>
         <p style="margin:6px 0 0"><button class="botao pequeno" name="acao" value="aprovar">✅ Aprovar</button>
-          <span class="discreto">Dá para corrigir o texto antes de aprovar.</span></p>
+          <button class="botao contorno pequeno" name="acao" value="dispensar" title="Tira dos recusados; o robô lê este site de novo na próxima vez">↩️ Dispensar</button>
+          <span class="discreto">Dá para corrigir o texto antes de aprovar. Dispensar: o robô lê o site de novo na próxima vez.</span></p>
       </form>
     <?php else: ?>
       <p><?= h((string)$s['texto']) ?></p>
