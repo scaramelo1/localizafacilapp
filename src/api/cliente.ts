@@ -173,6 +173,8 @@ export interface Profissional extends ProfissionalResumo {
   oferta?: Oferta | null;
   /** 23/11: texto do site do proprio comercio, aprovado pela equipe (so quando nao tem descricao do dono). */
   sobreSite?: string | null;
+  /** 23/11 (1.17.0): sem o plano Basico vem so o comeco do Sobre. */
+  sobreCortado?: boolean;
   /** Site de onde veio o sobreSite ("exemplo.com.br"). */
   sobreSiteDe?: string | null;
   /** 23/11: "Fica no bairro X, a 2,5 km do centro de Y. No bairro..." */

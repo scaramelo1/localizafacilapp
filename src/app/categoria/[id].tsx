@@ -1,41 +1,121 @@
 import { useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
-import { FlatList, ScrollView, Text, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, FlatList, ScrollView, Text, View } from 'react-native';
 
 import { chamar, type ProfissionalResumo, type TipoNegocio } from '../../api/cliente';
 import { useCidade } from '../../cidade';
 import { Cabecalho } from '../../componentes/Cabecalho';
-import { AVISO_ABERTO, CartaoProfissional, Carregando, Falha, Pilula, Vazio, useCarregar } from '../../componentes/ui';
+import { AVISO_ABERTO, CartaoProfissional, Carregando, Falha, Pilula, Vazio } from '../../componentes/ui';
 import { cores } from '../../tema';
 
 interface Resposta {
   categoria: { id: number; nome: string; icone: string; cor: string };
-  tipos: TipoNegocio[];
+  tipos?: TipoNegocio[];
+  totalArea?: number;
   profissionais: ProfissionalResumo[];
+  total: number;
+  temMais: boolean;
 }
 
-/** Sem acento e em minúsculas, para a busca dentro da área achar "cafe" em "Café". */
-function simples(t: string) {
-  return t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-}
+const POR_PAGINA = 50;
 
-// Uma área (ex.: Alimentação): cabeçalho com o nome e quantos lugares, busca amarela dentro da área e filtros pelo tipo
+// Uma area (ex.: Alimentacao): cabecalho com o nome e quantos lugares, busca amarela dentro da area e filtros pelo tipo.
+// 23/11 (1.17.0): a lista vem de 50 em 50 (antes vinha inteira: Saude em Pocos eram 1.102 lugares, 540 KB de uma vez).
+// Os filtros (tipo, busca e aberto agora) sao feitos no servidor; a busca espera a pessoa parar de digitar.
 export default function TelaCategoria() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { cidade } = useCidade();
-  const { dados, erro, carregando, recarregar } = useCarregar(() => chamar<Resposta>(`categoria.php?id=${id}`), `categoria-${id}-${cidade.slug}`);
   const [tipo, setTipo] = useState<string | null>(null);
   const [termo, setTermo] = useState('');
+  const [termoBusca, setTermoBusca] = useState('');
   const [aberto, setAberto] = useState(false);
 
-  const c = dados?.categoria;
-  const t = simples(termo.trim());
-  const lista = (dados?.profissionais ?? []).filter(
-    (p) => (!tipo || p.tipo === tipo) && (!aberto || p.abertoAgora === true) && (!t || simples(`${p.nome} ${p.tipo} ${p.bairro ?? ''}`).includes(t)),
+  const [cabeca, setCabeca] = useState<{ categoria: Resposta['categoria']; tipos: TipoNegocio[]; totalArea: number } | null>(null);
+  const [lista, setLista] = useState<ProfissionalResumo[]>([]);
+  const [total, setTotal] = useState(0);
+  const [pagina, setPagina] = useState(1);
+  const [temMais, setTemMais] = useState(false);
+  const [carregando, setCarregando] = useState(true);
+  const [carregandoMais, setCarregandoMais] = useState(false);
+  const [atualizando, setAtualizando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+  const pedido = useRef(0);
+
+  // busca: espera 400 ms sem digitar
+  useEffect(() => {
+    const t = setTimeout(() => setTermoBusca(termo.trim()), 400);
+    return () => clearTimeout(t);
+  }, [termo]);
+
+  const caminho = useCallback(
+    (p: number) => {
+      let c = `categoria.php?id=${id}&pagina=${p}&por=${POR_PAGINA}`;
+      if (tipo) c += `&tipo=${encodeURIComponent(tipo)}`;
+      if (termoBusca) c += `&q=${encodeURIComponent(termoBusca)}`;
+      if (aberto) c += '&aberto=1';
+      return c;
+    },
+    [id, tipo, termoBusca, aberto],
   );
-  // só mostra filtros que valem a pena (tipos com pelo menos 2 lugares)
-  const tipos = (dados?.tipos ?? []).filter((x) => x.total >= 2);
-  const total = dados?.profissionais.length ?? 0;
+
+  // primeira pagina (de novo a cada filtro ou cidade)
+  const carregar = useCallback(
+    (puxou = false) => {
+      const meu = ++pedido.current;
+      if (puxou) setAtualizando(true);
+      else setCarregando(true);
+      setErro(null);
+      chamar<Resposta>(caminho(1))
+        .then((d) => {
+          if (meu !== pedido.current) return;
+          setLista(d.profissionais);
+          setTotal(d.total);
+          setTemMais(d.temMais);
+          setPagina(1);
+          if (d.tipos) setCabeca({ categoria: d.categoria, tipos: d.tipos, totalArea: d.totalArea ?? d.total });
+        })
+        .catch((e: unknown) => {
+          if (meu === pedido.current) setErro(e instanceof Error ? e.message : 'Não foi possível carregar.');
+        })
+        .finally(() => {
+          if (meu === pedido.current) {
+            setCarregando(false);
+            setAtualizando(false);
+          }
+        });
+    },
+    [caminho],
+  );
+
+  useEffect(() => {
+    carregar();
+  }, [carregar, cidade.slug]);
+
+  // proxima pagina ao chegar perto do fim
+  const carregarMais = () => {
+    if (!temMais || carregandoMais || carregando) return;
+    const meu = pedido.current;
+    const proxima = pagina + 1;
+    setCarregandoMais(true);
+    chamar<Resposta>(caminho(proxima))
+      .then((d) => {
+        if (meu !== pedido.current) return;
+        setLista((atual) => {
+          const ja = new Set(atual.map((x) => x.id));
+          return [...atual, ...d.profissionais.filter((x) => !ja.has(x.id))];
+        });
+        setTemMais(d.temMais);
+        setPagina(proxima);
+      })
+      .catch(() => {})
+      .finally(() => setCarregandoMais(false));
+  };
+
+  const c = cabeca?.categoria;
+  // so mostra filtros que valem a pena (tipos com pelo menos 2 lugares)
+  const tipos = (cabeca?.tipos ?? []).filter((x) => x.total >= 2);
+  const totalArea = cabeca?.totalArea ?? 0;
+  const filtrando = !!(tipo || termoBusca || aberto);
 
   return (
     <FlatList
@@ -43,8 +123,10 @@ export default function TelaCategoria() {
       keyExtractor={(p) => String(p.id)}
       contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
       keyboardShouldPersistTaps="handled"
-      refreshing={carregando && !!dados}
-      onRefresh={recarregar}
+      refreshing={atualizando}
+      onRefresh={() => carregar(true)}
+      onEndReached={carregarMais}
+      onEndReachedThreshold={0.6}
       initialNumToRender={12}
       windowSize={7}
       ListHeaderComponent={
@@ -52,7 +134,7 @@ export default function TelaCategoria() {
           <Cabecalho
             voltar
             titulo={c?.nome ?? ' '}
-            subtitulo={dados ? `${total.toLocaleString('pt-BR')} ${total === 1 ? 'lugar' : 'lugares'} em ${cidade.curto}` : undefined}
+            subtitulo={cabeca ? `${totalArea.toLocaleString('pt-BR')} ${totalArea === 1 ? 'lugar' : 'lugares'} em ${cidade.curto}` : undefined}
             busca={{ texto: 'Buscar comércios ou serviços', valor: termo, aoMudar: setTermo }}
           />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, gap: 8 }}>
@@ -62,6 +144,11 @@ export default function TelaCategoria() {
               tipos.map((x) => <Pilula key={x.nome} texto={x.nome} ativo={tipo === x.nome} onPress={() => setTipo(tipo === x.nome ? null : x.nome)} />)}
           </ScrollView>
           {aberto && <Text style={{ paddingHorizontal: 16, paddingTop: 10, fontSize: 15, color: cores.textoSuave }}>{AVISO_ABERTO}</Text>}
+          {filtrando && !carregando && lista.length > 0 && (
+            <Text style={{ paddingHorizontal: 16, paddingTop: 10, fontSize: 15, color: cores.textoSuave }}>
+              {total.toLocaleString('pt-BR')} {total === 1 ? 'lugar encontrado' : 'lugares encontrados'}
+            </Text>
+          )}
         </View>
       }
       renderItem={({ item }) => (
@@ -69,15 +156,16 @@ export default function TelaCategoria() {
           <CartaoProfissional p={item} origem="categoria" />
         </View>
       )}
+      ListFooterComponent={carregandoMais ? <ActivityIndicator style={{ marginVertical: 20 }} color={cores.textoSuave} /> : null}
       ListEmptyComponent={
-        carregando && !dados ? (
+        carregando ? (
           <Carregando />
-        ) : erro && !dados ? (
-          <Falha mensagem={erro} tentar={recarregar} />
+        ) : erro ? (
+          <Falha mensagem={erro} tentar={() => carregar()} />
         ) : (
           <Vazio
             icone="store-search-outline"
-            texto={aberto ? 'Nenhum lugar com horário informado está aberto agora.' : termo || tipo ? 'Nada encontrado com esse filtro.' : 'Ainda não há lugares nesta área. Volte em breve!'}
+            texto={aberto ? 'Nenhum lugar com horário informado está aberto agora.' : filtrando ? 'Nada encontrado com esse filtro.' : 'Ainda não há lugares nesta área. Volte em breve!'}
           />
         )
       }

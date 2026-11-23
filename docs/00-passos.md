@@ -519,3 +519,16 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     d) busca.php com noindex (ferramenta do dono, cada cidade + termo virava página repetida).
     Falta: 3) ondas priorizando horário/WhatsApp/e-mail; 6) API categoria em páginas (540 KB em Saúde Poços; precisa app
     novo); 5) gerar e publicar o APK 1.16.0 no PC (site ainda oferece o 1.15.0).
+77. ✅ Itens 3, 6 e 5 da reavaliação (23/11, pedido do usuário).
+    3) Ondas: mudança 046 (profissionais.google_em). Quem entrou no Google fica (as 506 de hoje marcadas); as próximas
+       ondas escolhem entre as que faltam por SQL_ORDEM_GOOGLE: horário 4, WhatsApp 2, e-mail 1, site 1 e, no empate,
+       a nota de sempre. google_marcar() marca as novas a cada recálculo (1 h). Simulação da próxima onda: São João e
+       Poços 100/100 com horário; Santa Rita 100 com WhatsApp.
+    6) api/categoria.php em páginas (?pagina=&por=50&tipo=&q=&aberto=1; da_categoria_pagina): 1ª página 26 KB (antes
+       540 KB em Saúde Poços); sem "pagina" responde como antes (apps antigos). Tela src/app/categoria/[id].tsx carrega
+       de 50 em 50 ao rolar, filtros no servidor, busca espera 400 ms.
+    5) App 1.17.0 (app.json): lista em páginas + "texto completo com o plano Básico" no Sobre cortado + tudo da 1.16.0
+       (nunca publicada). Gerar no PC e publicar com servidor/publicar-apk.sh.
+    Santa Rita: os robôs do site já leram (381 de 489 sites; o resto é Facebook/Instagram); não precisa rodar de novo.
+    O robô do Maps no PC é opcional: traria as avaliações (popularidade) e aí dá para tirar a cidade do CASE de
+    SQL_PESO_GOOGLE.

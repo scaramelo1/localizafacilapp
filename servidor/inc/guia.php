@@ -250,7 +250,18 @@ function google_dividir(int $onda, array $fila): array {
     }
     return $vagas;
 }
-/** Cortes: [cidade => [grupo => null (o grupo inteiro) | [popularidade, id] (até essa ficha)]]. Guardado 1 h por onda. */
+/**
+ * 23/11 (passo 77, pedido do usuário): ordem da fila das próximas ondas. Primeiro quem tem horário (4), WhatsApp (2),
+ * e-mail de contato (1) e site (1); no empate, a nota de sempre (avaliações do Maps, ou os dados em Santa Rita).
+ * Um número só (dados x 1.000.000 + nota) para o corte continuar sendo [valor, id].
+ */
+const SQL_ORDEM_GOOGLE = "((" . "(p.horarios IS NOT NULL AND p.horarios NOT IN ('', '[]', '{}')) * 4 + (COALESCE(p.whatsapp, '') <> '') * 2
+    + (COALESCE(p.email_contato, '') <> '') + (COALESCE(p.site, '') <> '')) * 1000000 + LEAST(" . SQL_PESO_GOOGLE . ", 999999))";
+/**
+ * Cortes: [cidade => [grupo => null (o grupo inteiro) | false (nada novo) | [ordem, id] (até essa ficha)]]. Guardado 1 h.
+ * 23/11 (passo 77): quem já entrou no Google (google_em) fica e conta nas vagas da onda; o corte escolhe só entre as que
+ * ainda não entraram. Depois de calcular, marca as novas (google_marcar), para uma mudança de ordem nunca tirar ninguém.
+ */
 function google_cortes(): array {
     static $r = null;
     if ($r !== null) return $r;
@@ -259,24 +270,35 @@ function google_cortes(): array {
     if ($onda < 1) return $r;
     $arq = config()['dados_dir'] . '/cache/google-cortes.json';
     $c = is_file($arq) ? (json_decode((string)file_get_contents($arq), true) ?: []) : [];
-    if (($c['onda'] ?? 0) === $onda && ($c['quando'] ?? 0) > time() - 3600 && ($c['cidades'] ?? null) === cidades_no_google())
+    if (($c['v'] ?? 0) === 2 && ($c['onda'] ?? 0) === $onda && ($c['quando'] ?? 0) > time() - 3600 && ($c['cidades'] ?? null) === cidades_no_google())
         return $r = $c['cortes'];
     $prio = sql_prioridade_area();
     $base = "p.status = 'ativo' AND " . SQL_TEM_CONTATO . ' AND ' . SQL_PESO_GOOGLE . ' >= ' . GOOGLE_MIN_AVALIACOES;
     foreach (cidades_no_google() as $cid) {
         $fila = array_map('intval', array_column(linhas("SELECT $prio AS g, COUNT(*) AS n FROM profissionais p WHERE p.cidade = ? AND $base GROUP BY g", [$cid]), 'n', 'g'));
+        $ja = array_map('intval', array_column(linhas("SELECT $prio AS g, COUNT(*) AS n FROM profissionais p WHERE p.cidade = ? AND $base AND p.google_em IS NOT NULL GROUP BY g", [$cid]), 'n', 'g'));
         foreach (google_dividir($onda, $fila) as $g => $n) {
-            if ($n < 1) continue;
-            if ($n >= ($fila[$g] ?? 0)) { $r[$cid][$g] = null; continue; }
-            $l = linha("SELECT " . SQL_PESO_GOOGLE . " AS popularidade, p.id FROM profissionais p WHERE p.cidade = ? AND $base AND $prio = ?
-                ORDER BY " . SQL_PESO_GOOGLE . " DESC, p.id ASC LIMIT 1 OFFSET " . ($n - 1), [$cid, $g]);
-            if ($l) $r[$cid][$g] = [(int)$l['popularidade'], (int)$l['id']];
+            $novas = $n - ($ja[$g] ?? 0);   // vagas que sobram depois das que já estão no Google
+            if ($novas < 1) { $r[$cid][$g] = false; continue; }
+            if ($novas >= ($fila[$g] ?? 0) - ($ja[$g] ?? 0)) { $r[$cid][$g] = null; continue; }
+            $l = linha("SELECT " . SQL_ORDEM_GOOGLE . " AS ordem, p.id FROM profissionais p WHERE p.cidade = ? AND $base AND p.google_em IS NULL AND $prio = ?
+                ORDER BY " . SQL_ORDEM_GOOGLE . " DESC, p.id ASC LIMIT 1 OFFSET " . ($novas - 1), [$cid, $g]);
+            $r[$cid][$g] = $l ? [(int)$l['ordem'], (int)$l['id']] : false;
         }
         $r[$cid] ??= [];
     }
     @mkdir(dirname($arq), 0775, true);
-    @file_put_contents($arq, json_encode(['onda' => $onda, 'quando' => time(), 'cidades' => cidades_no_google(), 'cortes' => $r]), LOCK_EX);
+    @file_put_contents($arq, json_encode(['v' => 2, 'onda' => $onda, 'quando' => time(), 'cidades' => cidades_no_google(), 'cortes' => $r]), LOCK_EX);
+    google_marcar();
     return $r;
+}
+/** Marca google_em nas fichas que acabaram de entrar (a partir daí ficam no Google mesmo se a ordem mudar). */
+function google_marcar(): void {
+    static $feito = false;
+    if ($feito) return;
+    $feito = true;
+    try { q("UPDATE profissionais p SET p.google_em = NOW() WHERE p.status = 'ativo' AND p.google_em IS NULL AND " . sql_no_google()); }
+    catch (Throwable $e) { error_log('google_marcar: ' . $e->getMessage()); }
 }
 /** SQL da ficha que vai para o Google (slugs vêm de CIDADES, já validados em carregar_cidades()). */
 function sql_no_google(): string {
@@ -286,11 +308,13 @@ function sql_no_google(): string {
     $fila = [];
     foreach ($cortes as $c => $grupos) {
         $partes = [];
-        foreach ($grupos as $g => $corte)
-            $partes[] = "($prio = " . (int)$g . ($corte ? " AND (" . SQL_PESO_GOOGLE . " > {$corte[0]} OR (" . SQL_PESO_GOOGLE . " = {$corte[0]} AND p.id <= {$corte[1]}))" : '') . ')';
+        foreach ($grupos as $g => $corte) {
+            if ($corte === false) continue;
+            $partes[] = "($prio = " . (int)$g . ($corte ? ' AND (' . SQL_ORDEM_GOOGLE . " > {$corte[0]} OR (" . SQL_ORDEM_GOOGLE . " = {$corte[0]} AND p.id <= {$corte[1]}))" : '') . ')';
+        }
         if ($partes) $fila[] = "(p.cidade = '$c' AND (" . implode(' OR ', $partes) . '))';
     }
-    return '(' . SQL_TEM_CONTATO . " AND p.cidade IN ('" . implode("','", array_keys($cortes)) . "') AND (" . SQL_CONFIRMADA
+    return '(' . SQL_TEM_CONTATO . " AND p.cidade IN ('" . implode("','", array_keys($cortes)) . "') AND (" . SQL_CONFIRMADA . ' OR p.google_em IS NOT NULL'
         . ($fila ? ' OR (' . SQL_PESO_GOOGLE . ' >= ' . GOOGLE_MIN_AVALIACOES . ' AND (' . implode(' OR ', $fila) . '))' : '') . '))';
 }
 /** Quantas fichas de cada cidade estão no Google e quantas esperam na fila. */
@@ -497,6 +521,31 @@ function da_categoria(int $categoria_id, string $cidade): array {
         WHERE ' . visivel($cidade) . " AND p.categoria_id = ?
         ORDER BY " . SQL_DESTAQUE . " DESC, " . SQL_FICHA_PAGA . " DESC, " . SQL_COM_HORARIO . " DESC, p.total_avaliacoes > 0 DESC, RAND(?)",
         [$categoria_id, semente_dia()]));
+}
+
+/**
+ * 23/11 (passo 77): a mesma lista da área em páginas (app 1.17+). Filtros no servidor: tipo, termo (nome, tipo ou bairro,
+ * sem ligar para acento) e aberto agora. Mesma ordem do dia (RAND com a semente do dia), então as páginas não se repetem.
+ * Devolve [lista da página, total com os filtros].
+ */
+function da_categoria_pagina(int $categoria_id, string $cidade, int $pagina, int $por, ?string $tipo, string $termo, bool $aberto): array {
+    $w = visivel($cidade) . ' AND p.categoria_id = ?';
+    $par = [$categoria_id];
+    if ($tipo !== null && $tipo !== '') { $w .= ' AND p.tipo = ?'; $par[] = $tipo; }
+    if ($termo !== '') {
+        $l = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $termo) . '%';
+        $w .= ' AND (p.nome LIKE ? OR p.tipo LIKE ? OR p.bairro LIKE ?)'; array_push($par, $l, $l, $l);
+    }
+    $ordem = ' ORDER BY ' . SQL_DESTAQUE . ' DESC, ' . SQL_FICHA_PAGA . ' DESC, ' . SQL_COM_HORARIO . ' DESC, p.total_avaliacoes > 0 DESC, RAND(?)';
+    if ($aberto) {   // aberto agora sai do horário (PHP); só ~3% das fichas têm horário, então filtra aqui e corta depois
+        $todas = array_values(array_filter(array_map('prof_resumo', linhas('SELECT ' . CAMPOS_RESUMO . ' FROM profissionais p JOIN categorias c ON c.id = p.categoria_id
+            WHERE ' . $w . ' AND ' . SQL_COM_HORARIO . $ordem, [...$par, semente_dia()])), fn($x) => $x['abertoAgora'] === true));
+        return [array_slice($todas, ($pagina - 1) * $por, $por), count($todas)];
+    }
+    $total = (int)valor('SELECT COUNT(*) FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE ' . $w, $par);
+    $lista = array_map('prof_resumo', linhas('SELECT ' . CAMPOS_RESUMO . ' FROM profissionais p JOIN categorias c ON c.id = p.categoria_id
+        WHERE ' . $w . $ordem . ' LIMIT ' . (int)$por . ' OFFSET ' . (int)(($pagina - 1) * $por), [...$par, semente_dia()]));
+    return [$lista, $total];
 }
 
 // $cidade null = todas (busca do site, para o dono achar o negócio)

@@ -152,7 +152,11 @@ export default function TelaProfissional() {
             <>
               <Text style={estilos.secao}>Sobre</Text>
               <Text style={ui.texto}>{p.sobreSite}</Text>
-              {p.sobreSiteDe ? <Text style={estilos.sobreDe}>Do site do comércio: {p.sobreSiteDe}</Text> : null}
+              {p.sobreCortado ? (
+                <Text style={estilos.sobreDe}>O texto completo sobre este comércio aparece com o plano Básico.</Text>
+              ) : p.sobreSiteDe ? (
+                <Text style={estilos.sobreDe}>Do site do comércio: {p.sobreSiteDe}</Text>
+              ) : null}
             </>
           ) : null}
 
