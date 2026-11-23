@@ -386,3 +386,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     quadro fica verde/cinza com o resultado e some em 1,5 s; o número da aba desce. Ctrl+Enter na caixa = Aprovar.
     Sem JavaScript continua funcionando como antes. Tirado o web_cache_limpar() de cada clique (a ficha não fica em
     cache e as listas não mostram o Sobre).
+59. ✅ 2ª revisão dos "Sobre pelo site" (23/11, pedido do usuário: aprovar todos e resumir os grandes no tamanho da Emy).
+    O usuário rodou o robô em todas as fichas com site (--todas): 1.214 pendentes. 810 aprovados (783 resumidos, média
+    72 letras, máx. 149; 27 mantidos como estavam) e 404 recusados com motivo: plataforma/site de terceiro (MenuDino,
+    Brendi, Cardápio Web, encurtadores, Cliquei Achei, Trinks...), texto genérico de rede igual em várias fichas
+    (Correios, Drogal, Ipiranga, Pague Menos, Cacau Show, igrejas nacionais...), outra empresa/cidade, sem informação
+    (menu, aviso de site novo) e fichas duplicadas. Total no ar: 1.036 fichas com Sobre. Recusados podem ser aprovados
+    na aba Recusados (passo 57). Cópia antes: /var/lib/guia-novo/backups/antes-sobre-site-2-20261123.sql.gz.
