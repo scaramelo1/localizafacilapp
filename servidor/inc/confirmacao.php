@@ -81,14 +81,20 @@ function fila_sql(string $cidade): string {
     return visivel($cidade) . ' AND ' . SQL_TEM_CONTATO . ' AND NOT ' . SQL_CONFIRMADA . "
         AND NOT EXISTS (SELECT 1 FROM confirmar_fila f WHERE f.profissional_id = p.id AND (f.situacao = 'fechou' OR f.proxima_em > NOW()))";
 }
-/** A próxima ficha da fila (pular = quantas passar). Ordem: prioridade das áreas, depois as mais conhecidas. */
+/**
+ * 23/11 (passo 78, pedido do usuário): dentro das fichas do Google (e depois das outras), primeiro as que têm WhatsApp
+ * (ou celular) e ainda NÃO têm horário: dá para mandar o link pelo WhatsApp e o dono informa o horário (o que mais falta).
+ */
+const FILA_ORDEM_WHATS = "(COALESCE(p.whatsapp, '') <> '' OR p.telefone REGEXP '^[0-9]{2}9[0-9]{8}$') DESC,
+    (p.horarios IS NULL OR p.horarios IN ('', '[]', '{}')) DESC";
+/** A próxima ficha da fila (pular = quantas passar). Ordem: no Google, WhatsApp sem horário, áreas, mais conhecidas. */
 function fila_proxima(string $cidade, int $pular = 0): ?array {
     // 22/11 (passo 55, F): primeiro as fichas que já estão no Google (as que o Google julga), depois a ordem de antes
     $no = sql_no_google();
     return linha("SELECT p.*, c.nome AS categoria, f.situacao AS fila_situacao, f.tentativas AS fila_tentativas, f.atualizado_em AS fila_quando,
         $no AS no_google
         FROM profissionais p JOIN categorias c ON c.id = p.categoria_id LEFT JOIN confirmar_fila f ON f.profissional_id = p.id
-        WHERE " . fila_sql($cidade) . " ORDER BY $no DESC, " . sql_prioridade_area() . ', p.popularidade DESC, p.id LIMIT 1 OFFSET ' . max(0, $pular));
+        WHERE " . fila_sql($cidade) . " ORDER BY $no DESC, " . FILA_ORDEM_WHATS . ', ' . sql_prioridade_area() . ', p.popularidade DESC, p.id LIMIT 1 OFFSET ' . max(0, $pular));
 }
 /** Números da cidade para o topo da tela. */
 function fila_numeros(string $cidade): array {

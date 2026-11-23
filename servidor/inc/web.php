@@ -251,6 +251,46 @@ function web_qtd_bairro(array $p): int {
  * Frase da localização: "Fica no bairro Bortolan, a 2,3 km do centro de Poços de Caldas. No bairro, o Localiza Fácil
  * tem 85 comércios e serviços." Só com o que é verdade: sem ponto preciso, sem a distância; sem bairro, sem o bairro.
  */
+/**
+ * 23/11 (passo 78, avaliação: ficha vazia): um parágrafo próprio em toda ficha, só com fatos que o site tem (nada inventado):
+ * onde fica e como aparece; posição entre os do mesmo tipo pelas avaliações do Google Maps (quando está no topo); quantos do
+ * mesmo tipo há no bairro; e como falar com o comércio / o horário de hoje. Cada ficha fica com uma frase que só ela tem.
+ */
+function web_resumo_ficha(array $p, ?string $tipo, string $nome_cidade, string $uf, array $h): string {
+    $nome = nome_curto((string)$p['nome']);
+    $bairro = trim((string)($p['bairro'] ?? ''));
+    $centro = (bool)preg_match('/^centro$/iu', $bairro);
+    $onde = $bairro !== '' ? ($centro ? "no Centro de $nome_cidade ($uf)" : "no bairro $bairro, em $nome_cidade ($uf)") : "em $nome_cidade ($uf)";
+    $tipo_min = $tipo ? mb_strtolower($tipo) : null;
+    $f = [$nome . ' fica ' . $onde . ($tipo ? (str_contains($onde, ',') ? ',' : '') . ' e aparece no Localiza Fácil como ' . $tipo_min : '') . '.'];
+    if ($tipo) {
+        $vis = visivel((string)$p['cidade']);
+        $pop = (int)($p['popularidade'] ?? 0);
+        if ($pop > 0) {
+            $n = (int)valor("SELECT COUNT(*) FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE $vis AND p.tipo = ?", [$tipo]);
+            $pos = 1 + (int)valor("SELECT COUNT(*) FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE $vis AND p.tipo = ? AND p.popularidade > ?", [$tipo, $pop]);
+            if ($n >= 5) {
+                if ($pos <= 3) $f[] = "É um dos 3 lugares de $tipo_min mais avaliados no Google Maps em $nome_cidade, entre $n da cidade.";
+                elseif ($pos <= 10) $f[] = "Está entre os 10 lugares de $tipo_min mais avaliados no Google Maps em $nome_cidade, entre $n da cidade.";
+                elseif ($pos <= $n * 0.25) $f[] = "Está entre os 25% de $tipo_min mais avaliados no Google Maps em $nome_cidade.";
+            }
+        }
+        if ($bairro !== '') {
+            $k = (int)valor("SELECT COUNT(*) FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE $vis AND p.tipo = ? AND p.bairro = ? AND p.id <> ?", [$tipo, $bairro, (int)$p['id']]);
+            $no = $centro ? 'no Centro' : "no bairro $bairro";
+            $f[] = $k === 0 ? "É o único lugar de $tipo_min $no no Localiza Fácil."
+                : 'O Localiza Fácil tem mais ' . number_format($k, 0, ',', '.') . ' ' . ($k === 1 ? 'lugar' : 'lugares') . " de $tipo_min $no.";
+        }
+    }
+    $meios = array_values(array_filter([!empty($p['whatsapp']) ? 'WhatsApp' : null,
+        !empty($p['telefone']) && telefone_discar((string)$p['telefone']) !== telefone_discar((string)$p['whatsapp']) ? 'telefone' : null,
+        !empty($p['site']) ? 'site' : null]));
+    if ($meios) $f[] = 'Para falar com o comércio: ' . (count($meios) > 1 ? implode(', ', array_slice($meios, 0, -1)) . ' ou ' . end($meios) : $meios[0]) . '.';
+    $hoje = $h[campo_de_hoje()] ?? null;
+    if ($hoje) $f[] = 'Horário de hoje: ' . horario_campo_texto($hoje) . '.';
+    elseif (!$h) $f[] = 'O horário ainda não foi informado.';
+    return implode(' ', $f);
+}
 function web_local_texto(array $p, string $nome_cidade): string {
     $bairro = trim((string)$p['bairro']);
     $centro = web_geo_preciso($p) ? web_centro_cidade((string)$p['cidade']) : null;
@@ -700,13 +740,6 @@ function web_pagina_ficha(array $p): void {
 
       <?php if ($oferta = oferta_no_ar((int)$p['id'])) echo oferta_quadro_ficha($oferta);   // 19/11: Oferta da semana (só Destaque) ?>
 
-      <?= web_faltam(array_filter([   // passo 59 + 19/11: o que falta, num bloco só, cada item com o seu "Pedir"
-          'whatsapp' => $c['whatsapp'] ? null : 'WhatsApp',
-          'fotos' => $fotos ? null : 'Fotos',
-          'horario' => $tem_horario ? null : 'Horário',
-          'sobre' => $tem_sobre ? null : 'O que vende ou faz',
-          'catalogo' => $c['catalogoTrancado'] ?? null,   // 22/11 (passo 45): Cardápio / Produtos / Ofertas... (só no plano Destaque)
-      ])) ?>
 
       <?php if ($fotos): ?>
         <div class="ficha-fotos">
@@ -739,6 +772,7 @@ function web_pagina_ficha(array $p): void {
       <?php endif ?>
       <div class="ficha-colunas">
         <div>
+          <h2>Resumo</h2><p class="ficha-resumo"><?= h(web_resumo_ficha($p, $tipo, (string)$nome_cidade, (string)$uf, $h)) ?></p>
           <?php if ($p['descricao']): ?><h2>Sobre</h2><p><?= nl2br(h($p['descricao'])) ?></p>
           <?php elseif (!empty($p['sobre_cortado'])): // 23/11 (passo 76): sem o Básico, só o começo do Sobre ?><h2>Sobre</h2><p><?= h($p['sobre_site']) ?></p>
             <p class="sobre-trancado">🔒 O texto completo sobre este comércio aparece com o plano Básico.<?php if (!empty($c['linkAssumir'])): ?> <a href="<?= h($c['linkAssumir']) ?>" rel="nofollow">É o dono? Veja os planos</a><?php endif ?></p>
@@ -766,6 +800,15 @@ function web_pagina_ficha(array $p): void {
           <?php if ($local_txt): ?><h2>Localização</h2><p class="ficha-local"><?= h($local_txt) ?></p><?php endif ?>
         </div>
       </div>
+
+      <?php // 23/11 (passo 78): o que falta vem DEPOIS das informações da ficha (antes vinha logo abaixo dos botões) ?>
+      <?= web_faltam(array_filter([   // passo 59 + 19/11: o que falta, num bloco só, cada item com o seu "Pedir"
+          'whatsapp' => $c['whatsapp'] ? null : 'WhatsApp',
+          'fotos' => $fotos ? null : 'Fotos',
+          'horario' => $tem_horario ? null : 'Horário',
+          'sobre' => $tem_sobre ? null : 'O que vende ou faz',
+          'catalogo' => $c['catalogoTrancado'] ?? null,   // 22/11 (passo 45): Cardápio / Produtos / Ofertas... (só no plano Destaque)
+      ])) ?>
 
       <?php if ($cardapio): ?>
       </div>

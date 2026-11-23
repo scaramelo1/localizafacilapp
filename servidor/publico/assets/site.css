@@ -853,3 +853,5 @@ body.sem-rolagem { overflow: hidden; }
 /* 23/11 (passo 76): começo do Sobre aberto, o resto com o Básico */
 .sobre-trancado { margin: -4px 0 14px; font-size: .9em; color: var(--texto-2, #5c5c5c); }
 .sobre-trancado a { font-weight: 700; }
+
+.ficha-resumo { line-height: 1.55; }

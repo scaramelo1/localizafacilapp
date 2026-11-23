@@ -532,3 +532,17 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     Santa Rita: os robôs do site já leram (381 de 489 sites; o resto é Facebook/Instagram); não precisa rodar de novo.
     O robô do Maps no PC é opcional: traria as avaliações (popularidade) e aí dá para tirar a cidade do CASE de
     SQL_PESO_GOOGLE.
+78. ✅ Ficha vazia e qualidade dos dados (23/11, pedido do usuário: A, B e D; o C, pausar 1.545 fichas sem contato
+    nem avaliação, ficou de fora).
+    Notas antes: ficha vazia 4,5 (texto próprio 2, utilidade 5, ordem 4, diferença 3, venda 7); dados 6 (contato 8,
+    endereço 8, repetidas 7, tipo 7, bairro 7, site/e-mail/Sobre 6, mortas 5, mapa 3, horário 2, avaliações 1, fotos 1).
+    A) "Resumo" em toda ficha (web_resumo_ficha em inc/web.php), só com fatos: onde fica e o tipo; entre os 3/10/25%
+       mais avaliados no Google Maps do tipo na cidade; quantos do mesmo tipo no bairro (ou "o único"); como falar com
+       o comércio; horário de hoje ou "ainda não informado". O "🔒 Faltam" foi para DEPOIS das informações.
+    B) Fila de Admin > Confirmar fichas: dentro das que estão no Google, primeiro as com WhatsApp (ou celular) e sem
+       horário (FILA_ORDEM_WHATS em inc/confirmacao.php); a mensagem do link já pede o horário. (A tela "Quem chamar
+       hoje" é outra: só lista fichas com visitas.)
+    D) Admin > Comércios > "🏷️ Tipos genéricos" (/admin/tipos.php, inc/tipos-genericos.php): 692 fichas com tipo
+       genérico; 300 com sugestão pelo nome (só tipos já usados, com a área mais comum), revisão do usuário antes de
+       aplicar (tipo/área antigos guardados em /var/lib/guia-novo/backups/tipos-antes-*.json); 33 "não são comércio"
+       (nome = endereço ou bairro) só pausam se marcar; 359 sem sugestão.
