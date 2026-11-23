@@ -408,3 +408,11 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     "🕒 Horário pelo site" (/admin/horario-site.php): trecho do site + campos já preenchidos para corrigir, Aprovar/Recusar
     sem recarregar, "Tirar da ficha"; nunca troca horário que a ficha já tem (só marcando "Trocar"). Teste com 15 sites:
     3 com horário (Big Bom, Pizza na Roça, Ollivia).
+62. ✅ Revisão dos horários pelo site (23/11, pedido do usuário: "verifique esses horários e aprove o que achar correto").
+    O robô (passo 61) leu 2.450 sites: 547 com horário, 1.888 sem horário escrito, 15 fora do ar. Dos 547: 420 aprovados
+    (4 corrigidos: Chaveiro Delta 24 h; "18h 12" e "14h 08" eram 18h e 14h; Tintas MC pelo texto do próprio site) e 127
+    recusados: central de rede nacional (Drogal, Farmais, Ipiranga/AmPm, Unimed, Drogaria São Paulo/Pacheco, Sicoob,
+    Ultragaz, Cometa, UNINTER...), site com várias lojas misturadas (Big Bom, Via Mondo, Toyota, Campinas Celulares,
+    Boulevard), outra cidade, só da manhã ou estranho, "24h" de advogado/imobiliária, visita de hospital, restaurante de
+    hotel, e horário dia a dia muito diferente (Estética Nathalia, Physical). Fichas com horário: 5 -> 425 (filtro "Aberto
+    agora" e selo nas listas). Cópia antes: /var/lib/guia-novo/backups/antes-horarios-20261123.sql.gz.
