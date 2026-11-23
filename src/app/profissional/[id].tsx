@@ -136,7 +136,7 @@ export default function TelaProfissional() {
           {!p.fotos?.length && (
             <Trancado id={p.id} tipo="fotos" titulo="Fotos" texto="Ainda sem fotos do lugar, dos produtos ou do cardápio." botao="Pedir fotos ao comércio" />
           )}
-          {!p.descricao && p.servicos.length === 0 && (
+          {!p.descricao && !p.sobreSite && p.servicos.length === 0 && (
             <Trancado
               id={p.id}
               tipo="sobre"
@@ -147,6 +147,14 @@ export default function TelaProfissional() {
           )}
 
           {p.descricao ? <Text style={[ui.texto, { marginTop: 16 }]}>{p.descricao}</Text> : null}
+          {/* 23/11 (passo 60): texto do site do proprio comercio, aprovado pela equipe */}
+          {!p.descricao && p.sobreSite ? (
+            <>
+              <Text style={estilos.secao}>Sobre</Text>
+              <Text style={ui.texto}>{p.sobreSite}</Text>
+              {p.sobreSiteDe ? <Text style={estilos.sobreDe}>Do site do comércio: {p.sobreSiteDe}</Text> : null}
+            </>
+          ) : null}
 
           {p.servicos.length > 0 && (
             <>
@@ -184,6 +192,37 @@ export default function TelaProfissional() {
               <Linha icone="clock-outline" texto="Horário de funcionamento" detalhe={p.horario} ultima />
             ) : null}
           </View>
+          {/* 23/11 (passo 60): localizacao em texto e vizinhos, igual a ficha do site */}
+          {p.localizacao ? (
+            <>
+              <Text style={estilos.secao}>Localização</Text>
+              <Text style={ui.texto}>{p.localizacao}</Text>
+            </>
+          ) : null}
+          {p.perto?.itens.length ? (
+            <>
+              <Text style={estilos.secao}>{p.perto.titulo}</Text>
+              <View style={[estilos.caixa, { marginTop: 0 }]}>
+                {p.perto.itens.map((v, i) => (
+                  <Pressable
+                    key={v.id}
+                    accessibilityRole="button"
+                    onPress={() => router.push(`/profissional/${v.id}?origem=perto`)}
+                    style={({ pressed }) => [estilos.vizinho, i === p.perto!.itens.length - 1 && { borderBottomWidth: 0 }, pressed && { opacity: 0.7 }]}
+                  >
+                    <View style={[estilos.vizinhoIcone, { backgroundColor: v.cor || cores.verde }]}>
+                      <MaterialCommunityIcons name={(v.icone in MaterialCommunityIcons.glyphMap ? v.icone : 'storefront-outline') as NomeIcone} size={20} color="#fff" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={estilos.linhaTexto} numberOfLines={1}>{v.nome}</Text>
+                      <Text style={estilos.vizinhoTipo} numberOfLines={1}>{v.tipo}</Text>
+                    </View>
+                    <Text style={estilos.vizinhoOnde}>{v.onde}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </>
+          ) : null}
           {!temHorario && (
             <Trancado
               id={p.id}
@@ -414,6 +453,11 @@ const estilos = StyleSheet.create({
   whatsTexto: { color: '#fff', fontSize: fonte.media, fontWeight: '800' },
   aviso: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: cores.verdeClaro, borderRadius: 14, paddingHorizontal: 14, minHeight: 56, marginTop: 12 },
   secao: { fontSize: fonte.grande, fontWeight: '900', color: cores.texto, marginTop: 22, marginBottom: 10 },
+  sobreDe: { fontSize: fonte.pequena, color: cores.textoSuave, marginTop: 6 },
+  vizinho: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 60, paddingVertical: 8, borderBottomWidth: 1, borderColor: cores.borda },
+  vizinhoIcone: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  vizinhoTipo: { fontSize: fonte.pequena, color: cores.textoSuave },
+  vizinhoOnde: { fontSize: fonte.pequena, fontWeight: '800', color: cores.verde },
   servico: { backgroundColor: cores.fundoSuave, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 6 },
   caixa: { ...cartao, paddingHorizontal: 14, marginTop: 14 },
   linha: { flexDirection: 'row', alignItems: 'center', gap: 14, minHeight: 64, paddingVertical: 8, borderBottomWidth: 1, borderColor: cores.borda },

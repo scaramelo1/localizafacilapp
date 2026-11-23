@@ -13,4 +13,20 @@ $p ?? erro('Profissional não encontrado.', 404);
 // Sem origem = app antigo: conta como 'app'.
 $origem = isset($_GET['origem']) ? (string)$_GET['origem'] : null;
 if ($origem !== 'nenhuma') contar_visita((int)$p['id'], origem_valida($origem));
-responder(['profissional' => prof_completo($p, ($u = usuario_app()) ? (int)$u['id'] : null)]);
+$r = prof_completo($p, ($u = usuario_app()) ? (int)$u['id'] : null);
+// 23/11 (passo 60): o mesmo conteúdo próprio da ficha do site (passo 55). Apps antigos ignoram estes campos.
+require_once __DIR__ . '/../../inc/web.php';
+$r['sobreSite'] = !$p['descricao'] && !empty($p['sobre_site']) ? (string)$p['sobre_site'] : null;
+$r['sobreSiteDe'] = $r['sobreSite'] && !empty($p['sobre_site_url'])
+    ? preg_replace('#^www\.#', '', (string)parse_url((string)$p['sobre_site_url'], PHP_URL_HOST)) : null;
+$r['localizacao'] = web_local_texto($p, nome_cidade((string)$p['cidade'])) ?: null;
+$perto = web_perto($p);
+$r['perto'] = $perto ? [
+    'titulo' => $perto['modo'] === 'perto' ? 'Perto de ' . nome_curto((string)$p['nome']) : 'Também na ' . $perto['rua'],
+    'itens' => array_map(fn($x) => [
+        'id' => (int)$x['id'], 'nome' => nome_curto((string)$x['nome']), 'tipo' => (string)($x['tipo'] ?: $x['categoria']),
+        'icone' => icone_comercio($x), 'cor' => cor_comercio($x),
+        'onde' => $perto['modo'] === 'perto' ? web_distancia_txt((float)$x['distancia']) : 'nº ' . (int)$x['numero'],
+    ], $perto['itens']),
+] : null;
+responder(['profissional' => $r]);

@@ -128,6 +128,16 @@ export function reais(v: number): string {
   return 'R$ ' + v.toFixed(2).replace('.', ',');
 }
 
+/** Comercio vizinho na ficha: 'onde' = "a 150 m" ou "n. 1935" (o servidor escreve). */
+export interface Vizinho {
+  id: number;
+  nome: string;
+  tipo: string;
+  icone: string;
+  cor: string;
+  onde: string;
+}
+
 export interface Profissional extends ProfissionalResumo {
   responsavel: string | null;
   descricao: string | null;
@@ -161,6 +171,14 @@ export interface Profissional extends ProfissionalResumo {
   catalogoTrancado?: string | null;
   /** Oferta da semana no ar (so Destaque). */
   oferta?: Oferta | null;
+  /** 23/11: texto do site do proprio comercio, aprovado pela equipe (so quando nao tem descricao do dono). */
+  sobreSite?: string | null;
+  /** Site de onde veio o sobreSite ("exemplo.com.br"). */
+  sobreSiteDe?: string | null;
+  /** 23/11: "Fica no bairro X, a 2,5 km do centro de Y. No bairro..." */
+  localizacao?: string | null;
+  /** 23/11: vizinhos de areas diferentes (pelo mapa ou na mesma rua). */
+  perto?: { titulo: string; itens: Vizinho[] } | null;
   minhaAvaliacao: { estrelas: number; comentario: string | null } | null;
   comentarios: Comentario[];
 }
