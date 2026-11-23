@@ -481,6 +481,6 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     podem preencher e aprovar; aparecem sozinhos quando o dono pagar. Escondido em tudo: ficha do site (texto, botão, JSON-LD,
     descrição para o Google), cartões das listas, app (api/profissional.php e listas via prof_resumo) e números da página da
     cidade ("têm site ou Instagram", "atendem em casa"). O que falta entra no "🔒 Faltam: ...". A busca continua achando pelos
-    serviços/descrição. Facebook e e-mail de contato (passo 70) continuam abertos. No dia: 5 fichas liberadas; escondidos
+    serviços/descrição. Facebook também trancado (23/11, pedido do usuário); o e-mail de contato (passo 70) continua aberto. No dia: 5 fichas liberadas; escondidos
     1.415 Instagram e 1.062 Sobre pelo site. ATENÇÃO: o Sobre pelo site era o texto próprio que subia a nota das fichas no
     Google (passos 55 e 64); sem ele, as fichas não pagas voltam a ter só os dados do Maps.

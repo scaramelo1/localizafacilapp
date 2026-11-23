@@ -302,7 +302,7 @@ function ficha_paga(array $p): bool {
  * entrega" só aparecem para quem pagou o Básico (ou tem o Destaque em dia). Os dados continuam no banco (o robô e o admin
  * podem preencher); só não são mostrados em lugar nenhum (site, app, Google, listas) até pagar.
  */
-const CAMPOS_DO_BASICO = ['descricao', 'servicos', 'instagram', 'atende_em_casa', 'sobre_site', 'sobre_site_url'];
+const CAMPOS_DO_BASICO = ['descricao', 'servicos', 'instagram', 'facebook', 'atende_em_casa', 'sobre_site', 'sobre_site_url'];   // facebook: 23/11, pedido do usuário
 const SQL_BASICO_LIBERADO = '(' . SQL_FICHA_PAGA . ' OR ' . SQL_DESTAQUE . ')';
 function basico_liberado(array $p): bool {
     if (array_key_exists('basico_liberado', $p)) return (bool)$p['basico_liberado'];
