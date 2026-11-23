@@ -393,3 +393,18 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     (Correios, Drogal, Ipiranga, Pague Menos, Cacau Show, igrejas nacionais...), outra empresa/cidade, sem informação
     (menu, aviso de site novo) e fichas duplicadas. Total no ar: 1.036 fichas com Sobre. Recusados podem ser aprovados
     na aba Recusados (passo 57). Cópia antes: /var/lib/guia-novo/backups/antes-sobre-site-2-20261123.sql.gz.
+60. ✅ App 1.16.0 com o conteúdo próprio da ficha (23/11, pedido do usuário; a 1.15.0 já foi testada por ele).
+    api/profissional.php manda sobreSite/sobreSiteDe (Sobre do site, só sem descrição do dono), localizacao (web_local_texto)
+    e perto {titulo, itens: id, nome, tipo, icone, cor, onde} (web_perto: "a 150 m" ou "nº 1935"). Tela da ficha
+    (src/app/profissional/[id].tsx): seção Sobre com "Do site do comércio: x", Localização e a lista de vizinhos (toque
+    abre a ficha, origem 'perto'); o "Pedir detalhes" some quando tem Sobre do site. app.json 1.16.0. Apps antigos ignoram.
+    Não deu para conferir a sintaxe com esbuild na VPS (download bloqueado): conferir no PC com npx tsc --noEmit.
+61. ✅ Robô de horário pelo site (23/11, pedido do usuário: "pode criar o robô que eu já rodo"). Mudança 043 (tabela
+    horario_site), já aplicada. inc/site-robo.php (comum aos dois robôs: baixar, robots.txt, limpar; e horario_extrair:
+    schema.org openingHoursSpecification/openingHours ou texto "Segunda a sexta, das 8h às 18h", "SEG-SEX 08:00 - 18:00",
+    "Domingo fechado", almoço "8h às 12h e 14h às 18h" vira 8h às 18h, dia a dia "Seg: 11h-23h | Ter..." vira o mais comum
+    de seg-sex; "07h às 21h - segunda a sábado" só quando o outro jeito não acha). servidor/horario-do-site.php: só fichas
+    SEM horário, pula sites que o robô do Sobre viu fora do ar, tenta também a página de contato. Admin > Comércios >
+    "🕒 Horário pelo site" (/admin/horario-site.php): trecho do site + campos já preenchidos para corrigir, Aprovar/Recusar
+    sem recarregar, "Tirar da ficha"; nunca troca horário que a ficha já tem (só marcando "Trocar"). Teste com 15 sites:
+    3 com horário (Big Bom, Pizza na Roça, Ollivia).

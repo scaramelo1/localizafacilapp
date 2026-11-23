@@ -23,42 +23,8 @@ $todas = in_array('--todas', $argv, true);
 $limite = max(1, (int)(arg('limite') ?? 300));
 $so_id = (int)(arg('id') ?? 0);
 
-const SOBRE_UA = 'LocalizaFacilApp/1.0 (+https://localizafacilapp.com.br/contato.php)';
-const SOBRE_NAO_PROPRIOS = '/(^|\.)(facebook\.com|fb\.com|instagram\.com|wa\.me|whatsapp\.com|linktr\.ee|linkin\.bio|bio\.link|beacons\.ai|ifood\.com\.br|99app\.com|google\.com|goo\.gl|g\.page|bit\.ly|tinyurl\.com|youtube\.com|tiktok\.com|twitter\.com|x\.com|gov\.br|mercadolivre\.com\.br|olx\.com\.br|doctoralia\.com\.br|booking\.com|tripadvisor\.com(\.br)?|airbnb\.com(\.br)?|ueniweb\.com|negocio\.site|business\.site)$/i';
-// texto padrão de criador de site / em construção / genérico demais: não serve
-const SOBRE_GENERICOS = '/(just another wordpress|site em constru|em manuten|coming soon|under construction|lorem ipsum|create your website|crie seu site|this domain|domínio (está )?à venda|parked|hostgator|locaweb|wix\.com|página inicial$|^home$|^início$|bem-vindo ao site|welcome to)/iu';
+require_once __DIR__ . '/inc/site-robo.php';   // 23/11: baixar, robots.txt e limpar texto ficaram em comum com horario-do-site.php
 
-function sobre_baixar(string $url, int $max = 600000): array {
-    $ch = curl_init($url);
-    $corpo = '';
-    curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => false, CURLOPT_FOLLOWLOCATION => true, CURLOPT_MAXREDIRS => 4,
-        CURLOPT_CONNECTTIMEOUT => 6, CURLOPT_TIMEOUT => 10, CURLOPT_USERAGENT => SOBRE_UA, CURLOPT_ENCODING => '',
-        CURLOPT_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS, CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
-        CURLOPT_HTTPHEADER => ['Accept: text/html', 'Accept-Language: pt-BR,pt;q=0.9'],
-        CURLOPT_WRITEFUNCTION => function ($ch, $d) use (&$corpo, $max) { $corpo .= $d; return strlen($corpo) > $max ? 0 : strlen($d); }]);
-    curl_exec($ch);
-    $r = ['codigo' => (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE), 'final' => (string)curl_getinfo($ch, CURLINFO_EFFECTIVE_URL),
-        'tipo' => (string)curl_getinfo($ch, CURLINFO_CONTENT_TYPE), 'corpo' => $corpo, 'erro' => curl_errno($ch) && strlen($corpo) <= $max ? curl_error($ch) : ''];
-    curl_close($ch);
-    return $r;
-}
-/** robots.txt: o grupo "User-agent: *" (ou o nosso) proíbe "/"? */
-function sobre_robots_proibe(string $base): bool {
-    $r = sobre_baixar(rtrim($base, '/') . '/robots.txt', 100000);
-    if ($r['codigo'] !== 200 || stripos($r['tipo'], 'text/plain') === false) return false;
-    $vale = false; $proibe = false;
-    foreach (preg_split('/\R/', $r['corpo']) as $l) {
-        $l = trim(preg_replace('/#.*/', '', $l));
-        if (preg_match('/^user-agent:\s*(.+)$/i', $l, $m)) { $ua = trim($m[1]); $vale = $ua === '*' || stripos($ua, 'localizafacil') !== false; continue; }
-        if ($vale && preg_match('/^disallow:\s*(\S*)/i', $l, $m) && $m[1] === '/') $proibe = true;
-    }
-    return $proibe;
-}
-function sobre_limpar(string $t): string {
-    $t = html_entity_decode($t, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    if (!mb_check_encoding($t, 'UTF-8')) $t = mb_convert_encoding($t, 'UTF-8', 'ISO-8859-1');
-    return trim(preg_replace('/\s+/u', ' ', strip_tags($t)));
-}
 /** [titulo, texto, motivo-se-não-serve] da página. */
 function sobre_extrair(string $html, string $nome): array {
     $meta = function (string $chave) use ($html): string {

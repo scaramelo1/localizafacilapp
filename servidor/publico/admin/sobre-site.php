@@ -65,7 +65,8 @@ admin_inicio('Sobre pelo site do comércio', $admin);
 <p class="discreto">O robô lê a descrição que o <b>próprio comércio</b> escreveu no site dele. Nada aparece sozinho: confira, corrija se
   precisar e aprove. Aprovado aparece na ficha como “Sobre (do site do comércio)”, com o link. Texto de propaganda exagerada,
   de outra empresa (rede, plataforma) ou que não fala do comércio: recuse.<br>
-  Ler mais sites (na VPS): <code>sudo -u www-data php /var/www/guia-novo/servidor/sobre-do-site.php --limite=100</code></p>
+  Ler mais sites (na VPS): <code>sudo -u www-data php /var/www/guia-novo/servidor/sobre-do-site.php --limite=100</code>
+  · <a href="<?= h(url('admin/horario-site.php')) ?>">🕒 Horário pelo site</a></p>
 <p class="filtros-linha">
   <?php foreach (['pendente' => 'Para aprovar', 'aprovado' => 'Aprovados', 'recusado' => 'Recusados', 'erro' => 'Sites que não abrem'] as $k => $r): ?>
     <a class="botao <?= $k === $aba ? '' : 'contorno' ?> pequeno" href="<?= h(url('admin/sobre-site.php?aba=' . $k)) ?>"><?= h($r) ?> (<span<?= $k === $aba ? ' id="sobre-cont"' : '' ?>><?= (int)($num[$k] ?? 0) ?></span>)</a>
