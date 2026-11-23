@@ -29,9 +29,9 @@ function web_numeros_lista(string $cidade, ?int $categoria_id = null, ?string $t
     $r = linha("SELECT COUNT(*) AS total,
         SUM(COALESCE(p.whatsapp, '') <> '') AS whats,
         SUM(COALESCE(p.telefone, '') <> '' OR COALESCE(p.whatsapp, '') <> '') AS contato,
-        SUM(COALESCE(p.site, '') <> '' OR COALESCE(p.instagram, '') <> '') AS online,
+        SUM(COALESCE(p.site, '') <> '' OR (COALESCE(p.instagram, '') <> '' AND " . SQL_BASICO_LIBERADO . ")) AS online,
         SUM(" . SQL_COM_HORARIO . ") AS horario,
-        SUM(p.atende_em_casa = 1) AS em_casa,
+        SUM(p.atende_em_casa = 1 AND " . SQL_BASICO_LIBERADO . ") AS em_casa,   -- 23/11 (passo 72): só quem pagou o Básico
         COUNT(DISTINCT NULLIF(p.bairro, '')) AS bairros
         FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE $sql", $par) ?? [];
     return array_map('intval', $r);

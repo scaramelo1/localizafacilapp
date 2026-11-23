@@ -297,6 +297,26 @@ function ficha_paga(array $p): bool {
     if (array_key_exists('ficha_paga', $p)) return (bool)$p['ficha_paga'];
     return !$p['importado'] || !empty($p['basico_pago_em']);
 }
+/**
+ * 23/11 (passo 72, pedido do usuário): Sobre (do dono e o do site), "O que faz ou vende", Instagram e "Atende em casa /
+ * entrega" só aparecem para quem pagou o Básico (ou tem o Destaque em dia). Os dados continuam no banco (o robô e o admin
+ * podem preencher); só não são mostrados em lugar nenhum (site, app, Google, listas) até pagar.
+ */
+const CAMPOS_DO_BASICO = ['descricao', 'servicos', 'instagram', 'atende_em_casa', 'sobre_site', 'sobre_site_url'];
+const SQL_BASICO_LIBERADO = '(' . SQL_FICHA_PAGA . ' OR ' . SQL_DESTAQUE . ')';
+function basico_liberado(array $p): bool {
+    if (array_key_exists('basico_liberado', $p)) return (bool)$p['basico_liberado'];
+    if (ficha_paga($p) || !empty($p['destaque_pago'])) return true;
+    if (array_key_exists('destaque_pago', $p) || empty($p['id'])) return false;
+    return (bool)valor('SELECT ' . SQL_DESTAQUE . ' FROM profissionais p WHERE p.id = ?', [(int)$p['id']]);
+}
+/** A ficha como o público pode ver: sem os campos do Básico se não pagou. */
+function ficha_publica(array $p): array {
+    $lib = basico_liberado($p);
+    $p['basico_liberado'] = $lib;
+    if (!$lib) foreach (CAMPOS_DO_BASICO as $c) if (array_key_exists($c, $p)) $p[$c] = $c === 'atende_em_casa' ? 0 : null;
+    return $p;
+}
 function tem_dono(array $p): bool {
     if (array_key_exists('tem_dono', $p)) return (bool)$p['tem_dono'];
     return (bool)valor('SELECT ' . SQL_TEM_DONO . ' FROM profissionais p WHERE p.id = ?', [(int)$p['id']]);
@@ -330,6 +350,7 @@ function icone_comercio(array $p): string { return visual_tipo($p)[0] ?? (string
 function cor_comercio(array $p): string { return visual_tipo($p)[1] ?? (string)$p['cor']; }
 
 function prof_resumo(array $p): array {
+    $p = ficha_publica($p);   // 23/11 (passo 72)
     return [
         'id' => (int)$p['id'],
         'nome' => $p['nome'],
@@ -463,6 +484,7 @@ function profissional_visivel(int $id): ?array {
 }
 
 function prof_completo(array $p, ?int $usuario_id): array {
+    $p = ficha_publica($p);   // 23/11 (passo 72)
     $r = prof_resumo($p);
     $p += ['site' => null, 'mapa' => null];
     $r += [

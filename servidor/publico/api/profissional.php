@@ -9,6 +9,7 @@ if (!$p && ($id = (int)($_GET['id'] ?? 0)) && da_equipe()) {
         FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE p.id = ?', [$id]);
 }
 $p ?? erro('Profissional não encontrado.', 404);
+$p = ficha_publica($p);   // 23/11 (passo 72): sem os campos do Básico se não pagou
 // origem = de onde a pessoa abriu (app 1.5.0+); 'nenhuma' = recarga da mesma tela ou tela de avaliar (não conta).
 // Sem origem = app antigo: conta como 'app'.
 $origem = isset($_GET['origem']) ? (string)$_GET['origem'] : null;

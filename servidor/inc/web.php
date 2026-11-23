@@ -128,14 +128,14 @@ function web_ficha_previa(int $id): ?array {
     if ($id <= 0 || !da_equipe()) return null;
     $p = linha('SELECT p.*, ' . SQL_DESTAQUE . ' AS destaque_pago, c.id AS categoria_id, c.nome AS categoria, c.slug AS categoria_slug, c.icone, c.cor
         FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE p.id = ?', [$id]);
-    return $p && isset(CIDADES[$p['cidade']]) ? $p : null;
+    return $p && isset(CIDADES[$p['cidade']]) ? ficha_publica($p) : null;   // 23/11 (passo 72): sem os campos do Básico se não pagou
 }
 
 function web_ficha(int $id): ?array {
     if ($id <= 0) return null;
     $p = linha('SELECT p.*, ' . SQL_DESTAQUE . ' AS destaque_pago, c.id AS categoria_id, c.nome AS categoria, c.slug AS categoria_slug, c.icone, c.cor
         FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE p.id = ? AND ' . visivel(), [$id]);
-    return $p && isset(CIDADES[$p['cidade']]) ? $p : null;
+    return $p && isset(CIDADES[$p['cidade']]) ? ficha_publica($p) : null;   // 23/11 (passo 72): sem os campos do Básico se não pagou
 }
 /** "Outros dentistas em São João": do mesmo tipo (ou da mesma área, se o tipo tiver poucos). Devolve [lista, do mesmo tipo?]. */
 function web_parecidos(array $p, int $limite = 6): array {
