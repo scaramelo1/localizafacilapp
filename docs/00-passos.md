@@ -498,3 +498,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     (368 fichas, 396 dados: "não dá para afirmar que é isso mesmo"); as fichas ficaram com o que já tinham. Instagram/Facebook/
     serviços só aparecem com o Básico (passo 72). O robô agora descarta facebook.com/people, wix, 1234567890, dpo@/lgpd@.
     Cópia antes: /var/lib/guia-novo/backups/antes-aprovar-dados-site-20261123-145042.sql.gz.
+75. ✅ Sobre pelo site revisado um a um (23/11, pedido do usuário): 243 pendentes -> 168 aprovados (os longos resumidos em
+    ~180 letras) e 75 recusados (cardápio de plataforma: Brendi, MenuDino, UaiRango, Goomer, Sisfood, PedeDaki; texto de
+    rede/franquia: Burger King, Jadlog, Lupo, Chiquinho, Espaçolaser, Óticas Diniz, Magalu, Sebrae, Sest Senat; outra
+    cidade: Pouso Alegre, Itajubá, Franco da Rocha, Conceição dos Ouros; texto que não é do comércio). Decisões em
+    /var/lib/guia-novo/backups/sobre-decisao-23-11.txt; cópia antes: antes-sobre-lote-20261123-150111.sql.gz. Só aparece
+    com o Básico pago (passo 72).
