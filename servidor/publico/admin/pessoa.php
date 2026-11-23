@@ -52,7 +52,18 @@ admin_inicio($u['nome'], $admin);
 <p><a href="pessoas.php">‹ Pessoas</a></p>
 <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
   <?php if ($u['foto'] && str_starts_with($u['foto'], 'https://')): ?>
-  <img src="<?= h($u['foto']) ?>" alt="" width="64" height="64" style="border-radius:50%;object-fit:cover" referrerpolicy="no-referrer" onerror="this.remove()">
+  <?php $foto_grande = preg_replace('/=s\d+(-c)?$/', '=s0', $u['foto']); /* Google: =s0 = tamanho original */ ?>
+  <button type="button" onclick="document.getElementById('foto-grande').showModal()" title="Ver a foto no tamanho real"
+    style="padding:0;border:0;background:none;cursor:zoom-in;border-radius:50%">
+    <img src="<?= h($u['foto']) ?>" alt="Foto de <?= h($u['nome']) ?>" width="64" height="64" style="display:block;border-radius:50%;object-fit:cover" referrerpolicy="no-referrer" onerror="this.closest('button').remove()">
+  </button>
+  <dialog id="foto-grande" onclick="this.close()" style="padding:0;border:0;background:transparent;max-width:95vw;max-height:95vh;cursor:zoom-out">
+    <img src="<?= h($foto_grande) ?>" alt="Foto de <?= h($u['nome']) ?>" loading="lazy" referrerpolicy="no-referrer"
+      onerror="if (this.src !== <?= h(json_encode($u['foto'])) ?>) this.src = <?= h(json_encode($u['foto'])) ?>"
+      style="display:block;max-width:95vw;max-height:90vh;border-radius:8px">
+    <p style="margin:6px 0 0;text-align:center;color:#fff;font-size:14px">Clique ou aperte Esc para fechar</p>
+  </dialog>
+  <style>#foto-grande::backdrop{background:rgba(0,0,0,.8)}</style>
   <?php endif ?>
   <div>
     <h1 style="margin:0"><?= h($u['nome']) ?></h1>
