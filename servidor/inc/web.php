@@ -24,7 +24,10 @@ const WEB_CACHE_SEGUNDOS = 3600;    // listas guardadas prontas por 1 hora (VPS 
 /** Devolve o HTML guardado (até 1 h) ou gera com $gerar (que dá echo) e guarda. Sem pasta gravável, só gera. */
 function web_cache(string $chave, callable $gerar, int $segundos = WEB_CACHE_SEGUNDOS): string {
     $dir = web_cache_dir();
-    $arq = $dir ? "$dir/" . hash('sha256', $chave . '|' . hoje()) . '.html' : null;   // hoje(): a ordem muda todo dia
+    // 23/11 (passo 76): o nome do arquivo começa pelo tipo e pela cidade ("cidade-sao-joao-…", "lista-aguai-…"), para
+    // aprovar uma ficha apagar só as páginas da cidade dela (web_cache_limpar_cidade) e não o site inteiro
+    $pre = implode('-', array_slice(explode('|', preg_replace('/[^a-z0-9|-]+/', '', strtolower($chave))), 0, 2));
+    $arq = $dir ? "$dir/" . ($pre !== '' ? "$pre-" : '') . hash('sha256', $chave . '|' . hoje()) . '.html' : null;   // hoje(): a ordem muda todo dia
     if ($arq && is_file($arq) && filemtime($arq) > time() - $segundos) return (string)file_get_contents($arq);
     ob_start();
     $gerar();
@@ -737,6 +740,8 @@ function web_pagina_ficha(array $p): void {
       <div class="ficha-colunas">
         <div>
           <?php if ($p['descricao']): ?><h2>Sobre</h2><p><?= nl2br(h($p['descricao'])) ?></p>
+          <?php elseif (!empty($p['sobre_cortado'])): // 23/11 (passo 76): sem o Básico, só o começo do Sobre ?><h2>Sobre</h2><p><?= h($p['sobre_site']) ?></p>
+            <p class="sobre-trancado">🔒 O texto completo sobre este comércio aparece com o plano Básico.<?php if (!empty($c['linkAssumir'])): ?> <a href="<?= h($c['linkAssumir']) ?>" rel="nofollow">É o dono? Veja os planos</a><?php endif ?></p>
           <?php elseif (!empty($p['sobre_site'])): // 22/11 (passo 55, E): texto do site do próprio comércio, aprovado no admin ?><h2>Sobre</h2><p><?= h($p['sobre_site']) ?></p>
             <p class="discreto">Do site do comércio<?php if (!empty($p['sobre_site_url'])): ?>: <a href="<?= h($p['sobre_site_url']) ?>" rel="nofollow noopener" target="_blank"><?= h(preg_replace('#^www\.#', '', (string)parse_url($p['sobre_site_url'], PHP_URL_HOST))) ?></a><?php endif ?></p><?php endif ?>
           <?php if ($c['servicos']): ?><h2>O que faz ou vende</h2><p class="chips chips-texto"><?php foreach ($c['servicos'] as $s): ?><span><?= h($s) ?></span><?php endforeach ?></p><?php endif ?>

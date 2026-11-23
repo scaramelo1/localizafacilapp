@@ -36,7 +36,7 @@ if (e_post()) {
         q("UPDATE pedidos SET status = 'feito' WHERE id = ?", [$id]);
         registrar((int)$admin['id'], 'incluiu', (int)$p['id'], 'pedido ' . $id);
         acesso_do_incluir(['status' => 'feito'] + $pe);   // passo 93: quem incluiu já entra no painel com a conta Google
-        web_cache_limpar();
+        web_cache_limpar_ficha((int)$p['id']);
         $n = avisar_usuario(isset($pe['usuario_id']) ? (int)$pe['usuario_id'] : null, 'Seu comércio foi aceito!',
             "{$p['nome']} já aparece no Localiza Fácil. Toque para ver.", ['tela' => 'profissional', 'id' => (int)$p['id']]);
         flash($p['nome'] . ' já aparece no app. ' . ($n ? 'A pessoa recebeu o aviso no celular; ' : '') . 'Avise também pelo WhatsApp abaixo.');

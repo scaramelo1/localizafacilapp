@@ -118,7 +118,7 @@ if (e_post()) {
         $pend = alteracao_pendente($id);   // arquivos de um pedido do dono ainda pendente ficam
         apagar_fotos_sobrando(arquivos_dos_campos($p), array_merge(arquivos_dos_campos($agora), arquivos_dos_campos($pend['novos'] ?? [])));
         registrar((int)$admin['id'], 'editou_comercio', $id, implode(', ', array_keys($dados)));
-        web_cache_limpar();
+        array_key_exists('cidade', $dados) ? web_cache_limpar() : web_cache_limpar_ficha($id);   // passo 76: mudou de cidade = tudo
         // 19/11: quem pediu "Quer saber quando colocarem...?" é avisado também quando o admin completa a ficha
         $avisados = 0;
         try { require_once __DIR__ . '/../../inc/avisos-info.php'; $avisados = avisar_infos_completas([$id]); }

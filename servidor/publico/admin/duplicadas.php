@@ -35,7 +35,7 @@ if (e_post()) {
         // as que não foram marcadas para sair: "não são a mesma" que a que fica (o grupo sai da lista)
         foreach (array_diff($ids, $sai, [$fica]) as $o)
             q("INSERT IGNORE INTO fichas_iguais (a_id, b_id, situacao, decidido_em, decidido_por) VALUES (?, ?, 'diferentes', NOW(), ?)", [min($fica, $o), max($fica, $o), $admin['id']]);
-        web_cache_limpar();
+        web_cache_limpar_ficha($fica);   // passo 76: só a cidade (as repetidas são sempre da mesma cidade)
         if ($erros) dup_resposta(implode(' ', $erros), count($erros) === count($sai) ? 'erro' : 'ok', $voltar, 'aprovado');
         $nome = nome_curto((string)valor('SELECT nome FROM profissionais WHERE id = ?', [$fica]));
         dup_resposta('✅ Juntadas em ' . $nome . " (#$fica): " . count($sai) . ' ficha' . (count($sai) > 1 ? 's saíram' : ' saiu') . '.', 'ok', $voltar, 'aprovado');
@@ -47,7 +47,7 @@ if (e_post()) {
         dup_resposta('Marcadas como lojas diferentes.', 'ok', $voltar, 'recusado');
     } elseif ($acao === 'desfazer') {
         $e = dup_desfazer((int)($_POST['a'] ?? 0), (int)($_POST['b'] ?? 0), (int)$admin['id']);
-        web_cache_limpar();
+        web_cache_limpar_ficha((int)($_POST['a'] ?? 0));
         dup_resposta($e ?? 'Desfeito: a ficha voltou para o app.', $e ? 'erro' : 'ok', $voltar, 'recusado');
     } elseif ($acao === 'reabrir') {
         q("DELETE FROM fichas_iguais WHERE a_id = ? AND b_id = ? AND situacao = 'diferentes'", [(int)($_POST['a'] ?? 0), (int)($_POST['b'] ?? 0)]);

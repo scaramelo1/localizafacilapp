@@ -10,7 +10,8 @@ $termo = trim(mb_substr((string)($_GET['q'] ?? ''), 0, 60));
 $achados = $cidade && mb_strlen($termo) >= 2 ? buscar($termo, $cidade, 30) : [];
 $base = config()['url'];
 
-pagina_inicio('Procure seu negócio | Localiza Fácil App', 'Ache o seu comércio no Localiza Fácil e confira os planos para corrigir os dados e colocar fotos.');
+// 23/11 (passo 76): ferramenta do dono, não é conteúdo: fora do Google (cada cidade + termo virava uma página repetida)
+pagina_inicio('Procure seu negócio | Localiza Fácil App', 'Ache o seu comércio no Localiza Fácil e confira os planos para corrigir os dados e colocar fotos.', '', ['noindex' => true]);
 ?>
 <main class="documento">
   <h1>Procure seu negócio</h1>

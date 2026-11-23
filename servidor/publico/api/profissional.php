@@ -18,6 +18,7 @@ $r = prof_completo($p, ($u = usuario_app()) ? (int)$u['id'] : null);
 // 23/11 (passo 60): o mesmo conteúdo próprio da ficha do site (passo 55). Apps antigos ignoram estes campos.
 require_once __DIR__ . '/../../inc/web.php';
 $r['sobreSite'] = !$p['descricao'] && !empty($p['sobre_site']) ? (string)$p['sobre_site'] : null;
+$r['sobreCortado'] = !empty($p['sobre_cortado']);   // 23/11 (passo 76): só o começo (sem o Básico); apps antigos ignoram
 $r['sobreSiteDe'] = $r['sobreSite'] && !empty($p['sobre_site_url'])
     ? preg_replace('#^www\.#', '', (string)parse_url((string)$p['sobre_site_url'], PHP_URL_HOST)) : null;
 $r['localizacao'] = web_local_texto($p, nome_cidade((string)$p['cidade'])) ?: null;

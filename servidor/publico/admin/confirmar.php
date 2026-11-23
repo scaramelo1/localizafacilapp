@@ -44,7 +44,7 @@ if (e_post()) {
         marcar_confirmada($id, 'equipe');
         q('DELETE FROM confirmar_fila WHERE profissional_id = ?', [$id]);
         registrar((int)$admin['id'], 'confirmou_ficha', $id, 'por telefone');
-        web_cache_limpar();
+        web_cache_limpar_ficha($id);
         flash("✅ $nome confirmado" . ($dados ? ' (com correção)' : '') . '.');
     } elseif ($acao === 'nao_atende') {
         fila_marcar($id, 'nao_atende', (int)$admin['id'], FILA_DIAS_NAO_ATENDE);
@@ -54,7 +54,7 @@ if (e_post()) {
         q("UPDATE profissionais SET status = 'pausado' WHERE id = ?", [$id]);
         fila_marcar($id, 'fechou', (int)$admin['id'], 36500);
         registrar((int)$admin['id'], 'fila_fechou', $id, 'tirado do site (pausado)');
-        web_cache_limpar();
+        web_cache_limpar_ficha($id);
         flash("❌ $nome saiu do site (pausado). Dá para voltar em Comércios > editar.");
     } elseif ($acao === 'link') {
         $url = confirmacao_criar_link($id, (int)$admin['id']);

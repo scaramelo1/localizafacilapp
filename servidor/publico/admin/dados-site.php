@@ -76,7 +76,7 @@ if (e_post()) {
         foreach ($recusados as $c)
             q("UPDATE dados_site SET situacao = 'recusado', decidido_em = NOW(), decidido_por = ? WHERE profissional_id = ? AND campo = ?", [$admin['id'], $id, $c]);
         registrar((int)$admin['id'], 'dados_site_aprovado', $id, 'aprovado: ' . (implode(', ', $feitos) ?: 'nada') . ' · recusado: ' . (implode(', ', $recusados) ?: 'nada'));
-        if ($feitos) web_cache_limpar();
+        if ($feitos) web_cache_limpar_ficha($id);   // passo 76: só a cidade
         ds_resposta($feitos ? "✅ $nome: " . implode(', ', $feitos) . ' na ficha' . ($recusados ? ' (' . count($recusados) . ' recusado' . (count($recusados) > 1 ? 's' : '') . ')' : '') . '.' : "$nome: recusado.",
             'ok', $voltar, $feitos ? 'aprovado' : 'recusado');
     } elseif ($acao === 'desfazer') {
@@ -88,7 +88,7 @@ if (e_post()) {
         if ((string)$p[$col] === (string)$it['valor']) q("UPDATE profissionais SET $col = ? WHERE id = ?", [$it['valor_antes'] !== '' ? $it['valor_antes'] : null, $id]);
         q("UPDATE dados_site SET situacao = 'recusado', decidido_em = NOW(), decidido_por = ? WHERE id = ?", [$admin['id'], $it['id']]);
         registrar((int)$admin['id'], 'dados_site_desfeito', $id, DS_CAMPOS[$c]);
-        web_cache_limpar();
+        web_cache_limpar_ficha($id);
         ds_resposta("$nome: " . DS_CAMPOS[$c] . ' voltou ao que era.', 'ok', $voltar, 'recusado');
     } elseif ($acao === 'dispensar') {
         // sai dos Recusados e a ficha volta para a próxima leitura do robô

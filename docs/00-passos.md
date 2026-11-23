@@ -504,3 +504,18 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     cidade: Pouso Alegre, Itajubá, Franco da Rocha, Conceição dos Ouros; texto que não é do comércio). Decisões em
     /var/lib/guia-novo/backups/sobre-decisao-23-11.txt; cópia antes: antes-sobre-lote-20261123-150111.sql.gz. Só aparece
     com o Básico pago (passo 72).
+76. ✅ Reavaliação 23/11 (2ª do dia) e correções pedidas pelo usuário. Notas: inicial 8, cidade 8, categoria 7,5, ficha paga 8,
+    ficha não paga com site 6 (perdeu o Sobre), ficha vazia 4,5, velocidade 7 (sem cache 1,5–6 s), dados 6, app 7.
+    Feito:
+    a) Começo do Sobre aberto para todos (sobre_inicio()/ficha_publica() em inc/guia.php): 1ª frase curta ou ~100 letras
+       + "🔒 O texto completo... aparece com o plano Básico"; vai também na descrição para o Google e no app
+       (api sobreSite + sobreCortado). Instagram, Facebook, serviços e atende em casa continuam trancados.
+    b) Cache por cidade: o arquivo do cache leva o tipo e a cidade no nome; aprovar algo de uma ficha (horário, dados,
+       repetidas, confirmar, editar, acesso do dono) apaga só as páginas da cidade dela (web_cache_limpar_ficha).
+       servidor/aquecer-cache.php de 10 em 10 min (cron) deixa cidade e áreas prontas (64 páginas em ~16 s).
+    c) Santa Rita nas ondas: veio sem avaliações do Maps (popularidade 0). SQL_PESO_GOOGLE: lá a fila usa nota pelos
+       dados (site 3, horário 3, WhatsApp 2, Sobre 2, e-mail 1, ponto exato 1; 5+). 16 -> 101 fichas no Google, 292 na
+       fila. Outras cidades sem mudança. Quando o robô trouxer as avaliações de Santa Rita, tirar a cidade do CASE.
+    d) busca.php com noindex (ferramenta do dono, cada cidade + termo virava página repetida).
+    Falta: 3) ondas priorizando horário/WhatsApp/e-mail; 6) API categoria em páginas (540 KB em Saúde Poços; precisa app
+    novo); 5) gerar e publicar o APK 1.16.0 no PC (site ainda oferece o 1.15.0).

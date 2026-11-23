@@ -849,3 +849,7 @@ body.sem-rolagem { overflow: hidden; }
 .perto-texto small { color: var(--texto2); }
 .perto-dist { flex: none; font-weight: 800; color: var(--verde); font-size: .9rem; }
 .ficha-local { margin-top: 0; }
+
+/* 23/11 (passo 76): começo do Sobre aberto, o resto com o Básico */
+.sobre-trancado { margin: -4px 0 14px; font-size: .9em; color: var(--texto-2, #5c5c5c); }
+.sobre-trancado a { font-weight: 700; }

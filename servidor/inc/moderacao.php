@@ -107,7 +107,7 @@ function liberar_acesso(int $profissional_id, ?int $pedido_id, string $nome, ?st
     inserir('acessos_dono', ['profissional_id' => $profissional_id, 'pedido_id' => $pedido_id, 'nome' => mb_substr($nome, 0, 120),
         'telefone' => $telefone, 'token_hash' => hash('sha256', $token), 'admin_id' => $admin_id]);
     registrar($admin_id, 'liberou_acesso', $profissional_id, $nome);
-    web_cache_limpar();   // a ficha deixa de mostrar "Este comércio é seu?"
+    web_cache_limpar_ficha($profissional_id);   // a ficha deixa de mostrar "Este comércio é seu?"
     return url_publica('painel/?t=' . $token);
 }
 
@@ -140,7 +140,7 @@ function assumir_gratis(array $prof, ?int $usuario_id, string $nome, string $tel
     $id = inserir('acessos_dono', ['profissional_id' => $prof['id'], 'pedido_id' => $pedido_id, 'nome' => mb_substr($nome, 0, 120),
         'telefone' => $telefone, 'token_hash' => hash('sha256', random_bytes(32))]);
     registrar(null, 'acesso_gratis', (int)$prof['id'], $nome);
-    web_cache_limpar();   // a ficha deixa de mostrar "Este comércio é seu?" e ganha o selo
+    web_cache_limpar_ficha((int)$prof['id']);   // a ficha deixa de mostrar "Este comércio é seu?" e ganha o selo
     return $id;
 }
 
@@ -155,7 +155,7 @@ function acesso_do_incluir(array $pe): ?int {
     $id = inserir('acessos_dono', ['profissional_id' => $pe['profissional_id'], 'pedido_id' => $pe['id'], 'nome' => mb_substr((string)$pe['nome'], 0, 120),
         'telefone' => $pe['telefone'], 'token_hash' => hash('sha256', random_bytes(32))]);
     registrar(null, 'acesso_incluir', (int)$pe['profissional_id'], $pe['nome'] . ' (incluiu o negócio)');
-    web_cache_limpar();
+    web_cache_limpar_ficha((int)$pe['profissional_id']);
     return $id;
 }
 
@@ -351,7 +351,7 @@ function aprovar_alteracao(int $id, int $admin_id): void {
     // logo ou fotos trocados: apaga os arquivos antigos que saíram do app
     $agora = linha('SELECT foto, fotos FROM profissionais WHERE id = ?', [$a['profissional_id']]);
     apagar_fotos_sobrando(arquivos_dos_campos($prof), arquivos_dos_campos($agora));
-    web_cache_limpar();   // as páginas públicas mostram o dado novo na hora
+    web_cache_limpar_ficha((int)$a['profissional_id']);   // as páginas públicas da cidade mostram o dado novo na hora
     email_alteracao_decidida($a, true, null);
     // passo 65: avisa quem pediu "me avise quando colocar o WhatsApp/horário/fotos"
     try { require_once __DIR__ . '/avisos-info.php'; avisar_infos_completas([(int)$a['profissional_id']]); }

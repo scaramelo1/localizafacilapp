@@ -37,7 +37,7 @@ if (e_post()) {
         q("UPDATE horario_site SET horarios = ?, situacao = 'aprovado', decidido_em = NOW(), decidido_por = ? WHERE profissional_id = ?", [$hor, $admin['id'], $id]);
         q('UPDATE profissionais SET horarios = ?, horario = ? WHERE id = ?', [$hor, horarios_texto(horarios_ler($hor)), $id]);
         registrar((int)$admin['id'], 'horario_site_aprovado', $id, horarios_texto(horarios_ler($hor)));
-        web_cache_limpar();   // as listas mostram "Aberto agora" e o selo do horário
+        web_cache_limpar_ficha($id);   // as listas da cidade mostram "Aberto agora" e o selo do horário (passo 76: só a cidade)
         hs_resposta("✅ $nome: horário na ficha (" . horarios_texto(horarios_ler($hor)) . ').', 'ok', $voltar, 'aprovado');
     } elseif ($acao === 'recusar') {
         q("UPDATE horario_site SET situacao = 'recusado', decidido_em = NOW(), decidido_por = ? WHERE profissional_id = ?", [$admin['id'], $id]);
@@ -53,7 +53,7 @@ if (e_post()) {
         if ((string)$s['horarios_ficha'] === (string)$s['horarios']) q('UPDATE profissionais SET horarios = NULL, horario = NULL WHERE id = ?', [$id]);
         q("UPDATE horario_site SET situacao = 'recusado', decidido_em = NOW(), decidido_por = ? WHERE profissional_id = ?", [$admin['id'], $id]);
         registrar((int)$admin['id'], 'horario_site_desfeito', $id);
-        web_cache_limpar();
+        web_cache_limpar_ficha($id);
         hs_resposta("$nome: horário tirado da ficha.", 'ok', $voltar, 'recusado');
     }
     hs_resposta('Ação desconhecida.', 'erro', $voltar);

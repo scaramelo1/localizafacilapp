@@ -184,6 +184,15 @@ function confirmacao_por_cidade(): array {
  */
 const GOOGLE_ONDA = 100;            // fichas por cidade em cada onda (1 onda por semana)
 const GOOGLE_MIN_AVALIACOES = 5;    // avaliações no Google para entrar na fila sem confirmação
+/**
+ * 23/11 (passo 76): cidades que vieram SEM o número de avaliações do Google Maps (popularidade 0 em todas): a fila das
+ * ondas usa uma nota pelos dados da ficha (site 3, horário 3, WhatsApp 2, Sobre do site 2, e-mail 1, ponto exato 1;
+ * entra com 5+). Sem isso Santa Rita ficava com 16 fichas no Google e fila vazia. Quando o robô trouxer as avaliações,
+ * tirar a cidade do CASE abaixo. Nas outras cidades nada muda (a ordem continua pelas avaliações).
+ */
+const SQL_PESO_GOOGLE = "(CASE WHEN p.cidade IN ('santa-rita-do-sapucai') THEN GREATEST(p.popularidade, (COALESCE(p.site, '') <> '') * 3
+    + (p.horarios IS NOT NULL AND p.horarios NOT IN ('', '[]', '{}')) * 3 + (COALESCE(p.whatsapp, '') <> '') * 2
+    + (COALESCE(p.sobre_site, '') <> '') * 2 + (COALESCE(p.email_contato, '') <> '') + (p.geo_origem = 'google')) ELSE p.popularidade END)";
 /** 20/11 (pedido do usuário): ordem das áreas na fila do Google. Dentro de cada área, das mais conhecidas para as menos. */
 const GOOGLE_PRIORIDADE_AREAS = ['veiculos', 'saude', 'alimentacao', 'casa', 'mercados', 'lojas'];   // depois: todas as outras
 /** SQL com o lugar da área na fila (1 = Veículos ... 7 = outras), pelo id da categoria (não precisa do JOIN). */
@@ -253,14 +262,14 @@ function google_cortes(): array {
     if (($c['onda'] ?? 0) === $onda && ($c['quando'] ?? 0) > time() - 3600 && ($c['cidades'] ?? null) === cidades_no_google())
         return $r = $c['cortes'];
     $prio = sql_prioridade_area();
-    $base = "p.status = 'ativo' AND " . SQL_TEM_CONTATO . ' AND p.popularidade >= ' . GOOGLE_MIN_AVALIACOES;
+    $base = "p.status = 'ativo' AND " . SQL_TEM_CONTATO . ' AND ' . SQL_PESO_GOOGLE . ' >= ' . GOOGLE_MIN_AVALIACOES;
     foreach (cidades_no_google() as $cid) {
         $fila = array_map('intval', array_column(linhas("SELECT $prio AS g, COUNT(*) AS n FROM profissionais p WHERE p.cidade = ? AND $base GROUP BY g", [$cid]), 'n', 'g'));
         foreach (google_dividir($onda, $fila) as $g => $n) {
             if ($n < 1) continue;
             if ($n >= ($fila[$g] ?? 0)) { $r[$cid][$g] = null; continue; }
-            $l = linha("SELECT p.popularidade, p.id FROM profissionais p WHERE p.cidade = ? AND $base AND $prio = ?
-                ORDER BY p.popularidade DESC, p.id ASC LIMIT 1 OFFSET " . ($n - 1), [$cid, $g]);
+            $l = linha("SELECT " . SQL_PESO_GOOGLE . " AS popularidade, p.id FROM profissionais p WHERE p.cidade = ? AND $base AND $prio = ?
+                ORDER BY " . SQL_PESO_GOOGLE . " DESC, p.id ASC LIMIT 1 OFFSET " . ($n - 1), [$cid, $g]);
             if ($l) $r[$cid][$g] = [(int)$l['popularidade'], (int)$l['id']];
         }
         $r[$cid] ??= [];
@@ -278,17 +287,17 @@ function sql_no_google(): string {
     foreach ($cortes as $c => $grupos) {
         $partes = [];
         foreach ($grupos as $g => $corte)
-            $partes[] = "($prio = " . (int)$g . ($corte ? " AND (p.popularidade > {$corte[0]} OR (p.popularidade = {$corte[0]} AND p.id <= {$corte[1]}))" : '') . ')';
+            $partes[] = "($prio = " . (int)$g . ($corte ? " AND (" . SQL_PESO_GOOGLE . " > {$corte[0]} OR (" . SQL_PESO_GOOGLE . " = {$corte[0]} AND p.id <= {$corte[1]}))" : '') . ')';
         if ($partes) $fila[] = "(p.cidade = '$c' AND (" . implode(' OR ', $partes) . '))';
     }
     return '(' . SQL_TEM_CONTATO . " AND p.cidade IN ('" . implode("','", array_keys($cortes)) . "') AND (" . SQL_CONFIRMADA
-        . ($fila ? ' OR (p.popularidade >= ' . GOOGLE_MIN_AVALIACOES . ' AND (' . implode(' OR ', $fila) . '))' : '') . '))';
+        . ($fila ? ' OR (' . SQL_PESO_GOOGLE . ' >= ' . GOOGLE_MIN_AVALIACOES . ' AND (' . implode(' OR ', $fila) . '))' : '') . '))';
 }
 /** Quantas fichas de cada cidade estão no Google e quantas esperam na fila. */
 function google_ondas_por_cidade(): array {
     $r = [];
     $no = sql_no_google();
-    foreach (linhas("SELECT p.cidade, SUM($no) AS no_google, SUM(" . SQL_TEM_CONTATO . ' AND p.popularidade >= ' . GOOGLE_MIN_AVALIACOES . " AND NOT ($no)) AS na_fila
+    foreach (linhas("SELECT p.cidade, SUM($no) AS no_google, SUM(" . SQL_TEM_CONTATO . ' AND ' . SQL_PESO_GOOGLE . ' >= ' . GOOGLE_MIN_AVALIACOES . " AND NOT ($no)) AS na_fila
         FROM profissionais p WHERE p.status = 'ativo' GROUP BY p.cidade") as $l) $r[$l['cidade']] = ['no_google' => (int)$l['no_google'], 'na_fila' => (int)$l['na_fila']];
     return $r;
 }
@@ -310,11 +319,30 @@ function basico_liberado(array $p): bool {
     if (array_key_exists('destaque_pago', $p) || empty($p['id'])) return false;
     return (bool)valor('SELECT ' . SQL_DESTAQUE . ' FROM profissionais p WHERE p.id = ?', [(int)$p['id']]);
 }
-/** A ficha como o público pode ver: sem os campos do Básico se não pagou. */
+/**
+ * 23/11 (passo 76, pedido do usuário): o começo do Sobre fica aberto para todos (o Google precisa de um texto próprio
+ * em cada ficha; todo mundo vê a mesma coisa, então não é "cloaking"). A 1ª frase, se for curta e houver mais texto
+ * depois; senão até ~100 letras (no máximo 60% do texto), cortando na palavra. O resto é do Básico.
+ */
+function sobre_inicio(string $t): string {
+    $t = trim(preg_replace('/\s+/u', ' ', $t));
+    $n = mb_strlen($t);
+    if (preg_match('/^(.{30,130}?[.!?])(?=\s|$)/u', $t, $m) && mb_strlen($m[1]) <= $n * 0.7) return $m[1] . ' …';
+    $lim = (int)min(100, floor($n * 0.6));
+    $c = mb_substr($t, 0, $lim);
+    $c = preg_replace('/\s+\S*$/u', '', $c) ?: $c;
+    return rtrim($c, " ,;:-–—") . '…';
+}
+/** A ficha como o público pode ver: sem os campos do Básico se não pagou (do Sobre, só o começo). */
 function ficha_publica(array $p): array {
     $lib = basico_liberado($p);
     $p['basico_liberado'] = $lib;
-    if (!$lib) foreach (CAMPOS_DO_BASICO as $c) if (array_key_exists($c, $p)) $p[$c] = $c === 'atende_em_casa' ? 0 : null;
+    $p['sobre_cortado'] = false;
+    if (!$lib) {
+        $sobre = trim((string)(($p['descricao'] ?? '') ?: ($p['sobre_site'] ?? '')));
+        foreach (CAMPOS_DO_BASICO as $c) if (array_key_exists($c, $p)) $p[$c] = $c === 'atende_em_casa' ? 0 : null;
+        if ($sobre !== '' && mb_strlen($sobre) >= 40) { $p['sobre_site'] = sobre_inicio($sobre); $p['sobre_cortado'] = true; }
+    }
     return $p;
 }
 function tem_dono(array $p): bool {
@@ -625,6 +653,21 @@ function web_cache_dir(): ?string {
     $d = config()['dados_dir'] . '/cache/web';
     if (!is_dir($d)) @mkdir($d, 0750, true);
     return is_dir($d) && is_writable($d) ? $d : null;
+}
+/**
+ * 23/11 (passo 76): apaga só as páginas da cidade (cidade, áreas, tipos, eventos) e a página inicial. Usado quando o
+ * admin aprova algo de UMA ficha: antes cada clique apagava o site todo e o Google pegava páginas lentas (1,5 a 6 s).
+ */
+function web_cache_limpar_cidade(string $cidade): void {
+    $dir = web_cache_dir();
+    if (!$dir || !preg_match('/^[a-z0-9-]+$/', $cidade)) return;
+    foreach (['cidade', 'lista', 'eventos'] as $t) foreach (glob("$dir/$t-$cidade-*.html") ?: [] as $f) @unlink($f);
+    foreach (glob("$dir/inicio-dados-*.html") ?: [] as $f) @unlink($f);
+}
+/** A cidade da ficha e limpa só ela. */
+function web_cache_limpar_ficha(int $id): void {
+    $c = valor('SELECT cidade FROM profissionais WHERE id = ?', [$id]);
+    $c ? web_cache_limpar_cidade((string)$c) : web_cache_limpar();
 }
 /** Apaga as páginas guardadas (todas, ou só as mais velhas que $idade segundos). */
 function web_cache_limpar(int $idade = 0): void {

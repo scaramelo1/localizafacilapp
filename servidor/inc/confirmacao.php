@@ -52,7 +52,7 @@ function confirmacao_registrar_uso(array $link, string $resultado): void {
     marcar_confirmada((int)$link['profissional_id'], 'dono');
     q('DELETE FROM confirmar_fila WHERE profissional_id = ?', [(int)$link['profissional_id']]);
     registrar(null, $resultado === 'ok' ? 'dono_confirmou_link' : 'dono_corrigiu_link', (int)$link['profissional_id']);
-    web_cache_limpar();
+    web_cache_limpar_ficha((int)$link['profissional_id']);
 }
 /** Correção mandada pelo link: vira alteração pendente (o admin aprova em Pendências), sem acesso de dono. */
 function confirmacao_propor(array $p, array $valores): ?int {
