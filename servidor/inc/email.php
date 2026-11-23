@@ -123,7 +123,7 @@ function email_html(array $e): string {
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F4F6F1"><tr><td align="center" style="padding:24px 12px">'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#FFFFFF;border-radius:12px;overflow:hidden">'
         . '<tr><td style="background:#005C38;padding:18px 24px"><a href="' . h($site) . '" style="text-decoration:none;color:#FFFFFF;font-size:22px;font-weight:bold;font-style:italic">'
-        . '<img src="' . h($logo) . '" width="32" height="32" alt="" style="vertical-align:middle;border:0;margin-right:8px">Localiza <span style="color:#F7C600">Fácil</span></a></td></tr>'
+        . '<img src="' . h($logo) . '" width="32" height="32" alt="" style="vertical-align:middle;border:0;margin-right:8px">Localiza <span style="color:#F7C600">Fácil</span> App</a></td></tr>'
         . '<tr><td style="padding:28px 24px 12px;font-size:16px;line-height:1.55">' . email_texto_html($e['texto']) . '</td></tr>'
         . '<tr><td style="padding:16px 24px 24px;border-top:1px solid #E2E6DF;font-size:12px;line-height:1.5;color:#5B675F">' . $rodape
         . '<br><a href="' . h($site) . '" style="color:#5B675F">' . h(preg_replace('~^https?://|/$~', '', $site)) . '</a></td></tr>'
