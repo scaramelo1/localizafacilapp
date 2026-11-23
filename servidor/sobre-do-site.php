@@ -25,27 +25,7 @@ $so_id = (int)(arg('id') ?? 0);
 
 require_once __DIR__ . '/inc/site-robo.php';   // 23/11: baixar, robots.txt e limpar texto ficaram em comum com horario-do-site.php
 
-/** [titulo, texto, motivo-se-não-serve] da página. */
-function sobre_extrair(string $html, string $nome): array {
-    $meta = function (string $chave) use ($html): string {
-        foreach (['/<meta[^>]+(?:name|property)\s*=\s*["\']' . $chave . '["\'][^>]*content\s*=\s*["\']([^"\']*)["\']/is',
-                  '/<meta[^>]+content\s*=\s*["\']([^"\']*)["\'][^>]*(?:name|property)\s*=\s*["\']' . $chave . '["\']/is'] as $re)
-            if (preg_match($re, $html, $m)) return sobre_limpar($m[1]);
-        return '';
-    };
-    preg_match('/<title[^>]*>(.*?)<\/title>/is', $html, $mt);
-    $titulo = sobre_limpar($mt[1] ?? '');
-    $texto = $meta('description');
-    $og = $meta('og:description');
-    if (mb_strlen($og) > mb_strlen($texto)) $texto = $og;
-    if ($texto === '') return [$titulo, '', 'o site não tem descrição'];
-    if (mb_strlen($texto) < 50) return [$titulo, $texto, 'descrição curta demais'];
-    if (preg_match(SOBRE_GENERICOS, $texto)) return [$titulo, $texto, 'texto padrão do criador de site'];
-    if (mb_strtolower($texto) === mb_strtolower($titulo)) return [$titulo, $texto, 'igual ao título'];
-    if (!preg_match('/\b(de|da|do|em|com|para|e|os|as|seu|sua|nossa|nosso)\b/iu', $texto)) return [$titulo, $texto, 'não parece português'];
-    if (mb_strlen($texto) > 500) $texto = rtrim(mb_substr($texto, 0, 497)) . '…';
-    return [$titulo, $texto, ''];
-}
+// sobre_extrair() fica em inc/site-robo.php (23/11: o robô dados-do-site.php usa o mesmo)
 
 $where = "p.status = 'ativo' AND p.site IS NOT NULL AND p.site <> ''";
 if ($so_id) $where .= ' AND p.id = ' . $so_id;

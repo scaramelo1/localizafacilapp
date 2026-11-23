@@ -99,7 +99,7 @@ function dup_pontos(array $p): array {
 
 /** Campos que a ficha que fica recebe da que sai quando ela não tem (só ficha sem dono; dado do dono não é mexido). */
 const DUP_COMPLETAR = ['whatsapp', 'telefone', 'site', 'instagram', 'email', 'endereco', 'bairro', 'mapa', 'horarios', 'horario',
-    'sobre_site', 'sobre_site_url', 'ifood', 'food99', 'cardapio'];
+    'sobre_site', 'sobre_site_url', 'ifood', 'food99', 'cardapio', 'email_contato', 'facebook'];
 
 /** Junta $sai em $fica. Devolve null se deu certo, ou o motivo de não juntar. */
 function dup_juntar(int $fica, int $sai, ?int $admin_id): ?string {

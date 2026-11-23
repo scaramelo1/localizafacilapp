@@ -454,3 +454,17 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     também em Saúde, Farmácia e Drogaria; a dos mercados também na área Mercados. Tudo só com o horário das fichas
     (nunca o horário do Google Maps). Hoje: só a Drogaria São Paulo (Poços) é 24 h; os 9 horários da Drogal são iguais
     (7h–23h, do site geral da rede).
+70. ⏳ Robô "Dados pelo site" (23/11, pedido do usuário). servidor/dados-do-site.php lê o site próprio do comércio UMA vez
+    (inicial + até 2 páginas de contato) e acha tudo menos fotos: WhatsApp (links wa.me), telefone (tel: e schema.org),
+    Instagram, Facebook, e-mail de contato (mailto:, schema.org, ou escrito na página com o domínio do site), o que faz ou
+    vende (schema.org ou lista debaixo de um título "Serviços"/"Especialidades"...) e endereço (schema.org, só se a ficha
+    está sem ou com endereço inválido, e só se a cidade bate). Também faz o Sobre e o horário das fichas que esses robôs
+    ainda não leram (vão para sobre_site / horario_site, aprovação nas telas de sempre). Link de quem fez o site
+    ("desenvolvido por", "agência") fica de fora. Mudança 045 (já aplicada; backup em /var/backups/guia-novo/):
+    profissionais.email_contato (o e-mail do site; profissionais.email é o LOGIN do dono e não é mexido), profissionais.facebook
+    (botão "Facebook" na ficha, conta como contato), tabelas dados_site e dados_site_lidos. Aprovação em Admin > Comércios >
+    "🧩 Dados pelo site" (/admin/dados-site.php): um quadro por ficha; "preencher" vem marcado, "diferente" (ficha já tem
+    outro) vem desmarcado, valor que aparece em outras fichas (rede/agência) ou DDD diferente vem desmarcado com aviso; dá
+    para corrigir o texto; desmarcado vai para Recusados (com Dispensar); Aprovados têm Desfazer por linha. Endereço novo
+    refaz o ponto do mapa (menos o exato do Google). Teste: 15 fichas -> 34 dados. Falta: o usuário rodar em todas
+    (~5.100 fichas com site, várias horas) e revisar. Cidade nova: --cidade=<slug>.

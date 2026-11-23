@@ -22,7 +22,7 @@ const PAGINAS_ENTRADA = ['inicio' => 'Página inicial', 'cidade' => 'Cidade', 'l
     'eventos' => 'Agenda de eventos', 'evento' => 'Evento', 'busca' => 'Busca', 'outra' => 'Outra página'];
 /** Onde a ficha foi mostrada numa lista. */
 const ONDE_APARICAO = ['inicio' => 'Tela inicial', 'categoria' => 'Categoria', 'busca' => 'Busca', 'perto' => 'Perto de você'];
-const TIPOS_CONTATO = ['whatsapp' => 'WhatsApp', 'ligar' => 'Ligar', 'mapa' => 'Mapa', 'instagram' => 'Instagram', 'site' => 'Site', 'email' => 'E-mail', 'ifood' => 'iFood', 'food99' => '99Food',
+const TIPOS_CONTATO = ['whatsapp' => 'WhatsApp', 'ligar' => 'Ligar', 'mapa' => 'Mapa', 'instagram' => 'Instagram', 'site' => 'Site', 'email' => 'E-mail', 'ifood' => 'iFood', 'food99' => '99Food', 'facebook' => 'Facebook',
     'compartilhar' => 'Compartilhar no WhatsApp'];   // 19/11 (mudança 032): compartilhar não entra no total de contatos
 /** Numa lista longa (área com 700 comércios) só contam as primeiras posições, que a pessoa de fato vê. */
 const APARICAO_MAX = 40;

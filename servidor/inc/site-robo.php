@@ -39,6 +39,29 @@ function sobre_limpar(string $t): string {
     return trim(preg_replace('/\s+/u', ' ', strip_tags($t)));
 }
 
+// ---------- Sobre: descrição que o próprio comércio escreveu (meta description / og:description) ----------
+/** [titulo, texto, motivo-se-não-serve] da página. */
+function sobre_extrair(string $html, string $nome): array {
+    $meta = function (string $chave) use ($html): string {
+        foreach (['/<meta[^>]+(?:name|property)\s*=\s*["\']' . $chave . '["\'][^>]*content\s*=\s*["\']([^"\']*)["\']/is',
+                  '/<meta[^>]+content\s*=\s*["\']([^"\']*)["\'][^>]*(?:name|property)\s*=\s*["\']' . $chave . '["\']/is'] as $re)
+            if (preg_match($re, $html, $m)) return sobre_limpar($m[1]);
+        return '';
+    };
+    preg_match('/<title[^>]*>(.*?)<\/title>/is', $html, $mt);
+    $titulo = sobre_limpar($mt[1] ?? '');
+    $texto = $meta('description');
+    $og = $meta('og:description');
+    if (mb_strlen($og) > mb_strlen($texto)) $texto = $og;
+    if ($texto === '') return [$titulo, '', 'o site não tem descrição'];
+    if (mb_strlen($texto) < 50) return [$titulo, $texto, 'descrição curta demais'];
+    if (preg_match(SOBRE_GENERICOS, $texto)) return [$titulo, $texto, 'texto padrão do criador de site'];
+    if (mb_strtolower($texto) === mb_strtolower($titulo)) return [$titulo, $texto, 'igual ao título'];
+    if (!preg_match('/\b(de|da|do|em|com|para|e|os|as|seu|sua|nossa|nosso)\b/iu', $texto)) return [$titulo, $texto, 'não parece português'];
+    if (mb_strlen($texto) > 500) $texto = rtrim(mb_substr($texto, 0, 497)) . '…';
+    return [$titulo, $texto, ''];
+}
+
 // ---------- horário escrito no site (23/11, passo 61) ----------
 // Lê o horário de dois jeitos: (1) dados estruturados do site (openingHoursSpecification / openingHours) e
 // (2) texto da página ("Segunda a sexta, das 8h às 18h", "SEG-SEX 08:00 - 18:00", "Sábado: 8h às 12h", "Domingo fechado").

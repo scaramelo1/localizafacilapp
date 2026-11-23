@@ -476,7 +476,8 @@ function prof_completo(array $p, ?int $usuario_id): array {
         'endereco' => $p['endereco'],
         'mapa' => $p['mapa'] ?: ($p['endereco'] ? 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($p['endereco'] . ', ' . nome_cidade($p['cidade']) . ' - ' . uf_cidade($p['cidade'])) : null),
         'site' => $p['site'],
-        'email' => $p['email'] ?: null,   // 22/11 (passo 40)
+        'email' => ($p['email'] ?? null) ?: (($p['email_contato'] ?? null) ?: null),   // 22/11 (passo 40); 23/11 (passo 70): ou o e-mail de contato do site
+        'facebook' => ($p['facebook'] ?? null) ?: null,   // 23/11 (passo 70): página do Facebook (link completo)
         // 22/11 (passo 41): pedir pelo iFood e pelo 99Food (só áreas de comida)
         'ifood' => !empty($p['ifood']) && e_area_comida((int)$p['categoria_id']) ? $p['ifood'] : null,
         'food99' => !empty($p['food99']) && e_area_comida((int)$p['categoria_id']) ? $p['food99'] : null,

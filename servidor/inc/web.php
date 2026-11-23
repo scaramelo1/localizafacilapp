@@ -597,7 +597,7 @@ function web_pagina_ficha(array $p): void {
         $ld['openingHoursSpecification'][] = ['@type' => 'OpeningHoursSpecification', 'dayOfWeek' => $nomes,
             'opens' => $v['sit'] === '24h' ? '00:00' : $v['abre'], 'closes' => $v['sit'] === '24h' ? '23:59' : $v['fecha']];
     }
-    $sameAs = array_values(array_filter([$c['instagram'], $p['site'] ?: null]));
+    $sameAs = array_values(array_filter([$c['instagram'], $c['facebook'] ?? null, $p['site'] ?: null]));
     if ($sameAs) $ld['sameAs'] = $sameAs;
 
     $sub = array_filter([$tipo ?? $p['categoria'], $p['bairro'], "$nome_cidade - $uf"]);
@@ -669,6 +669,7 @@ function web_pagina_ficha(array $p): void {
         <?php if ($p['telefone']): ?><a class="botao" href="tel:<?= h(telefone_discar($p['telefone'])) ?>" data-contato="ligar" rel="nofollow">Ligar <?= h($c['telefoneFormatado']) ?><?= telefone_central($p['telefone']) ? ' (central)' : '' ?></a><?php endif ?>
         <?php if ($c['mapa']): ?><a class="botao contorno" href="<?= h($c['mapa']) ?>" data-contato="mapa" rel="nofollow noopener" target="_blank">Como chegar</a><?php endif ?>
         <?php if ($c['instagram']): ?><a class="botao contorno" href="<?= h($c['instagram']) ?>" data-contato="instagram" rel="nofollow noopener" target="_blank">Instagram</a><?php endif ?>
+        <?php if (!empty($c['facebook'])): // 23/11 (passo 70) ?><a class="botao contorno" href="<?= h($c['facebook']) ?>" data-contato="facebook" rel="nofollow noopener" target="_blank">Facebook</a><?php endif ?>
         <?php // 22/11 (passo 41): pedir pelo iFood / 99Food (abre o app se estiver instalado; senão o site) ?>
         <?php if (!empty($c['ifood'])): ?><a class="botao botao-ifood" href="<?= h($c['ifood']) ?>" data-contato="ifood" rel="nofollow noopener" target="_blank">Pedir no iFood</a><?php endif ?>
         <?php if (!empty($c['food99'])): ?><a class="botao botao-99food" href="<?= h($c['food99']) ?>" data-contato="food99" rel="nofollow noopener" target="_blank">Pedir no 99Food</a><?php endif ?>
