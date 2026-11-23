@@ -424,9 +424,13 @@ function web_pagina_cidade(string $cidade): void {
         WHERE ' . visivel($cidade) . ' AND NOT ' . SQL_DESTAQUE . ' ORDER BY p.popularidade + p.total_avaliacoes * 5 DESC LIMIT 60) t
         ORDER BY RAND(?) LIMIT 12', [semente_dia()]);
     [$trilha, $ld] = web_trilha([["$nome - $uf", null]]);
+    // 23/11 (avaliação do site, item 8): "Conhecidos na cidade" também em formato de lista para o Google (igual às áreas)
+    $lista_ld = $populares ? ['@context' => 'https://schema.org', '@type' => 'ItemList', 'name' => "Conhecidos em $nome",
+        'itemListElement' => array_map(fn($p, $i) => ['@type' => 'ListItem', 'position' => $i + 1, 'url' => web_absoluta(url_ficha($p)), 'name' => $p['nome']],
+            $populares, array_keys($populares))] : null;
     pagina_inicio("Comércios e serviços em $nome - $uf | Localiza Fácil App",
         web_num($total) . " comércios e serviços de $nome ($uf): restaurantes, mercados, oficinas, clínicas, lojas e muito mais. Endereço, horário e WhatsApp.",
-        'web', ['canonica' => web_absoluta(url_cidade($cidade)), 'head' => web_json_ld($ld), 'anuncios' => true,
+        'web', ['canonica' => web_absoluta(url_cidade($cidade)), 'head' => $lista_ld ? web_json_ld($ld, $lista_ld) : web_json_ld($ld), 'anuncios' => true,
             'noindex' => !cidade_no_google($cidade)]);   // Plano D, passo 7
     ?>
 <main>
@@ -468,6 +472,8 @@ function web_pagina_cidade(string $cidade): void {
     <?= web_cartoes($populares) ?>
   </div></section>
   <?php endif ?>
+
+  <?= web_quadro_farmacias($cidade) // 23/11 (item 8, pedido do usuário): farmácias 24 horas ?>
 
   <?= web_conteudo_cidade($cidade, $areas) ?>
 

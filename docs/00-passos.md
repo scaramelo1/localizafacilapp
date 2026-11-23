@@ -445,3 +445,12 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     comércio") que abre os botões de cada item (<details>; abre sozinho ao voltar do login com ?avisar=). Sem avaliações,
     some o título "Avaliações de quem usa" e o "Ainda sem avaliações": fica só "Avaliar este comércio" com 1 frase.
     site.css v=67.
+69. ✅ Página da cidade (item 8) + farmácias 24 horas (23/11, pedido do usuário). "Conhecidos na cidade" também vai para
+    o Google como ItemList. Quadro "💊 Farmácias 24 horas em X" depois dos Conhecidos (web_quadro_farmacias, inc/web-conteudo.php):
+    farmácias/drogarias com 24 h todos os dias; sem nenhuma, "abertas no domingo"; sem nenhuma, "até mais tarde"; sem
+    horário nenhum, o quadro não aparece (Santa Rita). Perguntas novas na cidade: "Tem farmácia 24 horas em X?" (resposta
+    honesta: "nenhuma informou" + as que abrem domingo + links das farmácias e drogarias) e "Quais mercados abrem no
+    domingo?" (só supermercado/mercearia/empório/atacadista; a área Mercados tem bebidas). A pergunta da farmácia vai
+    também em Saúde, Farmácia e Drogaria; a dos mercados também na área Mercados. Tudo só com o horário das fichas
+    (nunca o horário do Google Maps). Hoje: só a Drogaria São Paulo (Poços) é 24 h; os 9 horários da Drogal são iguais
+    (7h–23h, do site geral da rede).

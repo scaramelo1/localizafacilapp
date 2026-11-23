@@ -127,6 +127,11 @@ function web_conteudo_lista(string $cidade, array $area, ?string $tipo): string 
         'O bairro ' . h($bairros[0]['bairro']) . ' tem mais: ' . web_qtd((int)$bairros[0]['total'], 'lugar', 'lugares') . '. Use o filtro de bairro acima da lista para ver só os de um bairro.'];
     $perguntas[] = ['Como falar com um lugar de ' . $o_que . '?',
         'Abra a ficha e toque em WhatsApp, Ligar ou Mapa. ' . ($num['contato'] ? web_pct($num['contato'], $total) . ' dos lugares desta lista têm telefone ou WhatsApp.' : '')];
+    // 23/11 (item 8): na lista de farmácias/drogarias (ou de Saúde), a pergunta da farmácia 24 horas
+    if (in_array($tipo, WEB_TIPOS_FARMACIA, true) || ($tipo === null && $area['slug'] === 'saude'))
+        $perguntas[] = ['Tem farmácia 24 horas em ' . $nome_cidade . '?', web_resposta_farmacia_24h($cidade)];
+    if ($tipo === null && $area['slug'] === 'mercados' && ($r = web_resposta_mercados_domingo($cidade)))
+        $perguntas[] = ['Quais mercados abrem no domingo em ' . $nome_cidade . '?', $r];
     if ($vizinhas) $perguntas[] = ['Tem ' . $o_que . ' em cidades perto de ' . $nome_cidade . '?',
         'Sim: ' . web_e(array_map(fn($v) => h(CIDADES[$v[0]][0]) . ' (' . web_num($v[2]) . ', a ' . (int)round($v[1]) . ' km)', array_slice($vizinhas, 0, 3))) . '.'];
 
@@ -175,6 +180,9 @@ function web_conteudo_cidade(string $cidade, array $areas): string {
     $perguntas = [['Quantos comércios há em ' . $nome . ' no Localiza Fácil?', web_qtd($total, 'lugar', 'lugares') . ' com endereço e contato, separados por área e tipo de negócio.']];
     if ($bairros) $perguntas[] = ['Quais bairros de ' . $nome . ' têm mais comércios?', web_e(array_map(fn($b) => h($b['bairro']) . ' (' . web_num((int)$b['total']) . ')', array_slice($bairros, 0, 4))) . '.'];
     if ($perto) $perguntas[] = ['Quais cidades ficam perto de ' . $nome . '?', web_e(array_map(fn($s, $km) => h(CIDADES[$s][0]) . ' (' . (int)round($km) . ' km)', array_keys(array_slice($perto, 0, 4, true)), array_slice($perto, 0, 4, true))) . ', em linha reta. Todas têm guia no Localiza Fácil.'];
+    // 23/11 (item 8): perguntas com resposta dos horários das fichas
+    $perguntas[] = ['Tem farmácia 24 horas em ' . $nome . '?', web_resposta_farmacia_24h($cidade)];
+    if ($r = web_resposta_mercados_domingo($cidade)) $perguntas[] = ['Quais mercados abrem no domingo em ' . $nome . '?', $r];
     $perguntas[] = ['Tenho um comércio em ' . $nome . '. Como apareço?', 'Procure o seu negócio na busca acima: se já estiver aqui, toque em "É o dono?". Se não estiver, <a href="' . h(url('incluir.php')) . '">inclua de graça</a>.'];
 
     ob_start(); ?>
@@ -194,4 +202,99 @@ function web_conteudo_cidade(string $cidade, array $areas): string {
   </div></section>
 <?php
     return (string)ob_get_clean();
+}
+
+// ---------- 23/11 (avaliação do site, item 8): farmácias 24 horas e o que abre no domingo, pelos horários das fichas ----------
+const WEB_TIPOS_FARMACIA = ['Farmácia', 'Drogaria'];
+
+/** Fichas visíveis da cidade com horário, deste tipo (lista) ou desta área (slug). Cada uma com 'h' = horarios_ler(). */
+function web_com_horario(string $cidade, ?array $tipos = null, ?string $area_slug = null): array {
+    static $cache = [];
+    $k = $cidade . '|' . json_encode($tipos) . '|' . $area_slug;
+    if (isset($cache[$k])) return $cache[$k];
+    $where = visivel($cidade) . " AND p.horarios IS NOT NULL AND p.horarios NOT IN ('', '[]', '{}')";
+    $args = [];
+    if ($tipos) { $where .= ' AND p.tipo IN (' . implode(',', array_fill(0, count($tipos), '?')) . ')'; $args = $tipos; }
+    if ($area_slug !== null) { $where .= ' AND c.slug = ?'; $args[] = $area_slug; }
+    $r = [];
+    foreach (linhas('SELECT ' . CAMPOS_RESUMO . ', p.popularidade FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE ' . $where
+        . ' ORDER BY ' . SQL_DESTAQUE . ' DESC, p.popularidade DESC, p.id', $args) as $p) {
+        $p['h'] = horarios_ler($p['horarios']);
+        if ($p['h']) $r[] = $p;
+    }
+    return $cache[$k] = $r;
+}
+/** Aberta 24 horas todos os dias (segunda a domingo). */
+function web_e_24h(array $h): bool {
+    foreach (['semana', 'sab', 'dom'] as $c) if (($h[$c]['sit'] ?? '') !== '24h') return false;
+    return true;
+}
+function web_abre_domingo(array $h): bool { return in_array($h['dom']['sit'] ?? '', ['aberto', '24h'], true); }
+/** Fecha às 22h ou depois (ou depois da meia-noite) de segunda a sexta. */
+function web_abre_noite(array $h): bool {
+    $s = $h['semana'] ?? null;
+    if (!$s) return false;
+    if ($s['sit'] === '24h') return true;
+    return $s['sit'] === 'aberto' && ($s['fecha'] >= '22:00' || $s['fecha'] < $s['abre']);
+}
+/** Farmácias e drogarias da cidade com horário: ['24h' => [...], 'domingo' => [...] (sem as 24h), 'noite' => [...] (sem as de antes)]. */
+function web_farmacias(string $cidade): array {
+    $com = web_com_horario($cidade, WEB_TIPOS_FARMACIA);
+    $r = ['24h' => [], 'domingo' => [], 'noite' => []];
+    foreach ($com as $p) {
+        if (web_e_24h($p['h'])) $r['24h'][] = $p;
+        elseif (web_abre_domingo($p['h'])) $r['domingo'][] = $p;
+        elseif (web_abre_noite($p['h'])) $r['noite'][] = $p;
+    }
+    return $r;
+}
+/** "as 37 farmácias e as 16 drogarias de X", com link para a lista de cada tipo. */
+function web_links_farmacias(string $cidade): string {
+    $partes = [];
+    foreach (WEB_TIPOS_FARMACIA as $t) {
+        $n = (int)valor('SELECT COUNT(*) FROM profissionais p JOIN categorias c ON c.id = p.categoria_id WHERE ' . visivel($cidade) . ' AND p.tipo = ?', [$t]);
+        if ($n) $partes[] = '<a href="' . h(url_tipo($cidade, 'saude', $t)) . '">' . ($n === 1 ? 'a ' . mb_strtolower($t) : 'as ' . web_num($n) . ' ' . mb_strtolower($t) . 's') . '</a>';
+    }
+    return web_e($partes) . ' de ' . h(CIDADES[$cidade][0]);
+}
+/** Nomes com link: "A, B e C". */
+function web_nomes_links(array $lista, int $max = 4): string {
+    return web_e(array_map(fn($p) => '<a href="' . h(url_ficha($p)) . '">' . h(nome_curto($p['nome'])) . '</a>' . ($p['bairro'] ? ' (' . h($p['bairro']) . ')' : ''), array_slice($lista, 0, $max)));
+}
+/** Resposta de "Tem farmácia 24 horas em X?" só com o que as fichas informam. */
+function web_resposta_farmacia_24h(string $cidade): string {
+    $nome = CIDADES[$cidade][0];
+    $f = web_farmacias($cidade);
+    $todas = web_links_farmacias($cidade);
+    if ($f['24h']) return (count($f['24h']) > 1 ? 'Sim. Informaram atendimento 24 horas, todos os dias: ' : 'Sim. Informou atendimento 24 horas, todos os dias: ')
+        . web_nomes_links($f['24h']) . '. Antes de ir, confirme pelo telefone. Veja também ' . $todas . '.';
+    $r = 'Nenhuma farmácia de ' . h($nome) . ' informou atendimento 24 horas no Localiza Fácil até agora.';
+    if ($f['domingo']) $r .= ' Abrem no domingo: ' . web_nomes_links($f['domingo']) . '.';
+    elseif ($f['noite']) $r .= ' Ficam abertas até mais tarde: ' . web_nomes_links($f['noite']) . '.';
+    return $r . ' Para a farmácia de plantão, ligue antes. Veja ' . $todas . '.';
+}
+/** Resposta de "Quais mercados abrem no domingo em X?", ou null se nenhum mercado informou o horário. */
+function web_resposta_mercados_domingo(string $cidade): ?string {
+    // só mercado de verdade (a área Mercados também tem loja de bebidas e distribuidora)
+    $com = array_values(array_filter(web_com_horario($cidade, null, 'mercados'), fn($p) => preg_match('/mercado|mercearia|hortifr|sacol|emp[óo]rio|atacad/iu', (string)$p['tipo'])));
+    if (!$com) return null;
+    $dom = array_values(array_filter($com, fn($p) => web_abre_domingo($p['h'])));
+    if (!$dom) return 'Dos ' . web_num(count($com)) . ' mercados que informaram o horário, nenhum abre no domingo.';
+    return web_nomes_links($dom, 5) . (count($dom) > 5 ? ', entre outros (' . web_num(count($dom)) . ' no total)' : '') . (count($dom) === 1 ? ' abre' : ' abrem') . ' no domingo, pelo horário informado. '
+        . 'Nas listas, o botão <i>Aberto agora</i> mostra quem está atendendo neste momento.';
+}
+/** Quadro "Farmácias 24 horas" da página da cidade (só aparece se alguma farmácia tem horário). */
+function web_quadro_farmacias(string $cidade): string {
+    $nome = CIDADES[$cidade][0];
+    $f = web_farmacias($cidade);
+    if (!$f['24h'] && !$f['domingo'] && !$f['noite']) return '';
+    $lista = $f['24h'] ?: ($f['domingo'] ?: $f['noite']);
+    $titulo = $f['24h'] ? 'Farmácias 24 horas em ' . $nome : ($f['domingo'] ? 'Farmácias abertas no domingo em ' . $nome : 'Farmácias abertas até mais tarde em ' . $nome);
+    $intro = $f['24h'] ? (count($f['24h']) > 1 ? 'Informaram' : 'Informou') . ' atendimento 24 horas, todos os dias. Antes de ir, confirme pelo telefone.'
+        : 'Nenhuma farmácia de ' . $nome . ' informou atendimento 24 horas até agora. ' . (count($lista) > 1 ? 'Estas ' : 'Esta ')
+          . ($f['domingo'] ? (count($lista) > 1 ? 'abrem no domingo' : 'abre no domingo') : (count($lista) > 1 ? 'ficam abertas até mais tarde' : 'fica aberta até mais tarde')) . ', pelo horário informado.';
+    $extra = $f['24h'] && $f['domingo'] ? '<p class="intro">Também abrem no domingo: ' . web_nomes_links($f['domingo'], 6) . '.</p>' : '';
+    return '<section><div class="conteudo"><h2>💊 ' . h($titulo) . '</h2><p class="intro">' . h($intro) . '</p>'
+        . web_cartoes(array_slice($lista, 0, 6)) . $extra
+        . '<p class="intro">Veja ' . web_links_farmacias($cidade) . '.</p></div></section>';
 }
