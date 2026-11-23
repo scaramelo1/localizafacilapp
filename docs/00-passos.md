@@ -484,3 +484,8 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     serviços/descrição. Facebook também trancado (23/11, pedido do usuário); o e-mail de contato (passo 70) continua aberto. No dia: 5 fichas liberadas; escondidos
     1.415 Instagram e 1.062 Sobre pelo site. ATENÇÃO: o Sobre pelo site era o texto próprio que subia a nota das fichas no
     Google (passos 55 e 64); sem ele, as fichas não pagas voltam a ter só os dados do Maps.
+73. ✅ Repetidas "Mesmo endereço" revisadas uma a uma (23/11, pedido do usuário): 68 fichas juntadas (inclui as 5 fichas
+    de especialidade do AME SJBV na ficha do AME, os "·Link acessado" das imobiliárias e os PSF = Estratégia de Saúde da
+    Família) e 13 pares marcados "Não são a mesma" (Pousada x Restaurante Vitória, Seixas, Helen Silva, Sex shop x Sexóloga,
+    Ótica Real loja 1 x 2, lava-rápidos, Casa Mascarin...). Ficaram 6 em dúvida para o usuário decidir. Fichas ativas: 18.137.
+    Cópia antes: /var/lib/guia-novo/backups/antes-repetidas-lote2-20261123-143720.sql.gz.
