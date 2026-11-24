@@ -32,6 +32,23 @@ function origem_valida(?string $o, string $padrao = 'app'): string {
 }
 
 /** Robôs de busca, prévias de link e ferramentas não contam. */
+// Faixas da Microsoft/Azure (AS8075), de onde vêm os robôs que conferem links de e-mail (24/11).
+const IPS_MICROSOFT = ['4.0.0.0/8', '13.64.0.0/11', '13.96.0.0/13', '13.104.0.0/14', '20.0.0.0/8', '40.64.0.0/10', '51.104.0.0/15',
+    '52.96.0.0/12', '52.112.0.0/14', '52.120.0.0/14', '52.136.0.0/13', '52.145.0.0/16', '52.146.0.0/15', '52.148.0.0/14', '52.152.0.0/13',
+    '52.160.0.0/11', '65.52.0.0/14', '70.37.0.0/17', '72.152.0.0/14', '74.234.0.0/15', '74.240.0.0/14', '98.64.0.0/14', '104.40.0.0/13',
+    '104.208.0.0/13', '108.140.0.0/14', '131.253.0.0/16', '134.170.0.0/16', '135.220.0.0/14', '135.224.0.0/12', '137.116.0.0/15',
+    '137.135.0.0/16', '138.91.0.0/16', '157.54.0.0/15', '157.56.0.0/14', '168.61.0.0/16', '168.62.0.0/15', '172.160.0.0/11',
+    '191.232.0.0/13'];
+function ip_da_microsoft(string $ip): bool {
+    $n = ip2long($ip);
+    if ($n === false) return false;
+    foreach (IPS_MICROSOFT as $faixa) {
+        [$base, $bits] = explode('/', $faixa);
+        $mascara = -1 << (32 - (int)$bits);
+        if (($n & $mascara) === (ip2long($base) & $mascara)) return true;
+    }
+    return false;
+}
 function e_robo(): bool {
     $ua = (string)($_SERVER['HTTP_USER_AGENT'] ?? '');
     // 22/11 (passo 46): o próprio servidor (testes feitos daqui, mesmo fingindo ser celular) nunca conta
@@ -45,6 +62,9 @@ function e_robo(): bool {
     // 21/11: teste automático da Google Play (pre-launch report): o app de verdade (okhttp) rodando em celulares dos
     // servidores do Google; pesquisava, abria fichas e ligava avisos como se fosse gente
     if (stripos($ua, 'okhttp') !== false && preg_match('/^(108\.177\.|66\.249\.|74\.125\.|64\.233\.|209\.85\.|172\.217\.|142\.25[01]\.|216\.58\.|173\.194\.)/', ip())) return true;
+    // 24/11: antivírus de e-mail da Microsoft (Outlook/Hotmail/Office 365, "Links Seguros") abre todos os links do e-mail em
+    // segundos, com Chrome de verdade no Windows, de dentro do Azure (72.153., 135.232. ...). Gente não navega de lá.
+    if (ip_da_microsoft(ip())) return true;
     // 16/11: robô do AdSense que se passa por Chrome no Windows, vindo dos servidores do Google
     // (rate-limited-proxy-74-125-*.google.com), sem Referer. Contava como "entrou direto" e inflou o dia 15/11.
     return empty($_SERVER['HTTP_REFERER']) && preg_match('/^(74\.125\.(20[89]|21\d)|66\.249\.(6[4-9]|[7-9]\d))\./', ip()) === 1;

@@ -576,3 +576,11 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     aviso de e-mail automático e "Não quero mais receber" (o rodapé entra sozinho). Nada enviado: o usuário manda.
     24/11 (pedido do usuário): sem planos nem preços (afasta as pessoas); fica só o link {planos}, com destaque para
     "assumir a ficha e corrigir os dados é de graça".
+84. ✅ Robôs de e-mail fora dos números (24/11, "depois que mandei os e-mails as visitas dispararam"). O lote 5 (Aguaí, 57
+    e-mails, 19:12–19:14) trouxe 28 entradas em 6 min: 20 entradas + 3 fichas vistas vieram de servidores da Microsoft
+    (72.153.x e 135.232.x, Azure = "Links Seguros" do Outlook/Office 365, que abre todos os links do e-mail; abriram
+    também /descadastrar.php e /busca.php). As outras 8 (provedores do Brasil: Telefônica, Vero, Giga Mais...) foram 1 a
+    1 na página inicial; podem ser pessoas ou o antivírus do provedor de e-mail, sem como ter certeza. Feito:
+    ip_da_microsoft() + IPS_MICROSOFT em inc/numeros.php, usado em e_robo(). "Não quero mais receber" é seguro (só
+    descadastra com o botão; nenhum descadastro). Falta (decisão do usuário): apagar as 20 entradas da Microsoft de 24/11
+    (cópia já feita em /var/lib/guia-novo/backup-numeros-20261124-1920.sql).
