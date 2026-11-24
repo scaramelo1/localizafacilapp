@@ -574,3 +574,4 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     ficha" (?modelo=lojas) preenche público "Lojas com e-mail no site", assunto e texto: comércio já está no guia da
     região, link da ficha, app em breve e até lá atualizar a ficha no site (de graça), planos Básico/Destaque (opcionais),
     aviso de e-mail automático e "Não quero mais receber" (o rodapé entra sozinho). Nada enviado: o usuário manda.
+    24/11 (pedido do usuário): sem planos, preços nem "de graça" no texto (afasta as pessoas); fica só o link {planos}.
