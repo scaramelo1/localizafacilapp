@@ -554,3 +554,13 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     O teste mostra a 1ª loja da lista. Sai pela fila de sempre (Gmail, 20/min, limite 450/24 h) com o rodapé "Não quero
     mais receber". Recomendado: uma cidade por dia, começando pela menor (Aguaí), e olhar respostas/devolvidos antes da
     próxima, para o Gmail não bloquear a conta.
+80. ✅ (24/11) "Quem chamar hoje" com e-mail: a coluna Contato mostra o e-mail da ficha (o da conta ou o de contato do
+    site), filtro "Contato: com e-mail / com WhatsApp", e o botão **E-mail** manda a mesma mensagem (com os números da
+    ficha e o link "Cadastrar grátis") pela fila de e-mails do site, com "Não quero mais receber", e já marca como chamado.
+    Fichas só com e-mail (sem telefone) também entram na lista. inc/prospeccao.php: prospeccao_ficha(), prospeccao_assunto().
+81. ✅ Avaliação 24/11 (pedido do usuário: site e app com notas). Site 7: inicial 8, cidade 8, categoria 7,5, ficha com
+    horário/site (não paga) 6,5, ficha vazia 5, velocidade 8,5 (cache 60–90 ms, ficha ~350 ms), SEO técnico 8, dados 6,5
+    (horário 3%, Sobre 7%, fotos 4, confirmadas 2), tráfego 2 (5 entradas pelo Google em 4 dias), receita 3 (2 Básico,
+    1 Destaque). App 6,5: telas e recursos 7,5, publicação 4 (site oferece 1.15.0; 1.16/1.17 não publicadas; Play em
+    análise de produção). Detalhes vistos: tipo em minúscula no Resumo/descrição ("concessionária nissan"), nome com a
+    cidade repetindo a cidade, complemento virando bairro ("Lj A").
