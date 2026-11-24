@@ -582,5 +582,5 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     também /descadastrar.php e /busca.php). As outras 8 (provedores do Brasil: Telefônica, Vero, Giga Mais...) foram 1 a
     1 na página inicial; podem ser pessoas ou o antivírus do provedor de e-mail, sem como ter certeza. Feito:
     ip_da_microsoft() + IPS_MICROSOFT em inc/numeros.php, usado em e_robo(). "Não quero mais receber" é seguro (só
-    descadastra com o botão; nenhum descadastro). Falta (decisão do usuário): apagar as 20 entradas da Microsoft de 24/11
-    (cópia já feita em /var/lib/guia-novo/backup-numeros-20261124-1920.sql).
+    descadastra com o botão; nenhum descadastro). Apagadas (pedido do usuário) as 20 entradas + 3 fichas vistas da
+    Microsoft de 24/11; as 8 do Brasil ficaram. Cópia antes: /var/lib/guia-novo/backup-numeros-20261124-1920.sql.
