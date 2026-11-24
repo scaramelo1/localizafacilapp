@@ -35,7 +35,7 @@ function limpar_bairro(?string $b, string $nome_comercio = '', string $cidade = 
     if (mb_strlen($b) < 3 || mb_strlen($b) > 60) return null;
     // não é bairro
     if (preg_match('/\bcep\b|^\d|regi[ãa]o urbana homog|[,\/:;()@]|\d{3,}/iu', $b)) return null;
-    if (preg_match('/^(r|rua|av|avenida|avnida|al|alameda|rod|rodovia|estr|estrada|tv|travessa|pra[çc]a|p[çc]a|largo|via|km|sl|sala)\b\.?/iu', $b)) return null;
+    if (preg_match('/^(r|rua|av|avenida|avnida|al|alameda|rod|rodovia|estr|estrada|tv|travessa|pra[çc]a|p[çc]a|largo|via|km|sl|sala|lj|ed|edif\w*)\b\.?/iu', $b)) return null;
     if (preg_match('/\b(bloco|loja|apto|apartamento|box|galp[ãa]o|edif[íi]cio|em frente|ao lado|do lado|pr[óo]ximo|dentro|refer[êe]ncia|shopping|mall|galeria|esquina|fundos|andar|t[ée]rreo|n[º°]|cl[íi]nica|despachante|salgad\w*|lanchonete|restaurante|academia|mec[âa]nica|est[úu]dio|espa[çc]o|unimed|farm[áa]cia|escola|igreja|posto|street|rotat[óo]ri\w*|estacionamento|prefeitura|santu[áa]rio)\b/iu', $b)) return null;
     // tudo minúsculo ("centro"): vale só se a cidade já tem esse bairro escrito direito; senão é pedaço de rua ou nome de pessoa
     if (!preg_match('/\p{Lu}/u', $b)) {

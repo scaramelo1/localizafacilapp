@@ -564,3 +564,9 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     1 Destaque). App 6,5: telas e recursos 7,5, publicação 4 (site oferece 1.15.0; 1.16/1.17 não publicadas; Play em
     análise de produção). Detalhes vistos: tipo em minúscula no Resumo/descrição ("concessionária nissan"), nome com a
     cidade repetindo a cidade, complemento virando bairro ("Lj A").
+82. ✅ Loja/edifício no lugar do bairro (24/11, pedido do usuário: "Lj A" na lista "Outras opções"). limpar_bairro()
+    em inc/limpeza.php agora também recusa bairro que começa com Lj, Ed. ou Edif... (vale para as próximas importações).
+    13 fichas corrigidas: 8 com o bairro das fichas do mesmo endereço/rua (Jardim Santa Clara, Vila Cruz, Centro, São
+    Lázaro, Vila Conrado) e 5 ficaram sem bairro (rua com vários bairros: Serafim José Ferreira 517, João Pinheiro 1029,
+    Correa Neto 01). Antes: /var/lib/guia-novo/backups/bairros-loja-antes-20261124-1802.sql. Cache dessas cidades limpo.
+    (24/11) App 1.17.0 já está na Play (usuário); o APK do site ainda é o 1.15.0. Horário depende dos donos.
