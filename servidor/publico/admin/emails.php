@@ -17,16 +17,18 @@ $f = ['publico' => 'donos', 'cidade' => '', 'um' => '', 'escolhidos' => [], 'ass
 $contagem = null;
 if (!e_post() && ($pre = email_valido((string)($_GET['para'] ?? '')))) $f = ['publico' => 'um', 'um' => $pre] + $f;
 // 24/11 (passo 83): modelo pronto do convite para as lojas atualizarem a ficha (Admin > E-mails > "Usar o modelo")
-const EMAIL_MODELO_LOJAS_ASSUNTO = '{comercio} está no Localiza Fácil App: atualize a sua ficha';
+const EMAIL_MODELO_LOJAS_ASSUNTO = '{comercio} está no Localiza Fácil App: assuma e atualize a sua ficha de graça';
 const EMAIL_MODELO_LOJAS = "Olá, equipe {comercio}!
 
 O seu comércio já aparece no Localiza Fácil App (localizafacilapp.com.br), o guia de comércios e serviços da região. Todo dia, pessoas da cidade usam o guia para encontrar onde comprar, comer e resolver as coisas, e chamam direto pelo WhatsApp ou pelo telefone.
 
 Veja como está a sua ficha: {link}
 
-O nosso aplicativo será lançado em breve. Até lá, aproveite para deixar a ficha do seu comércio atualizada no site, para já receber acessos: confira o telefone, o WhatsApp, o endereço e o horário de funcionamento.
+O nosso aplicativo será lançado em breve. Até lá, aproveite para deixar a ficha do seu comércio atualizada no site, para já receber acessos.
 
-Para atualizar ou assumir a sua ficha: {planos}
+Assumir a ficha é de graça, e corrigir os dados também: telefone, WhatsApp, endereço e horário de funcionamento. Leva poucos minutos e você não paga nada por isso.
+
+Para assumir e atualizar a sua ficha de graça: {planos}
 
 Este e-mail é automático e foi enviado porque o e-mail do seu comércio está no site da própria empresa. Se não quiser receber mais, é só clicar em \"Não quero mais receber\", no fim desta mensagem.
 
