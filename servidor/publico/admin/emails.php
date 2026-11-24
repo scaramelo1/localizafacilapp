@@ -16,6 +16,28 @@ const EMAIL_MODELO = "Olá {nome},\n\n\n\nQualquer dúvida, é só responder est
 $f = ['publico' => 'donos', 'cidade' => '', 'um' => '', 'escolhidos' => [], 'assunto' => '', 'texto' => EMAIL_MODELO];
 $contagem = null;
 if (!e_post() && ($pre = email_valido((string)($_GET['para'] ?? '')))) $f = ['publico' => 'um', 'um' => $pre] + $f;
+// 24/11 (passo 83): modelo pronto do convite para as lojas atualizarem a ficha (Admin > E-mails > "Usar o modelo")
+const EMAIL_MODELO_LOJAS_ASSUNTO = '{comercio} está no Localiza Fácil App: atualize a sua ficha de graça';
+const EMAIL_MODELO_LOJAS = "Olá, equipe {comercio}!
+
+O seu comércio já aparece no Localiza Fácil App (localizafacilapp.com.br), o guia de comércios e serviços da região. Todo dia, pessoas da cidade usam o guia para encontrar onde comprar, comer e resolver as coisas, e chamam direto pelo WhatsApp ou pelo telefone.
+
+Veja como está a sua ficha: {link}
+
+O nosso aplicativo será lançado em breve. Até lá, aproveite para deixar a ficha do seu comércio atualizada no site, para já receber acessos: confira o telefone, o WhatsApp, o endereço e o horário de funcionamento. Isso é de graça.
+
+Para atualizar ou assumir a sua ficha: {planos}
+
+Se quiser aparecer mais, também temos planos: o Básico (R$ 9,90, uma vez só) libera o logo e fotos, a descrição completa, o Instagram e a lista do que você vende ou faz; o Destaque (R$ 29,90 por mês) coloca o seu comércio em \"Em destaque\" no topo da tela inicial, com até 10 fotos e cardápio ou catálogo com preços. Os planos são opcionais: a ficha continua no guia sem pagar nada.
+
+Este e-mail é automático e foi enviado porque o e-mail do seu comércio está no site da própria empresa. Se não quiser receber mais, é só clicar em \"Não quero mais receber\", no fim desta mensagem.
+
+Qualquer dúvida, é só responder este e-mail.
+
+Equipe Localiza Fácil App";
+if (!e_post() && ($_GET['modelo'] ?? '') === 'lojas') {
+    $f = ['publico' => 'lojas', 'assunto' => EMAIL_MODELO_LOJAS_ASSUNTO, 'texto' => EMAIL_MODELO_LOJAS] + $f;
+}
 
 if (e_post()) {
     exigir_post();
@@ -113,6 +135,8 @@ admin_inicio('E-mails', $admin);
   <?php endif ?></p>
 
 <h2>Escrever</h2>
+<p class="discreto">Modelo pronto: <a href="?modelo=lojas">📨 Convite para as lojas atualizarem a ficha</a> (já escolhe "Lojas com e-mail no site").
+  Mande um teste para você antes e, para não travar o Gmail, uma cidade por dia, começando pela menor.</p>
 <form method="post" id="form-email">
   <?= campo_csrf() ?>
   <label for="publico">Para quem</label>

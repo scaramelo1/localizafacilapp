@@ -570,3 +570,7 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     Lázaro, Vila Conrado) e 5 ficaram sem bairro (rua com vários bairros: Serafim José Ferreira 517, João Pinheiro 1029,
     Correa Neto 01). Antes: /var/lib/guia-novo/backups/bairros-loja-antes-20261124-1802.sql. Cache dessas cidades limpo.
     (24/11) App 1.17.0 já está na Play (usuário); o APK do site ainda é o 1.15.0. Horário depende dos donos.
+83. ✅ Modelo de e-mail para as lojas (24/11, pedido do usuário). Admin > E-mails > "📨 Convite para as lojas atualizarem a
+    ficha" (?modelo=lojas) preenche público "Lojas com e-mail no site", assunto e texto: comércio já está no guia da
+    região, link da ficha, app em breve e até lá atualizar a ficha no site (de graça), planos Básico/Destaque (opcionais),
+    aviso de e-mail automático e "Não quero mais receber" (o rodapé entra sozinho). Nada enviado: o usuário manda.
