@@ -598,3 +598,11 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     com 503 no flash). Resposta em 2-4 s; com sobrecarga, até ~40 s.
     Falta (usuário): b) cadastro na Meta (número só do bot, wa_token, wa_numero_id,
     wa_segredo_app, webhook) e Ligar; c) depois, botão "Fale com o LocalizaBot" no site e no app.
+86. ✅ Aparições também no site (25/11, pedido do usuário: "no Acha Fácil mostrava o quanto apareceu em pesquisas, agora
+    só aparecem as entradas"). Antes só o app contava aparições; o site é o canal principal e ficava sem. Agora as listas
+    do site levam uma marca escondida (aparicao_marca em inc/numeros.php: lugar + ids + sinal) e o script do rodapé
+    manda para api/aparicao.php quando a página abre num navegador (conta mesmo vindo do cache; robôs e equipe fora).
+    Lugares novos: site_cidade (destaques, conhecidos, farmácias), site_lista (área/tipo), site_busca, site_ficha (outras
+    opções). Admin > Números: "Apareceram em listas" volta a aparecer com o filtro Site e mostra app · site; o caminho
+    "No site" começa em "apareceram em listas do site". Painel do dono e relatório já somam tudo. Páginas do cache antigo
+    (até 1 h) ainda não têm a marca.

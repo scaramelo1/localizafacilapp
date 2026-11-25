@@ -151,6 +151,14 @@ function pagina_fim(): void {
     caixa.hidden = false;
   } catch (e) {}
 })();
+// 25/11: fichas que apareceram nas listas desta página (marcas data-ap de aparicao_marca) contam como aparição
+(function () {
+  var m = [].map.call(document.querySelectorAll('[data-ap]'), function (e) { return e.getAttribute('data-ap'); });
+  if (!m.length) return;
+  function contar() { try { fetch(<?= json_encode(url('api/aparicao.php')) ?>, {method: 'POST', keepalive: true,
+    headers: {'Content-Type': 'application/json'}, body: JSON.stringify({m: m})}); } catch (e) {} }
+  if (document.prerendering) document.addEventListener('prerenderingchange', contar, {once: true}); else contar();
+})();
 </script>
 </body>
 </html>

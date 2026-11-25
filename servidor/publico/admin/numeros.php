@@ -48,9 +48,16 @@ $w_toq = function (string $a = 'k') use ($origem, $e_app, $sql_in): array {
 };
 $w_cid = fn(string $col) => $cidade !== '' ? [" AND $col = ?", [$cidade]] : ['', []];
 $tem_entradas = entradas_prontas() && !$e_app;
-$tem_aparicoes = !$e_site && ($origem === '' || $origem === 'app' || isset(ONDE_APARICAO[$origem]));
+// 25/11: o site também conta aparições (ONDE_APARICAO_SITE), mas sem saber de onde a pessoa veio: com uma origem do
+// site escolhida (Google, redes...) as aparições somem; "Site" mostra só as do site e "App" só as do app.
+$tem_aparicoes = $origem === '' || $origem === 'app' || $origem === 'site' || isset(ONDE_APARICAO[$origem]);
 $w_ent = fn() => in_array($origem, ORIGENS_SITE, true) ? [' AND origem = ?', [$origem]] : ['', []];
-$w_apa = fn() => isset(ONDE_APARICAO[$origem]) ? [' AND a.onde = ?', [$origem]] : ['', []];
+$w_apa = fn() => match (true) {
+    isset(ONDE_APARICAO[$origem]) => [' AND a.onde = ?', [$origem]],
+    $origem === 'app' => [' AND a.onde NOT IN (' . $sql_in(ONDE_APARICAO_SITE) . ')', ONDE_APARICAO_SITE],
+    $origem === 'site' => [' AND a.onde IN (' . $sql_in(ONDE_APARICAO_SITE) . ')', ONDE_APARICAO_SITE],
+    default => ['', []],
+};
 
 // ---------- números por dia (período atual e anterior) ----------
 const ZERO = ['entradas' => 0, 'aparicoes' => 0, 'vis' => 0, 'pessoas' => 0, 'toques' => 0];
@@ -127,7 +134,7 @@ if ($tem_entradas) {
         [$desde, ...$ep, ...$ecp]), 't', 'origem'));
 }
 
-// ---------- caminho por canal (app e site separados: aparição só existe no app, chegada só no site) ----------
+// ---------- caminho por canal (app e site separados; desde 25/11 o site também tem aparição) ----------
 $vis_canal = ['app' => 0, 'site' => 0];
 foreach ($vis_origem as $o => $n) $vis_canal[in_array($o, ORIGENS_SITE, true) ? 'site' : 'app'] += $n;
 [$ts0, $tp0] = $w_toq();
@@ -135,9 +142,19 @@ $toq_canal = ['app' => 0, 'site' => 0];
 foreach (linhas("SELECT k.origem, SUM(k.total) AS t FROM contatos k JOIN profissionais p ON p.id = k.profissional_id
         WHERE k.tipo NOT IN ('perfil','compartilhar') AND k.dia >= ?$cs$ts0 GROUP BY k.origem", [$desde, ...$cp, ...$tp0]) as $l)
     $toq_canal[in_array($l['origem'], ORIGENS_SITE, true) ? 'site' : 'app'] += (int)$l['t'];
+// aparições separadas por canal (25/11: o site também conta)
+$apa_canal = ['app' => 0, 'site' => 0];
+if ($tem_aparicoes) {
+    [$as0, $ap0] = $w_apa();
+    foreach (linhas("SELECT a.onde, SUM(a.total) AS t FROM aparicoes a JOIN profissionais p ON p.id = a.profissional_id
+            WHERE a.dia >= ?$cs$as0 GROUP BY a.onde", [$desde, ...$cp, ...$ap0]) as $l)
+        $apa_canal[in_array($l['onde'], ONDE_APARICAO_SITE, true) ? 'site' : 'app'] += (int)$l['t'];
+}
 $caminhos = [];
-if ($tem_aparicoes) $caminhos['app'] = ['📱 No app', $agora['aparicoes'], 'apareceram em listas', $vis_canal['app'], $toq_canal['app']];
-if ($tem_entradas) $caminhos['site'] = ['🌐 No site', $agora['entradas'], 'chegaram ao site', $vis_canal['site'], $toq_canal['site']];
+if ($tem_aparicoes && !$e_site) $caminhos['app'] = ['📱 No app', $apa_canal['app'], 'apareceram em listas', $vis_canal['app'], $toq_canal['app']];
+if ($tem_aparicoes && !$e_app && $apa_canal['site'] > 0)
+    $caminhos['site'] = ['🌐 No site', $apa_canal['site'], 'apareceram em listas do site', $vis_canal['site'], $toq_canal['site']];
+elseif ($tem_entradas) $caminhos['site'] = ['🌐 No site', $agora['entradas'], 'chegaram ao site', $vis_canal['site'], $toq_canal['site']];
 
 // ---------- cidades, áreas, comércios e tipos de toque ----------
 [$ts, $tp] = $w_toq();
@@ -398,7 +415,7 @@ admin_inicio('Números', $admin);
   <?php endif ?>
   <?php if ($tem_aparicoes): ?>
   <div class="np-cartao"><span class="np-tit">👀 Apareceram em listas</span><span class="np-num"><?= num($agora['aparicoes']) ?></span>
-    <span class="np-exp">vezes que uma ficha foi mostrada no app (início, área, busca, perto)</span><?= $dif('aparicoes') ?><?= $tendencia('aparicoes') ?></div>
+    <span class="np-exp">vezes que uma ficha foi mostrada numa lista ou busca<?php if (!$e_site && !$e_app): ?> (📱 app <?= num($apa_canal['app']) ?> · 🌐 site <?= num($apa_canal['site']) ?>)<?php endif ?></span><?= $dif('aparicoes') ?><?= $tendencia('aparicoes') ?></div>
   <?php endif ?>
   <div class="np-cartao"><span class="np-tit">📄 Fichas abertas</span><span class="np-num"><?= num($agora['vis']) ?></span>
     <span class="np-exp">vezes que alguém abriu a ficha de um comércio, por <?= num($agora['pessoas']) ?> pessoa<?= $agora['pessoas'] === 1 ? '' : 's' ?> (somadas por dia)</span><?= $dif('vis') ?><?= $tendencia('vis') ?></div>
@@ -421,7 +438,7 @@ admin_inicio('Números', $admin);
     <div class="etapa"><strong><?= num($toq_c) ?></strong><span>contatos</span></div>
   </div>
   <?php endforeach ?>
-  <?php if (isset($caminhos['site']) && $caminhos['site'][3] > $caminhos['site'][1]): ?><p class="discreto">No site há mais fichas abertas do que chegadas: a mesma pessoa abre várias fichas numa visita (e até 20/11 robôs também abriam).</p><?php endif ?>
+  <?php if (isset($caminhos['site']) && $caminhos['site'][2] === 'chegaram ao site' && $caminhos['site'][3] > $caminhos['site'][1]): ?><p class="discreto">No site há mais fichas abertas do que chegadas: a mesma pessoa abre várias fichas numa visita (e até 20/11 robôs também abriam).</p><?php endif ?>
 </section>
 <?php endif ?>
 

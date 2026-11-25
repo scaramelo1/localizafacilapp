@@ -295,6 +295,6 @@ function web_quadro_farmacias(string $cidade): string {
           . ($f['domingo'] ? (count($lista) > 1 ? 'abrem no domingo' : 'abre no domingo') : (count($lista) > 1 ? 'ficam abertas até mais tarde' : 'fica aberta até mais tarde')) . ', pelo horário informado.';
     $extra = $f['24h'] && $f['domingo'] ? '<p class="intro">Também abrem no domingo: ' . web_nomes_links($f['domingo'], 6) . '.</p>' : '';
     return '<section><div class="conteudo"><h2>💊 ' . h($titulo) . '</h2><p class="intro">' . h($intro) . '</p>'
-        . web_cartoes(array_slice($lista, 0, 6)) . $extra
+        . web_cartoes(array_slice($lista, 0, 6), 'site_cidade') . $extra
         . '<p class="intro">Veja ' . web_links_farmacias($cidade) . '.</p></div></section>';
 }

@@ -14,7 +14,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/guia.php';
 require_once __DIR__ . '/pagina.php';
 require_once __DIR__ . '/ofertas.php';   // 19/11: Oferta da semana na ficha e na página da cidade
-require_once __DIR__ . '/web-conteudo.php';   // 20/11 (passo 119): sobre, mais conhecidos, vizinhas e perguntas
+require_once __DIR__ . '/web-conteudo.php';
+require_once __DIR__ . '/numeros.php';   // 25/11: aparições no site (aparicao_marca)   // 20/11 (passo 119): sobre, mais conhecidos, vizinhas e perguntas
 
 const WEB_POR_PAGINA = 30;
 const WEB_TIPO_MINIMO = 3;          // tipo com menos comércios que isso não vai para o Google (página fraca)
@@ -422,8 +423,9 @@ function web_cartoes_ofertas(array $lista): string {
     }
     return '<ul class="ofertas-lista">' . $html . '</ul>';
 }
-function web_cartoes(array $lista): string {
-    return '<ul class="cartoes">' . implode('', array_map('web_cartao', $lista)) . '</ul>';
+function web_cartoes(array $lista, ?string $onde = null): string {
+    // 25/11: $onde = lugar do site para contar a aparição (ONDE_APARICAO_SITE)
+    return '<ul class="cartoes">' . implode('', array_map('web_cartao', $lista)) . '</ul>' . ($onde !== null ? aparicao_marca($lista, $onde) : '');
 }
 /** Paginação: ‹ 1 2 3 › com ?pagina= (mantém o bairro). */
 function web_paginacao(string $base, int $pagina, int $paginas, ?string $bairro): string {
@@ -495,7 +497,7 @@ function web_pagina_cidade(string $cidade): void {
   <?php if ($destaques): // 17/11 (pedido do usuário): Destaque ANTES das áreas, para ficar em destaque de verdade ?>
   <section><div class="conteudo">
     <h2>Em destaque em <?= h($nome) ?></h2>
-    <?= web_cartoes($destaques) ?>
+    <?= web_cartoes($destaques, 'site_cidade') ?>
   </div></section>
   <?php endif ?>
 
@@ -512,7 +514,7 @@ function web_pagina_cidade(string $cidade): void {
   <section><div class="conteudo">
     <h2>Conhecidos na cidade</h2>
     <p class="intro">Uma seleção, que muda todo dia, dos lugares mais procurados de <?= h($nome) ?>.</p>
-    <?= web_cartoes($populares) ?>
+    <?= web_cartoes($populares, 'site_cidade') ?>
   </div></section>
   <?php endif ?>
 
@@ -583,7 +585,7 @@ function web_pagina_lista(string $cidade, array $area, ?string $tipo, ?string $b
     <p class="filtros-linha"><?= web_botao_aberto($base_url, $aberto, ['bairro' => $bairro]) ?></p>
     <?php if ($aberto): ?><?= web_aviso_aberto(count($itens)) ?><?php endif ?>
     <?php if ($itens): ?>
-      <?= web_cartoes($itens) ?>
+      <?= web_cartoes($itens, 'site_lista') ?>
     <?php elseif (!$aberto): ?>
       <p class="aviso erro">Nenhum lugar encontrado<?= $bairro !== null ? ' neste bairro' : '' ?>.</p>
     <?php endif ?>
@@ -1096,7 +1098,7 @@ function web_pagina_ficha(array $p): void {
     <?php if ($parecidos): ?>
       <section class="parecidos">
         <h2>Outras opções de <?= h(mb_strtolower($mesmo_tipo ? $tipo : $p['categoria'])) ?> em <?= h($nome_cidade) ?></h2>
-        <?= web_cartoes($parecidos) ?>
+        <?= web_cartoes($parecidos, 'site_ficha') ?>
         <p><a href="<?= h($mesmo_tipo ? url_tipo($cidade, $p['categoria_slug'], $tipo) : url_area($cidade, $p['categoria_slug'])) ?>">Ver todos</a></p>
       </section>
     <?php endif ?>
@@ -1391,7 +1393,7 @@ function web_pagina_busca(string $cidade, string $termo, bool $aberto = false): 
       <?php else: ?>
         <p><?= web_qtd(count($achados), 'resultado', 'resultados') ?> para "<?= h($termo) ?>"<?= count($achados) >= 60 ? ' (os 60 primeiros)' : '' ?>.</p>
       <?php endif ?>
-      <?= $achados ? web_cartoes($achados) : '' ?>
+      <?= $achados ? web_cartoes($achados, 'site_busca') : '' ?>
     <?php endif ?>
   </div></section>
   <?= web_baixe_app($cidade) ?>

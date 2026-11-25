@@ -21,7 +21,12 @@ const ORIGENS_SITE = ['google', 'acha_facil', 'buscadores', 'redes', 'outros_sit
 const PAGINAS_ENTRADA = ['inicio' => 'Página inicial', 'cidade' => 'Cidade', 'lista' => 'Área ou tipo', 'ficha' => 'Ficha de comércio',
     'eventos' => 'Agenda de eventos', 'evento' => 'Evento', 'busca' => 'Busca', 'outra' => 'Outra página'];
 /** Onde a ficha foi mostrada numa lista. */
-const ONDE_APARICAO = ['inicio' => 'Tela inicial', 'categoria' => 'Categoria', 'busca' => 'Busca', 'perto' => 'Perto de você'];
+const ONDE_APARICAO = ['inicio' => 'Tela inicial', 'categoria' => 'Categoria', 'busca' => 'Busca', 'perto' => 'Perto de você',
+    // 25/11 (pedido do usuário): o site também conta quando a ficha aparece numa lista (antes só o app contava)
+    'site_cidade' => 'Site: página da cidade', 'site_lista' => 'Site: área ou tipo', 'site_busca' => 'Site: busca',
+    'site_ficha' => 'Site: outras opções na ficha'];
+/** Lugares do site onde a ficha aparece (o resto de ONDE_APARICAO é do app). */
+const ONDE_APARICAO_SITE = ['site_cidade', 'site_lista', 'site_busca', 'site_ficha'];
 const TIPOS_CONTATO = ['whatsapp' => 'WhatsApp', 'ligar' => 'Ligar', 'mapa' => 'Mapa', 'instagram' => 'Instagram', 'site' => 'Site', 'email' => 'E-mail', 'ifood' => 'iFood', 'food99' => '99Food', 'facebook' => 'Facebook',
     'compartilhar' => 'Compartilhar no WhatsApp'];   // 19/11 (mudança 032): compartilhar não entra no total de contatos
 /** Numa lista longa (área com 700 comércios) só contam as primeiras posições, que a pessoa de fato vê. */
@@ -303,6 +308,33 @@ function contar_aparicoes(array $lista, string $onde): void {
         q('INSERT INTO aparicoes (profissional_id, dia, onde, total) VALUES ' . implode(',', array_fill(0, count($ids), '(?, CURDATE(), ?, 1)'))
             . ' ON DUPLICATE KEY UPDATE total = total + 1', $params);
     } catch (PDOException $e) { error_log('Localiza Fácil aparições: ' . $e->getMessage()); }
+}
+
+/**
+ * Aparições no site (25/11): a lista vai na página como marca escondida (onde + ids + sinal). O script do rodapé
+ * (pagina_fim) junta as marcas e manda para api/aparicao.php quando a página abre num navegador de verdade, então conta
+ * mesmo com a página vinda do cache e robôs que só baixam o HTML ficam de fora. O sinal impede inventar ids.
+ */
+function aparicao_sinal(string $onde, string $ids): string {
+    return substr(hash_hmac('sha256', "aparicao|$onde|$ids", sal_visitas()), 0, 20);
+}
+function aparicao_marca(array $lista, string $onde): string {
+    if (!in_array($onde, ONDE_APARICAO_SITE, true)) return '';
+    $ids = implode('.', array_values(array_unique(array_map(fn($p) => (int)$p['id'], array_slice($lista, 0, APARICAO_MAX)))));
+    if ($ids === '') return '';
+    return '<i hidden data-ap="' . $onde . '|' . $ids . '|' . aparicao_sinal($onde, $ids) . '"></i>';
+}
+/** api/aparicao.php: confere cada marca e grava (uma lista por lugar; ids repetidos entre listas contam uma vez por lugar). */
+function gravar_aparicoes_site(array $marcas): void {
+    if (nao_contar()) return;
+    $por_onde = [];
+    foreach (array_slice($marcas, 0, 12) as $m) {
+        [$onde, $ids, $sinal] = array_pad(explode('|', (string)$m, 3), 3, '');
+        if (!in_array($onde, ONDE_APARICAO_SITE, true) || !preg_match('/^\d+(\.\d+)*$/', $ids)
+            || !hash_equals(aparicao_sinal($onde, $ids), $sinal)) continue;
+        foreach (explode('.', $ids) as $id) $por_onde[$onde][(int)$id] = ['id' => (int)$id];
+    }
+    foreach ($por_onde as $onde => $lista) contar_aparicoes(array_values($lista), $onde);
 }
 
 // ---------- leitura (admin, relatório e painel do dono) ----------
