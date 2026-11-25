@@ -106,6 +106,11 @@ cat > /etc/cron.d/$NOME <<CRON
 */10 * * * * www-data php $RAIZ/aquecer-cache.php >> /var/log/guia-novo-cache.log 2>&1
 # 25/11 (passo 85): LocalizaBot no WhatsApp - responde o que o webhook deixou sem resposta
 * * * * * www-data php $RAIZ/localizabot-pendentes.php >> /var/log/guia-novo-localizabot.log 2>&1
+# 25/11 (passo 87): aparições na pesquisa do Google (Search Console), 2x por dia; sem a chave só registra o aviso
+41 7,16 * * * www-data php $RAIZ/google-pesquisa.php >> /var/log/guia-novo-google-pesquisa.log 2>&1
 CRON
 chmod 644 /etc/cron.d/$NOME
+for l in /var/log/guia-novo-google-pesquisa.log; do touch $l; chown www-data:www-data $l; done   # 25/11: cron roda como www-data
+# chave do Search Console (passo 87): o PHP (www-data) precisa ler
+[ -f $CONF_DIR/search-console.json ] && chown root:www-data $CONF_DIR/search-console.json && chmod 640 $CONF_DIR/search-console.json
 echo; echo "Pronto: https://fsadesigners.com.br/guia-novo/"

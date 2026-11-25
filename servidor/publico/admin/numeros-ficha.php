@@ -11,6 +11,9 @@ $desde = desde_dias($dias);
 $n = numeros_ficha((int)$p['id'], $desde);
 $pos = posicao_ficha($p, $desde, hoje());
 $pedidos = pedidos_info_ficha((int)$p['id'], $desde);   // passo 59
+require_once __DIR__ . '/../../inc/google-pesquisa.php';   // 25/11 (passo 87)
+$goo = gp_pronto() ? linha('SELECT SUM(impressoes) AS imp, SUM(cliques) AS cli, ROUND(SUM(posicao * impressoes) / NULLIF(SUM(impressoes), 0), 1) AS pos
+    FROM google_paginas WHERE profissional_id = ? AND dia >= ?', [(int)$p['id'], $desde]) : null;
 $maior = max([1, ...array_values(array_map(fn($d) => max($d["aparicoes"], $d["visualizacoes"]), $n["por_dia"]))]);
 
 admin_inicio('Números · ' . $p['nome'], $admin);
@@ -22,7 +25,8 @@ admin_inicio('Números · ' . $p['nome'], $admin);
 <p><a class="botao pequeno" href="relatorio.php?id=<?= (int)$p['id'] ?>&amp;dias=<?= $dias ?>" target="_blank">Relatório para o comerciante</a></p>
 
 <div class="numeros-resumo">
-  <div><strong><?= num($n['aparicoes']) ?></strong><span>aparições</span></div>
+  <div><strong><?= num($n['aparicoes']) ?></strong><span>aparições em listas</span></div>
+  <?php if ($goo): ?><div><strong><?= num((int)$goo['imp']) ?></strong><span>no Google<?= $goo['imp'] ? ' (' . num((int)$goo['cli']) . ' cliques, ' . h((string)$goo['pos']) . 'º lugar)' : '' ?></span></div><?php endif ?>
   <div><strong><?= num($n['visualizacoes']) ?></strong><span>visualizações</span></div>
   <div><strong><?= num($n['pessoas']) ?></strong><span>pessoas</span></div>
   <div><strong><?= num($n['contatos']) ?></strong><span>contatos (<?= pct($n['contatos'], $n['visualizacoes']) ?>)</span></div>

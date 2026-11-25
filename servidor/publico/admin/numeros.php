@@ -7,6 +7,7 @@
 require __DIR__ . '/../../inc/admin.php';
 $admin = exigir_admin();
 exigir_numeros_prontos();
+require_once __DIR__ . '/../../inc/google-pesquisa.php';   // 25/11 (passo 87): aparições na pesquisa do Google
 
 // ---------- filtros ----------
 const PERIODOS = [1 => 'Hoje', 7 => '7 dias', 30 => '30 dias', 90 => '90 dias'];
@@ -155,6 +156,27 @@ if ($tem_aparicoes && !$e_site) $caminhos['app'] = ['📱 No app', $apa_canal['a
 if ($tem_aparicoes && !$e_app && $apa_canal['site'] > 0)
     $caminhos['site'] = ['🌐 No site', $apa_canal['site'], 'apareceram em listas do site', $vis_canal['site'], $toq_canal['site']];
 elseif ($tem_entradas) $caminhos['site'] = ['🌐 No site', $agora['entradas'], 'chegaram ao site', $vis_canal['site'], $toq_canal['site']];
+
+// ---------- pesquisa do Google (Search Console, passo 87) ----------
+// Não sabe se a pessoa usa app ou site: some só com o filtro do app. Os dados chegam com 2 a 3 dias de atraso.
+$tem_google = gp_pronto() && !$e_app;
+$g = ['imp' => 0, 'cli' => 0, 'ate' => null, 'antes' => null, 'consultas' => [], 'fichas' => []];
+if ($tem_google) {
+    [$gcs, $gcp] = $w_cid('cidade');
+    $gl = linha("SELECT SUM(impressoes) AS imp, SUM(cliques) AS cli, MAX(dia) AS ate FROM google_paginas WHERE dia >= ?$gcs", [$desde, ...$gcp]);
+    $g['imp'] = (int)$gl['imp']; $g['cli'] = (int)$gl['cli']; $g['ate'] = $gl['ate'];
+    if ($compara) $g['antes'] = (int)valor("SELECT SUM(impressoes) FROM google_paginas WHERE dia BETWEEN ? AND ?$gcs", [$ant_ini, $ant_fim, ...$gcp]);
+    if ($cidade === '') $g['consultas'] = linhas('SELECT consulta, SUM(impressoes) AS imp, SUM(cliques) AS cli,
+        ROUND(SUM(posicao * impressoes) / NULLIF(SUM(impressoes), 0), 1) AS pos FROM google_consultas WHERE dia >= ?
+        GROUP BY consulta ORDER BY imp DESC, cli DESC LIMIT 20', [$desde]);
+    [$gcs2, $gcp2] = $w_cid('g.cidade');
+    $g['fichas'] = linhas("SELECT g.profissional_id AS id, p.nome, p.cidade, SUM(g.impressoes) AS imp, SUM(g.cliques) AS cli,
+        ROUND(SUM(g.posicao * g.impressoes) / NULLIF(SUM(g.impressoes), 0), 1) AS pos
+        FROM google_paginas g JOIN profissionais p ON p.id = g.profissional_id WHERE g.dia >= ?$gcs2
+        GROUP BY g.profissional_id ORDER BY imp DESC, cli DESC LIMIT 20", [$desde, ...$gcp2]);
+    $g['outras'] = linhas("SELECT g.pagina, SUM(g.impressoes) AS imp, SUM(g.cliques) AS cli FROM google_paginas g
+        WHERE g.profissional_id IS NULL AND g.dia >= ?$gcs2 GROUP BY g.pagina ORDER BY imp DESC LIMIT 10", [$desde, ...$gcp2]);
+}
 
 // ---------- cidades, áreas, comércios e tipos de toque ----------
 [$ts, $tp] = $w_toq();
@@ -413,6 +435,15 @@ admin_inicio('Números', $admin);
   <div class="np-cartao"><span class="np-tit">🌐 Chegaram ao site</span><span class="np-num"><?= num($agora['entradas']) ?></span>
     <span class="np-exp">pessoas que entraram no site vindas de fora (Google, redes, link, digitando o endereço)</span><?= $dif('entradas') ?><?= $tendencia('entradas') ?></div>
   <?php endif ?>
+  <?php if ($tem_google): ?>
+  <div class="np-cartao"><span class="np-tit">🔎 Apareceram no Google</span>
+    <?php if (!gp_ligado() && !$g['ate']): ?><span class="np-num">—</span>
+      <span class="np-exp">ainda não ligado: falta a chave do Search Console (docs/search-console-api.md)</span>
+    <?php else: ?><span class="np-num"><?= num($g['imp']) ?> <small><?= num($g['cli']) ?> clique<?= $g['cli'] === 1 ? '' : 's' ?></small></span>
+      <span class="np-exp">vezes que uma página do site apareceu numa pesquisa do Google (Search Console<?= $g['ate'] ? ', dados até ' . h(data_br($g['ate'])) : '' ?>; o Google atrasa 2 a 3 dias)</span>
+      <?php if ($g['antes'] !== null && $g['antes'] > 0): $dg = $g['imp'] - $g['antes']; ?><span class="np-exp"><?= $dg >= 0 ? '▲' : '▼' ?> <?= num(abs($dg)) ?> em relação ao período anterior (<?= num($g['antes']) ?>)</span><?php endif ?>
+    <?php endif ?></div>
+  <?php endif ?>
   <?php if ($tem_aparicoes): ?>
   <div class="np-cartao"><span class="np-tit">👀 Apareceram em listas</span><span class="np-num"><?= num($agora['aparicoes']) ?></span>
     <span class="np-exp">vezes que uma ficha foi mostrada numa lista ou busca<?php if (!$e_site && !$e_app): ?> (📱 app <?= num($apa_canal['app']) ?> · 🌐 site <?= num($apa_canal['site']) ?>)<?php endif ?></span><?= $dif('aparicoes') ?><?= $tendencia('aparicoes') ?></div>
@@ -440,6 +471,39 @@ admin_inicio('Números', $admin);
   <?php endforeach ?>
   <?php if (isset($caminhos['site']) && $caminhos['site'][2] === 'chegaram ao site' && $caminhos['site'][3] > $caminhos['site'][1]): ?><p class="discreto">No site há mais fichas abertas do que chegadas: a mesma pessoa abre várias fichas numa visita (e até 20/11 robôs também abriam).</p><?php endif ?>
 </section>
+<?php endif ?>
+
+<!-- 2b. pesquisa do Google (passo 87) -->
+<?php if ($tem_google && ($g['consultas'] || $g['fichas'])): ?>
+<div class="np-duas">
+  <?php if ($g['consultas']): ?>
+  <section class="np-caixa">
+    <h2>🔎 O que pesquisaram no Google</h2>
+    <p class="discreto">Pesquisas em que o site apareceu. O Google esconde as pesquisas raras, então a soma fica menor que o total.</p>
+    <div class="tabela" style="margin-bottom:0"><table class="np-ranking">
+      <tr><th>Pesquisa</th><th>Apareceu</th><th>Cliques</th><th>Posição</th></tr>
+      <?php foreach ($g['consultas'] as $l): ?><tr><td><?= h($l['consulta']) ?></td><td><?= num((int)$l['imp']) ?></td><td><?= num((int)$l['cli']) ?></td><td><?= h((string)$l['pos']) ?>º</td></tr><?php endforeach ?>
+    </table></div>
+  </section>
+  <?php endif ?>
+  <section class="np-caixa">
+    <h2>🔎 Fichas que mais apareceram no Google</h2>
+    <p class="discreto">Posição = lugar médio na página de resultados (1º é o primeiro).</p>
+    <?php if (!$g['fichas']): ?><p class="discreto">Nenhuma ficha apareceu no período.</p><?php else: ?>
+    <div class="tabela" style="margin-bottom:0"><table class="np-ranking">
+      <tr><th>Comércio</th><th>Apareceu</th><th>Cliques</th><th>Posição</th></tr>
+      <?php foreach ($g['fichas'] as $l): ?><tr><td><a href="numeros-ficha.php?id=<?= (int)$l['id'] ?>&amp;dias=<?= max(7, $dias) ?>"><?= h($l['nome']) ?></a> <small class="discreto"><?= h(CIDADES[$l['cidade']][0] ?? $l['cidade']) ?></small></td>
+        <td><?= num((int)$l['imp']) ?></td><td><?= num((int)$l['cli']) ?></td><td><?= h((string)$l['pos']) ?>º</td></tr><?php endforeach ?>
+    </table></div>
+    <?php endif ?>
+    <?php if (!empty($g['outras'])): ?>
+    <p class="np-sub">Outras páginas (cidade, área, início)</p>
+    <div class="tabela" style="margin-bottom:0"><table class="np-ranking">
+      <?php foreach ($g['outras'] as $l): ?><tr><td><?= h($l['pagina']) ?></td><td><?= num((int)$l['imp']) ?></td><td><?= num((int)$l['cli']) ?> clique<?= (int)$l['cli'] === 1 ? '' : 's' ?></td></tr><?php endforeach ?>
+    </table></div>
+    <?php endif ?>
+  </section>
+</div>
 <?php endif ?>
 
 <!-- 3. gráfico no tempo -->

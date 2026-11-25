@@ -606,3 +606,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     opções). Admin > Números: "Apareceram em listas" volta a aparecer com o filtro Site e mostra app · site; o caminho
     "No site" começa em "apareceram em listas do site". Painel do dono e relatório já somam tudo. Páginas do cache antigo
     (até 1 h) ainda não têm a marca.
+87. 🟡 Aparições na pesquisa do Google no admin (25/11, pedido do usuário: "no Acha Fácil mostrava quantas vezes
+    apareceu no Google, chegava a 400"). São as impressões do Search Console, puxadas pela API com conta de serviço:
+    inc/google-pesquisa.php, servidor/google-pesquisa.php (cron 7h41 e 16h41), mudança 049 (google_paginas por dia e
+    página, com a ficha; google_consultas). Admin > Números: cartão "🔎 Apareceram no Google" (com cliques e comparação),
+    "O que pesquisaram no Google" e "Fichas que mais apareceram no Google"; Números da ficha também mostra.
+    Falta (usuário): criar a conta de serviço e mandar a chave (docs/search-console-api.md), rodar instalar.sh e
+    `sudo -u www-data php servidor/google-pesquisa.php 90`.
