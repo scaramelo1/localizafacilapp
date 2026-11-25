@@ -857,10 +857,11 @@ body.sem-rolagem { overflow: hidden; }
 .ficha-resumo { line-height: 1.55; }
 
 /* 25/11 (pedido do usuário): Google Play bem à vista */
-.selo-play { display: inline-flex; align-items: center; gap: 10px; margin: 6px 0 14px; padding: 10px 20px 10px 14px;
+.selo-play { display: flex; width: fit-content; align-items: center; gap: 12px; margin: 22px auto 0; padding: 12px 26px 12px 18px;
   background: #111; color: #fff; border-radius: 14px; text-decoration: none; box-shadow: 0 6px 18px rgba(0,0,0,.18); transition: transform .15s; }
 .selo-play:hover { transform: translateY(-2px); }
-.selo-play span { display: flex; flex-direction: column; font-weight: 800; font-size: 1.35rem; line-height: 1.1; }
+.selo-play span { display: flex; flex-direction: column; align-items: flex-start; font-weight: 800; font-size: 1.5rem; line-height: 1.1; }
+.selo-play svg { width: 34px; height: 34px; }
 .selo-play small { font-weight: 600; font-size: .75rem; opacity: .85; text-transform: uppercase; letter-spacing: .03em; }
 .faixa-app { display: flex; align-items: center; gap: 10px; margin: 10px 16px 0; max-width: 760px;
   background: #fff; color: var(--verde); padding: 8px 10px 8px 12px; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.14); }

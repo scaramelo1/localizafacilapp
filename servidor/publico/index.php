@@ -81,14 +81,14 @@ pagina_inicio('Localiza Fácil App: o comércio da sua cidade no seu celular',
         <button class="botao amarelo">🔍 Buscar</button>
       </form>
       <p class="busca-aviso" id="busca-aviso" hidden>Escolha a cidade primeiro.</p>
+      <?php // 25/11 (pedido do usuário): Google Play bem à vista, numa linha só dele logo abaixo da busca ?>
+      <a class="selo-play" href="<?= h(link_play()) ?>" rel="noopener">
+        <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="#00d7fe" d="M3.6 2.2 13.5 12l-9.9 9.8c-.4-.2-.6-.6-.6-1.1V3.3c0-.5.2-.9.6-1.1Z"/><path fill="#ffce00" d="m16.8 8.7 3.3 1.9c1.2.7 1.2 2.1 0 2.8l-3.3 1.9L13.5 12Z"/><path fill="#ff3a44" d="M13.5 12 3.6 21.8c.4.2.9.2 1.4-.1l11.8-6.4Z"/><path fill="#00f076" d="M3.6 2.2c.4-.2.9-.2 1.4.1l11.8 6.4L13.5 12Z"/></svg>
+        <span><small>Baixe grátis no</small>Google Play</span></a>
       <ul class="numeros">
         <li><b><?= $num($total) ?></b> comércios e serviços</li>
         <li><b><?= count(CIDADES) ?></b> <a href="#cidades">cidades</a></li>
       </ul>
-      <?php // 25/11 (pedido do usuário): Google Play bem à vista, logo no topo ?>
-      <a class="selo-play" href="<?= h(link_play()) ?>" rel="noopener">
-        <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="#00d7fe" d="M3.6 2.2 13.5 12l-9.9 9.8c-.4-.2-.6-.6-.6-1.1V3.3c0-.5.2-.9.6-1.1Z"/><path fill="#ffce00" d="m16.8 8.7 3.3 1.9c1.2.7 1.2 2.1 0 2.8l-3.3 1.9L13.5 12Z"/><path fill="#ff3a44" d="M13.5 12 3.6 21.8c.4.2.9.2 1.4-.1l11.8-6.4Z"/><path fill="#00f076" d="M3.6 2.2c.4-.2.9-.2 1.4.1l11.8 6.4L13.5 12Z"/></svg>
-        <span><small>Baixe grátis no</small>Google Play</span></a>
       <?php // 21/11 (passo 38, pedido do usuário): convite para incluir o negócio já no topo (antes só no fim da página e na busca) ?>
       <a class="hero-incluir" href="<?= $base ?>/incluir.php"><span aria-hidden="true">🏪</span>
         <span>Não achou o seu negócio? <b>Inclua o seu negócio de graça</b></span><span class="seta" aria-hidden="true">›</span></a>
