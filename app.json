@@ -6,7 +6,7 @@
       "ios",
       "android"
     ],
-    "version": "1.18.0",
+    "version": "1.18.1",
     "scheme": "achafacil",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
