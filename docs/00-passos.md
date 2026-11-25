@@ -613,3 +613,7 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     "O que pesquisaram no Google" e "Fichas que mais apareceram no Google"; Números da ficha também mostra.
     Falta (usuário): criar a conta de serviço e mandar a chave (docs/search-console-api.md), rodar instalar.sh e
     `sudo -u www-data php servidor/google-pesquisa.php 90`.
+88. ✅ App na Play Store (25/11, usuário: 1.19.0 publicada, versionCode 19). Site sem o "Baixar APK": botoes_lojas() usa
+    link_play() (https://play.google.com/store/apps/details?id=br.com.fsadesigner.achafacil), a pergunta "Como instalar o
+    APK" virou "Onde baixo o app?" e /baixar-apk.php redireciona para a Play (links antigos em e-mails e no app).
+    O APK antigo (1.15.0) continua guardado em /var/lib/guia-novo/apk, mas não é mais oferecido.

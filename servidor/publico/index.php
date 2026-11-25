@@ -5,6 +5,7 @@ require_once __DIR__ . '/../inc/guia.php';
 require __DIR__ . '/../inc/pagina.php';
 require_once __DIR__ . '/../inc/eventos.php';
 require_once __DIR__ . '/../inc/numeros.php';
+require_once __DIR__ . '/../inc/apk.php';   // 25/11: link_play() nas perguntas
 // Busca do topo (16/11): sem JavaScript o formulário vem para cá (?cidade=&q=) e vai para a busca da cidade
 if (isset($_GET['cidade'])) {
     $c = (string)$_GET['cidade'];
@@ -238,12 +239,9 @@ pagina_inicio('Localiza Fácil App: o comércio da sua cidade no seu celular',
       <details><summary>De onde vêm os comércios?</summary><p>De informações públicas (nome, endereço, telefone e redes sociais que o próprio comércio divulga na internet). O dono pode assumir o perfil e corrigir tudo, ou pedir para tirar do app pela <a href="<?= $base ?>/busca.php">busca do site</a>.</p></details>
       <details><summary>O Localiza Fácil vende ou faz os serviços?</summary><p>Não. O Localiza Fácil só mostra quem é quem. Preço, prazo e garantia são combinados direto com o comércio.</p></details>
       <details><summary>Em que ordem aparecem?</summary><p>Quem paga o Destaque aparece primeiro. Depois vêm as fichas completas (dos donos que pagaram o Básico) e os demais. Dentro de cada grupo, a ordem muda todo dia, para ser justa com todos.</p></details>
-      <details id="instalar-apk"><summary>Como instalar o APK no Android?</summary>
-        <p>1. Toque em <strong>Baixar APK</strong> e espere terminar o download.<br>
-        2. Toque na notificação do download (ou abra o arquivo <strong>localiza-facil.apk</strong> na pasta Downloads).<br>
-        3. Se o celular avisar que é de "fonte desconhecida", toque em <strong>Configurações</strong>, ligue <strong>Permitir desta fonte</strong> e volte.<br>
-        4. Toque em <strong>Instalar</strong> e depois em <strong>Abrir</strong>.<br>
-        Para atualizar, é só baixar de novo e instalar por cima. No iPhone, o app virá pela App Store.</p></details>
+      <details id="instalar-apk"><summary>Onde baixo o app?</summary>
+        <p>No Android, pela <a href="<?= h(link_play()) ?>">Google Play</a>: procure "Localiza Fácil" ou toque em <strong>Baixar no Google Play</strong>.
+        As atualizações chegam sozinhas pela loja. No iPhone, o app virá pela App Store; enquanto isso, use o site.</p></details>
       <details><summary>Achei uma informação errada. O que faço?</summary><p>Fale com a gente: <?= contatos_html() ?>. Se for o dono, <a href="<?= $base ?>/busca.php">procure o seu negócio</a> e corrija os dados de graça.</p></details>
     </div>
   </section>

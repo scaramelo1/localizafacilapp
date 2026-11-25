@@ -4,6 +4,10 @@ require __DIR__ . '/../inc/base.php';
 require __DIR__ . '/../inc/apk.php';
 require_once __DIR__ . '/../inc/numeros.php';   // e_robo(): robôs e ferramentas não contam (desde 14/11)
 
+// 25/11 (pedido do usuário): o app está na Play Store; o link antigo do APK (e-mails, QR codes, app antigo) leva para lá
+header('Location: ' . link_play(), true, 302);
+exit;
+
 $f = apk_arquivo();
 if (!is_file($f)) {
     header('Location: ' . config()['url'] . '/#baixar', true, 302);
