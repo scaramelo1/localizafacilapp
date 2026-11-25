@@ -47,7 +47,7 @@ function localizabot_balao_html(array $msgs): string {
     if (!$msgs) return '<p class="discreto">Nenhuma mensagem ainda.</p>';
     $o = '<div class="localizabot-conversa">';
     foreach ($msgs as $m) {
-        $eu = $m['de'] === 'localizabot';
+        $eu = $m['de'] === 'bot';
         $texto = nl2br(preg_replace('~(https?://[^\s<]+)~', '<a href="$1" target="_blank" rel="noopener">$1</a>', h($m['texto'])));
         $texto = preg_replace('/\*([^*\n]+)\*/u', '<b>$1</b>', $texto);
         $info = [datahora_br($m['criado_em'])];

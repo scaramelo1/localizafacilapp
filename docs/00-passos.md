@@ -591,6 +591,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     passam por busca_executar/ficha_publica/catalogo_api), publico/whatsapp.php (webhook assinado), localizabot-pendentes.php
     (cron de 1 min; apaga conversas com mais de 90 dias), Admin > Pessoas > 🤖 LocalizaBot (situação, liga/desliga,
     conversa de teste, conversas, bloqueio), mudanças 047 e 048 (25/11: nome trocado de Amarilis para LocalizaBot, pedido do usuário), texto na privacidade (item 2, 4 e 5). Campos vazios no
-    /etc/guia-novo/config.php (wa_verificar já gerado). As ferramentas foram testadas no banco; a IA ainda não foi testada.
-    Falta (usuário): a) gemini_chave e testar no admin; b) cadastro na Meta (número só do bot, wa_token, wa_numero_id,
+    /etc/guia-novo/config.php (wa_verificar já gerado). As ferramentas foram testadas no banco.
+    ✅ a) Chave do Gemini colocada e testada (25/11): conversa real com saudação, pizzaria aberta em Poços, "endereço da
+    primeira", chaveiro em Aguaí, recado (loja sem dono → passa o telefone), piada de política e pedido para revelar as
+    instruções (os dois recusados). Ordem dos modelos: flash-lite-latest, flash-latest, 3.5-flash-lite (o Google estava
+    com 503 no flash). Resposta em 2-4 s; com sobrecarga, até ~40 s.
+    Falta (usuário): b) cadastro na Meta (número só do bot, wa_token, wa_numero_id,
     wa_segredo_app, webhook) e Ligar; c) depois, botão "Fale com o LocalizaBot" no site e no app.

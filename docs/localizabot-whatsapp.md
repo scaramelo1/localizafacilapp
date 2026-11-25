@@ -4,7 +4,9 @@ Passo 85 de `00-passos.md` (25/11/2026, pedido do usuário). O LocalizaBot respo
 do guia: procura comércios, diz quem está aberto agora, mostra o cardápio ou catálogo dos Destaque e manda recado ao dono.
 
 - **Canal:** WhatsApp oficial da Meta (Cloud API).
-- **IA:** Gemini, na cota grátis do Google. Quando a cota do `gemini-2.5-flash` acaba, ele passa para o `gemini-2.5-flash-lite`.
+- **IA:** Gemini, na cota grátis do Google. Modelos em ordem: `gemini-flash-lite-latest`, `gemini-flash-latest` e
+  `gemini-3.5-flash-lite`. Se um estiver com a cota acabada, sobrecarregado ou lento, ele passa para o próximo. Em 25/11 o
+  2.5 já não valia para chaves novas; os apelidos `-latest` seguem o modelo mais novo sozinhos.
 - **Dados:** só os do banco, com as mesmas regras do site (busca, `ficha_publica()`, catálogo só do Destaque).
 
 ## Arquivos
