@@ -855,3 +855,18 @@ body.sem-rolagem { overflow: hidden; }
 .sobre-trancado a { font-weight: 700; }
 
 .ficha-resumo { line-height: 1.55; }
+
+/* 25/11 (pedido do usuário): Google Play bem à vista */
+.selo-play { display: inline-flex; align-items: center; gap: 10px; margin: 6px 0 14px; padding: 10px 20px 10px 14px;
+  background: #111; color: #fff; border-radius: 14px; text-decoration: none; box-shadow: 0 6px 18px rgba(0,0,0,.18); transition: transform .15s; }
+.selo-play:hover { transform: translateY(-2px); }
+.selo-play span { display: flex; flex-direction: column; font-weight: 800; font-size: 1.35rem; line-height: 1.1; }
+.selo-play small { font-weight: 600; font-size: .75rem; opacity: .85; text-transform: uppercase; letter-spacing: .03em; }
+.faixa-app { display: flex; align-items: center; gap: 10px; margin: 10px 16px 0; max-width: 760px;
+  background: #fff; color: var(--verde); padding: 8px 10px 8px 12px; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.14); }
+.faixa-app[hidden] { display: none; }
+.faixa-app img { border-radius: 10px; flex: none; }
+.faixa-app span { flex: 1; display: flex; flex-direction: column; line-height: 1.2; font-size: .95rem; }
+.faixa-app small { color: #5c5c5c; font-size: .8rem; }
+.faixa-app .botao { padding: 8px 16px; flex: none; }
+.faixa-fechar { background: none; border: 0; font-size: 1.1rem; color: #777; padding: 6px; cursor: pointer; flex: none; }

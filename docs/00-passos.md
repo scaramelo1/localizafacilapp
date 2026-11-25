@@ -617,3 +617,7 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     link_play() (https://play.google.com/store/apps/details?id=br.com.fsadesigner.achafacil), a pergunta "Como instalar o
     APK" virou "Onde baixo o app?" e /baixar-apk.php redireciona para a Play (links antigos em e-mails e no app).
     O APK antigo (1.15.0) continua guardado em /var/lib/guia-novo/apk, mas não é mais oferecido.
+89. ✅ Google Play bem à vista (25/11, pedido do usuário): botão amarelo do topo (todas as páginas) vai direto para a Play
+    ("📲 Baixar no Google Play"; no celular "📲 Baixar app"); selo preto do Google Play no topo da página inicial, logo
+    abaixo da busca; faixa "Localiza Fácil App · Grátis no Google Play · Baixar" no topo de qualquer página, só em
+    celular Android (fora do app), e quem fecha não vê por 15 dias. site.css v70.

@@ -3,6 +3,7 @@
 // cantos redondos e letra grande (Nunito), como o app.
 declare(strict_types=1);
 require_once __DIR__ . '/guia.php';   // resumo_cidades() no rodapé
+require_once __DIR__ . '/apk.php';    // link_play() no topo (25/11)
 
 /** Contatos e links das lojas, definidos em /etc/guia-novo/config.php (vazio = ainda não existe). */
 function site(string $chave): string {
@@ -78,16 +79,34 @@ function pagina_inicio(string $titulo, string $descricao, string $classe = '', a
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap">
-<link rel="stylesheet" href="<?= $base ?>/assets/site.css?v=69">
+<link rel="stylesheet" href="<?= $base ?>/assets/site.css?v=70">
 <?= $opc['head'] ?? '' ?>
 <?= !empty($opc['anuncios']) ? anuncios_head() : '' ?>
 </head>
 <body class="<?= h($classe) ?>">
 <header class="topo">
   <a class="marca" href="<?= $base ?>/"><img src="<?= $base ?>/assets/logo.png?v=2" alt="" width="40" height="40"><span>Localiza <b>Fácil</b></span></a>
-  <nav><a href="<?= $base ?>/#cidades">Cidades</a><a href="<?= $base ?>/#seu-negocio">Seu negócio</a><a href="<?= $base ?>/#baixar" class="nav-botao" aria-label="Baixar o app"><span class="nav-longo">Baixar o app</span><span class="nav-curto" aria-hidden="true">📲 App</span></a>
+  <nav><a href="<?= $base ?>/#cidades">Cidades</a><a href="<?= $base ?>/#seu-negocio">Seu negócio</a><a href="<?= h(link_play()) ?>" class="nav-botao" aria-label="Baixar o app no Google Play" rel="noopener"><span class="nav-longo">📲 Baixar no Google Play</span><span class="nav-curto" aria-hidden="true">📲 Baixar app</span></a>
     <a href="<?= $base ?>/entrar.php" class="nav-conta" id="conta-topo" rel="nofollow">Entrar</a></nav>
 </header>
+<?php // 25/11 (pedido do usuário): faixa do Google Play logo no topo, só em celular Android (fechou = some por 15 dias) ?>
+<div class="faixa-app" id="faixa-app" hidden>
+  <img src="<?= $base ?>/assets/logo.png?v=2" alt="" width="40" height="40">
+  <span><b>Localiza Fácil App</b><small>Grátis no Google Play</small></span>
+  <a class="botao amarelo pequeno" href="<?= h(link_play()) ?>" rel="noopener">Baixar</a>
+  <button type="button" class="faixa-fechar" aria-label="Fechar">✕</button>
+</div>
+<script>
+(function () {
+  try {
+    var f = document.getElementById('faixa-app');
+    if (!/Android/i.test(navigator.userAgent) || /; wv\)/.test(navigator.userAgent)) return;
+    if (Date.now() - Number(localStorage.getItem('lf_faixa_app') || 0) < 15 * 864e5) return;
+    f.hidden = false;
+    f.querySelector('.faixa-fechar').addEventListener('click', function () { localStorage.setItem('lf_faixa_app', Date.now()); f.hidden = true; });
+  } catch (e) {}
+})();
+</script>
 <script>
 // conta no site (passo 44): "Entrar" volta para esta página; quem já entrou vê a foto e vai para Minha conta.
 // As páginas ficam em cache iguais para todos: quem entrou é descoberto aqui, só se o cookie af_logado existir.
