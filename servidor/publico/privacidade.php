@@ -52,8 +52,8 @@ pagina_inicio('Privacidade | Localiza Fácil App', 'Quais dados o Localiza Fáci
   ou pedir para tirar do app; o pedido é atendido em até 2 dias úteis. Quem faz o pedido informa nome e telefone,
   usados só para confirmar e responder.</p>
 
-  <h3>Conversa com a Amarilis no WhatsApp</h3>
-  <p>Se você conversa com a Amarilis, a assistente do Localiza Fácil no WhatsApp, guardamos o seu número, o nome do seu
+  <h3>Conversa com o LocalizaBot no WhatsApp</h3>
+  <p>Se você conversa com a LocalizaBot, o assistente do Localiza Fácil no WhatsApp, guardamos o seu número, o nome do seu
   perfil do WhatsApp e as mensagens da conversa, para responder, lembrar a cidade que você procura e evitar abusos.
   As mensagens são lidas por uma inteligência artificial (Gemini, do Google) para entender o que você procura; não envie
   dados pessoais como CPF, endereço ou senhas. Se você pedir para mandar um recado a um comércio, o recado e o nome que
@@ -78,7 +78,7 @@ pagina_inicio('Privacidade | Localiza Fácil App', 'Quais dados o Localiza Fáci
       personalizados em <a href="https://adssettings.google.com" target="_blank" rel="noopener">Configurações de anúncios do Google</a>
       e ver como o Google usa os dados em <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">policies.google.com</a>.
       O app não tem anúncios.</li>
-    <li><strong>Amarilis no WhatsApp:</strong> as mensagens passam pelo WhatsApp (Meta) e são lidas pelo Gemini (Google) para
+    <li><strong>LocalizaBot no WhatsApp:</strong> as mensagens passam pelo WhatsApp (Meta) e são lidas pelo Gemini (Google) para
       montar a resposta. O Google pode usar esse conteúdo para melhorar os serviços dele, conforme os
       <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">termos da API do Gemini</a>.</li>
     <li>Autoridades: somente quando a lei ou uma ordem judicial exigir.</li>
@@ -88,7 +88,7 @@ pagina_inicio('Privacidade | Localiza Fácil App', 'Quais dados o Localiza Fáci
   <h2>5. Por quanto tempo</h2>
   <p>Os dados da conta ficam guardados enquanto a conta existir. Ao excluir a conta, apagamos na hora o nome, e-mail, foto,
   avaliações, comentários e salvos. Registros de acesso são guardados pelo prazo que a lei exige (6 meses); tentativas de entrada que falharam são apagadas após 1 dia.
-  As conversas com a Amarilis no WhatsApp são apagadas após 90 dias.</p>
+  As conversas com o LocalizaBot no WhatsApp são apagadas após 90 dias.</p>
 
   <h2>6. Seus direitos</h2>
   <p>Pela LGPD você pode, a qualquer momento: saber quais dados temos sobre você, receber uma cópia, corrigir dados errados,

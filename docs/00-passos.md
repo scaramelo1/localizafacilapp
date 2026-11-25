@@ -584,13 +584,13 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     ip_da_microsoft() + IPS_MICROSOFT em inc/numeros.php, usado em e_robo(). "Não quero mais receber" é seguro (só
     descadastra com o botão; nenhum descadastro). Apagadas (pedido do usuário) as 20 entradas + 3 fichas vistas da
     Microsoft de 24/11; as 8 do Brasil ficaram. Cópia antes: /var/lib/guia-novo/backup-numeros-20261124-1920.sql.
-85. 🟡 Amarilis no WhatsApp (25/11, pedido do usuário; detalhes em docs/amarilis-whatsapp.md). Assistente que responde
+85. 🟡 LocalizaBot no WhatsApp (25/11, pedido do usuário; detalhes em docs/localizabot-whatsapp.md). Assistente que responde
     os moradores com os dados do guia: procura comércios, diz quem está aberto agora, mostra o cardápio ou catálogo
     (só Destaque) e manda recado ao dono (e-mail, só comércio com dono, 3 por dia). Escolhas do usuário: WhatsApp oficial
-    (Meta), Gemini grátis (2.5 Flash, e o Flash-Lite quando a cota acaba). Feito: inc/amarilis.php (4 ferramentas, todas
-    passam por busca_executar/ficha_publica/catalogo_api), publico/whatsapp.php (webhook assinado), amarilis-pendentes.php
-    (cron de 1 min; apaga conversas com mais de 90 dias), Admin > Pessoas > 🤖 Amarilis (situação, liga/desliga,
-    conversa de teste, conversas, bloqueio), mudança 047, texto na privacidade (item 2, 4 e 5). Campos vazios no
+    (Meta), Gemini grátis (2.5 Flash, e o Flash-Lite quando a cota acaba). Feito: inc/localizabot.php (4 ferramentas, todas
+    passam por busca_executar/ficha_publica/catalogo_api), publico/whatsapp.php (webhook assinado), localizabot-pendentes.php
+    (cron de 1 min; apaga conversas com mais de 90 dias), Admin > Pessoas > 🤖 LocalizaBot (situação, liga/desliga,
+    conversa de teste, conversas, bloqueio), mudanças 047 e 048 (25/11: nome trocado de Amarilis para LocalizaBot, pedido do usuário), texto na privacidade (item 2, 4 e 5). Campos vazios no
     /etc/guia-novo/config.php (wa_verificar já gerado). As ferramentas foram testadas no banco; a IA ainda não foi testada.
     Falta (usuário): a) gemini_chave e testar no admin; b) cadastro na Meta (número só do bot, wa_token, wa_numero_id,
-    wa_segredo_app, webhook) e Ligar; c) depois, botão "Fale com a Amarilis" no site e no app.
+    wa_segredo_app, webhook) e Ligar; c) depois, botão "Fale com o LocalizaBot" no site e no app.
