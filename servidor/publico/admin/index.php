@@ -141,15 +141,7 @@ $conf = confirmacao_por_cidade(); $ondas = google_ondas_por_cidade(); $onda = go
 
 <h2>"Quero minha Cidade!" (<?= array_sum(array_column($cidades, 'total')) ?> pedidos)</h2>
 <?php if (!$cidades): ?><p class="discreto">Ninguém pediu ainda.</p><?php else: ?>
-<div class="tabela"><table>
-  <tr><th>Cidade</th><th>Estado</th><th>Pedidos</th><th>Último</th><th></th></tr>
-  <?php foreach ($cidades as $c): ?>
-  <tr><td><?= h($c['cidade']) ?></td><td><?= h($c['uf'] ?? '-') ?></td><td><strong><?= (int)$c['total'] ?></strong></td><td><?= h(datahora_br($c['ultimo'])) ?></td>
-    <td><form method="post" onsubmit="return confirm('Tirar <?= h(addslashes($c['cidade'])) ?> da lista?')"><?= campo_csrf() ?>
-      <input type="hidden" name="acao" value="apagar_cidade"><input type="hidden" name="cidade" value="<?= h($c['cidade']) ?>">
-      <input type="hidden" name="uf" value="<?= h($c['uf'] ?? '') ?>">
-      <button class="botao contorno" style="padding:6px 12px;font-size:14px">Excluir</button></form></td></tr>
-  <?php endforeach ?>
-</table></div>
+<p><?= implode(' · ', array_map(fn($c) => '<strong>' . h($c['cidade']) . '</strong>' . ($c['uf'] ? ' ' . h($c['uf']) : '') . ' (' . (int)$c['total'] . ')', array_slice($cidades, 0, 8))) ?></p>
 <?php endif ?>
+<p><a class="botao pequeno" href="cidades-pedidas.php">Ver quem pediu e cada pedido</a></p>
 <?php admin_fim();

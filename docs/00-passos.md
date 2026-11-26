@@ -621,3 +621,10 @@ Status: ⬜ a fazer · 🟡 em andamento · ✅ feito
     ("📲 Baixar no Google Play"; no celular "📲 Baixar app"); selo preto do Google Play no topo da página inicial, logo
     abaixo da busca (2º ajuste: numa linha só dele, centralizado, entre a busca e os números); faixa "Localiza Fácil App · Grátis no Google Play · Baixar" no topo de qualquer página, só em
     celular Android (fora do app), e quem fecha não vê por 15 dias. site.css v70.
+90. 🟡 "Quero minha Cidade!" com página própria no admin (25/11, pedido do usuário: "só aparece a notificação no celular,
+    não tem um campo no site para verificar quem solicitou"). Admin > Comércios > 🙋 Quero minha Cidade!
+    (/admin/cidades-pedidas.php): resumo, cidades mais pedidas (com "novos", excluir) e cada pedido com data, cidade, quem
+    pediu (conta do app/site com link para a pessoa; sem conta = anônimo) e se veio do app ou do site. Contador no menu
+    com os pedidos ainda não vistos (abrir a página zera). Pendências mostra só o resumo e o botão. Robôs não contam mais
+    (o único pedido até 25/11, Itajubá, foi o teste automático da Google Play, IP 108.177.6.29). Mudança 050 (usuario_id,
+    origem, visto). Falta (usuário): bash servidor/instalar.sh para aplicar a 050.

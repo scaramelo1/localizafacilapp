@@ -39,6 +39,8 @@ function admin_inicio(string $titulo, ?array $admin): void {
     $sup = $admin ? suporte_abertos_contar() : 0;   // chamados esperando resposta (passo 53)
     require_once __DIR__ . '/novidades.php';
     $nov = $admin ? nov_aguardando_contar() : 0;   // listas do robô esperando aprovação (passo 56)
+    require_once __DIR__ . '/cidades-pedidas.php';
+    $qc = $admin ? cidades_pedidas_novas() : 0;   // 25/11: pedidos do "Quero minha Cidade!" ainda não vistos
     ?><!doctype html>
 <html lang="pt-BR">
 <head>
@@ -58,10 +60,10 @@ function admin_inicio(string $titulo, ?array $admin): void {
   // 19/11 (pedido do usuário): menu compacto em 4 grupos + Pendências; o número de cada grupo soma o que espera ali dentro
   $cont = fn(int $n) => $n ? ' <span class="contador">' . $n . '</span>' : '';
   $grupos = [
-      ['🏪', 'Comércios', $nov + $of, [
+      ['🏪', 'Comércios', $nov + $of + $qc, [
           ['confirmar.php', '✅ Confirmar fichas', 0],   /* 23/11: os números do Sobre/Horário/Dados contam só fichas ativas, igual às telas */ ['sobre-site.php', '🌐 Sobre pelo site', (int)(valor("SELECT COUNT(*) FROM sobre_site s JOIN profissionais p ON p.id = s.profissional_id WHERE s.situacao = 'pendente' AND p.status = 'ativo'") ?? 0)], ['horario-site.php', '🕒 Horário pelo site', (int)(valor("SELECT COUNT(*) FROM horario_site s JOIN profissionais p ON p.id = s.profissional_id WHERE s.situacao = 'pendente' AND p.status = 'ativo'") ?? 0)], ['dados-site.php', '🧩 Dados pelo site', (int)(valor("SELECT COUNT(DISTINCT d.profissional_id) FROM dados_site d JOIN profissionais p ON p.id = d.profissional_id WHERE d.situacao = 'pendente' AND p.status = 'ativo'") ?? 0)], ['duplicadas.php', '👯 Fichas repetidas', 0], ['tipos.php', '🏷️ Tipos genéricos', 0], ['chamar.php', '📞 Quem chamar hoje', 0], ['comercios.php', 'Comércios (editar)', 0], ['ofertas.php', 'Ofertas da semana', $of],
           ['cupons.php', 'Cupons', 0], ['novidades.php', 'Novidades do robô', $nov], ['importar.php', 'Importar lista', 0],
-          ['cidades.php', 'Cidades', 0], ['mapa.php', 'Mapa das cidades', 0]]],
+          ['cidades.php', 'Cidades', 0], ['cidades-pedidas.php', '🙋 Quero minha Cidade!', $qc], ['mapa.php', 'Mapa das cidades', 0]]],
       ['📊', 'Números', 0, [
           ['numeros.php', 'Números e de onde vêm', 0], ['buscas.php', 'O que procuram', 0],
           ['pedidos-info.php', 'Pedidos de informação', 0], ['google.php', 'Google por cidade', 0]]],
